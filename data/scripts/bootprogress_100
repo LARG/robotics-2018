@@ -1,0 +1,28 @@
+#!/sbin/runscript
+##
+## This file was generated.
+##
+## Copyright (C) 2010, 2011 Aldebaran Robotics
+##
+
+depend() {
+  use aldev-i2c
+  after *
+}
+
+start() {
+  ebegin "Starting bootprogress 100"
+  setears --init 100 &>/dev/null
+  eend $?
+  /etc/init.d/utwireless restart
+}
+
+stop() {
+  ebegin "Stopping bootprogress 100"
+  setears --init 100 &>/dev/null
+  eend $?
+}
+
+restart() {
+  :
+}

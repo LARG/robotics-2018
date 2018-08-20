@@ -1,0 +1,13 @@
+How to use this documentation:
+
+1) Compile the documentation by running:
+   $NAO_HOME/build/make_docs
+2) Open the main HTML file in your favorite web browser:
+   firefox $NAO_HOME/documentation/html/index.html
+
+NOTES:
+- don't change Doxyfile unless you know what you're doing!
+- Doxygen manual:
+  www.stack.nl/~dimitri/doxygen/manual
+- Useful commands to know when commenting your code for Doxygen:
+  www.stack.nl/~dimitri/doxygen/manual/commands.html

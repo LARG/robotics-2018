@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+cd $NAO_HOME/lib
+rm -rf caffe
+git clone git@github.com:LARG/caffe.git
+cd caffe
+git checkout robocup
+cd $NAO_HOME/install
+
+# main caffe dependencies
+sudo apt-get install -y libhdf5-dev liblmdb-dev libleveldb-dev libsnappy-dev libatlas-dev libatlas-base-dev libgflags-dev libopenblas-dev protobuf-compiler libprotobuf-dev libunwind8-dev
+sudo apt-get install -y gcc-4.6 g++-4.6 gcc-4.6-multilib g++-4.6-multilib
+
+wget -N https://github.com/google/glog/archive/v0.3.4.tar.gz
+tar zxvf v0.3.4.tar.gz
+cd glog-0.3.4
+./configure && make && sudo make install
+
+# pycaffe
+sudo apt-get install -y libboost-python-dev
+sudo apt-get install python-pip
+sudo pip install 'tornado<5.0.0'
+sudo pip install --ignore-installed 'protobuf>=2.5.0'
+sudo pip install --upgrade numpy
+sudo apt-get install -y python-skimage
+
+cd $NAO_HOME/lib/caffe/python
+for req in $(cat requirements.txt)
+do 
+   if [ $req == "ipython" ]; then
+       sudo pip install ipython==3.0.0
+   else
+       sudo pip install $req
+   fi
+done
+cd $NAO_HOME/install
+
+# 32-bit libs
+wget -N http://cs.utexas.edu/~AustinVilla/software/caffe-32.tar.gz
+tar zxvf caffe-32.tar.gz
+cp -ar caffe-32/lib/* $NAO_HOME/naoqi/link_libs/
+cp -ar caffe-32/caffe/lib/* $NAO_HOME/naoqi/link_libs/
+cp -ar caffe-32/include/* $NAO_HOME/naoqi/includes/
+rm -rf caffe-32
+
+# create a missing symlink
+sudo ln -sf libunwind.so.8 /usr/lib/x86_64-linux-gnu/libunwind.so
+
+# pull down repo
+cd $NAO_HOME/lib/caffe
+cp Makefile.config.example Makefile.config
+make
+make pycaffe

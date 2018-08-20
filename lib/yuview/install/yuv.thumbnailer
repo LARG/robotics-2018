@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=/usr/bin/yuview
+Exec=yuview %i --target %o --size %s
+MimeType=image/yuv;

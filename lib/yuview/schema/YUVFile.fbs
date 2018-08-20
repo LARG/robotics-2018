@@ -1,0 +1,7 @@
+table YUVFile {
+  width:int;
+  height:int;
+  buffer:[ubyte];
+}
+
+root_type YUVFile;

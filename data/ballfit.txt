@@ -1,0 +1,119 @@
+42 cm
+	Ball distance for diameter(98.586): 381.989
+	Ball distance for diameter(99.016): 380.486
+	Ball distance for diameter(99.022): 380.467
+	Ball distance for diameter(99.438): 379.027
+	Ball distance for diameter(98.898): 380.897
+	Ball distance for diameter(98.690): 381.625
+	Ball distance for diameter(98.626): 381.848
+	Ball distance for diameter(99.159): 379.991
+	Ball distance for diameter(99.066): 380.312
+	Ball distance for diameter(99.019): 380.477
+	Ball distance for diameter(99.104): 380.181
+	Ball distance for diameter(98.821): 381.168
+
+70 cm
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(53.013): 669.417
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(53.013): 669.417
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(53.013): 669.417
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(53.013): 669.417
+	Ball distance for diameter(55.247): 644.895
+	Ball distance for diameter(53.551): 663.334
+
+120 cm
+	Ball distance for diameter(30.086): 1117.306
+	Ball distance for diameter(30.023): 1119.413
+	Ball distance for diameter(29.957): 1121.646
+	Ball distance for diameter(30.018): 1119.579
+	Ball distance for diameter(29.950): 1121.891
+	Ball distance for diameter(29.970): 1121.222
+	Ball distance for diameter(30.027): 1119.278
+	Ball distance for diameter(29.989): 1120.572
+	Ball distance for diameter(30.054): 1118.366
+	Ball distance for diameter(30.090): 1117.186
+
+170 cm
+	Ball distance for diameter(21.184): 1534.462
+	Ball distance for diameter(21.143): 1537.125
+	Ball distance for diameter(21.031): 1544.545
+	Ball distance for diameter(21.181): 1534.612
+	Ball distance for diameter(21.127): 1538.162
+	Ball distance for diameter(21.071): 1541.900
+	Ball distance for diameter(20.978): 1548.036
+	Ball distance for diameter(21.082): 1541.161
+	Ball distance for diameter(21.064): 1542.349
+	Ball distance for diameter(21.028): 1544.748
+	Ball distance for diameter(21.095): 1540.276
+	Ball distance for diameter(21.091): 1540.564
+
+270 cm
+	Ball distance for diameter(13.001): 2386.055
+	Ball distance for diameter(12.904): 2402.246
+	Ball distance for diameter(12.916): 2400.329
+	Ball distance for diameter(12.952): 2394.292
+	Ball distance for diameter(12.881): 2406.259
+	Ball distance for diameter(12.991): 2387.766
+	Ball distance for diameter(12.914): 2400.648
+	Ball distance for diameter(13.055): 2377.108
+	Ball distance for diameter(12.974): 2390.532
+	Ball distance for diameter(12.980): 2389.579
+	Ball distance for diameter(12.962): 2392.515
+	Ball distance for diameter(12.959): 2393.060
+	Ball distance for diameter(12.959): 2393.145
+	Ball distance for diameter(12.958): 2393.202
+
+370 cm
+	Ball distance for diameter(9.235): 3250.943
+	Ball distance for diameter(9.296): 3231.799
+	Ball distance for diameter(9.217): 3256.581
+	Ball distance for diameter(9.221): 3255.507
+	Ball distance for diameter(9.267): 3240.715
+	Ball distance for diameter(9.281): 3236.387
+	Ball distance for diameter(9.104): 3293.093
+	Ball distance for diameter(9.212): 3258.226
+	Ball distance for diameter(9.090): 3297.820
+	Ball distance for diameter(9.387): 3203.208
+	Ball distance for diameter(9.138): 3282.286
+	Ball distance for diameter(9.259): 3243.458
+
+470 cm
+	Ball distance for diameter(8.140): 3644.140
+	Ball distance for diameter(7.077): 4135.804
+	Ball distance for diameter(7.226): 4058.202
+	Ball distance for diameter(7.276): 4033.157
+	Ball distance for diameter(7.238): 4052.530
+	Ball distance for diameter(7.226): 4058.292
+	Ball distance for diameter(7.237): 4052.857
+	Ball distance for diameter(7.332): 4005.058
+	Ball distance for diameter(8.385): 3547.469
+	Ball distance for diameter(10.929): 2791.654
+	Ball distance for diameter(8.688): 3435.432
+	Ball distance for diameter(7.051): 4149.322
+	Ball distance for diameter(7.340): 4001.200
+	Ball distance for diameter(7.231): 4055.805
+	Ball distance for diameter(7.388): 3978.074
+
+570 cm
+	Ball distance for diameter(5.605): 5106.412
+	Ball distance for diameter(5.447): 5240.032
+	Ball distance for diameter(5.507): 5188.360
+	Ball distance for diameter(5.555): 5147.882
+	Ball distance for diameter(5.445): 5242.157
+	Ball distance for diameter(5.464): 5225.314
+	Ball distance for diameter(5.485): 5207.197
+	Ball distance for diameter(5.521): 5176.973
+	Ball distance for diameter(5.559): 5144.904
+	Ball distance for diameter(5.502): 5192.620
+	Ball distance for diameter(5.663): 5059.336
+	Ball distance for diameter(5.443): 5243.642
+	Ball distance for diameter(5.536): 5163.964
+	Ball distance for diameter(5.523): 5175.321
+	Ball distance for diameter(5.383): 5296.455
+	Ball distance for diameter(5.315): 5357.490
+	Ball distance for diameter(5.527): 5171.247
+

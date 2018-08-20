@@ -1,0 +1,13 @@
+<project version="3">
+  <!-- Add your name and e-mail here
+    <maintainer email="...">Your Name</maintainer>
+  -->
+
+  <qibuild name="motion">
+    <depends buildtime="true" runtime="true" names="nao" />
+    <depends buildtime="true" runtime="true" names="core" />
+    <depends buildtime="true" runtime="true" names="pythonswig" />
+    <depends buildtime="true" runtime="true" names="rswalk2014" />
+ </qibuild>
+
+</project>

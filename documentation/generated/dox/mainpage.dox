@@ -1,0 +1,37 @@
+/**
+ * @mainpage
+ *
+ *
+ * @section intro Introduction
+ * This documentation is (mostly) auto-generated from comments written directly in the code. Assuming people comment their code, it should be useful to anyone trying to understand the different parts of the code base.
+ *
+ * @subsection intro_contents Useful Links
+ * <a href="todo.html">To-Do List (copied from docs/todo.txt)</a> <br>
+ * <a href="install_codebase.html">Installing (and Updating) the UT Nao Codebase</a> <br>
+ * <a href="ut_nao_tool.html">Navigating the UT NAO Tool</a> <br>
+ * <a href="http://www.informatik.uni-bremen.de/spl/pub/Website/Downloads/Rules2014.pdf">2014 SPL Official Rule Book</a> <br>
+ * <a href="http://www.cs.utexas.edu/users/AustinVilla/legged/cgi-bin/wiki.cgi?2013_SPL_Installation">Austin Villa SPL Wiki</a> (password-protected)
+ * <hr>
+ *
+ *
+ * @section using Using Doxygen
+ *
+ * @subsection using_navigating Navigating the Documentation
+ * The <b>Related Pages</b> tab has some useful links that might be handy to look at. The <b>Modules</b> tab contains a list of different parts of the code base, such as vision, localization, communication, etc. You can click on a module to view all classes, structs, definitions, and variables related to that module. <b>Classes</b> is just a list of all classes that Doxygen was able to find in the codebase. Similarly, <b>Files</b> contains a list of all files in the codebase.
+ *
+ * @subsection using_comments Commenting Your Code
+ * When you comment on code a certain way, Doxygen will automatically generate documentation for you. In general, add comments by following these examples:<br><br>
+ * Commenting a class, variable, function, etc:
+\image html documentation1.png
+ * For functions, you can also document parameters and return values:
+\image html documentation2.png
+ * For comments to the side of a variable, add a left bracket to it:
+\image html documentation3.png
+ * <b>NOTE:</b> comments read as a single line in the documentation. You can make newlines using the HTML linebreak tag (lbracket br rbracket).
+ *
+ * @subsection using_modules Adding Things to a Module
+ * You can (and for the sake of keeping things organized, should) add things to modules if you create new objects or classes. To add a single item to a module (for example, vision), do this:
+\image html ingroup1.png
+ * You can add a whole bunch of things in a file to a module by doing this:
+\image html ingroup2.png
+ */

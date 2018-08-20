@@ -1,0 +1,2 @@
+#!/bin/sh
+ln -sf tool-$1 $NAO_HOME/build/tool/UTNaoTool

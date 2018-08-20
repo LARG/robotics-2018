@@ -1,0 +1,4 @@
+[project behaviorsim]
+# Add your project dependencies here:
+depends = swig
+

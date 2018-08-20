@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+cd $NAO_HOME
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt-get install -y git-lfs
+git lfs install

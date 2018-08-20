@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+
+# Tutorial: http://www.debian-administration.org/article/316/An_introduction_to_bash_completion_part_1
+
+_compile() 
+{
+  local cur prev flags
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  flags="--help --debug --textlog --fast --clean --sound --optimize"
+
+  # If the argument starts with numbers and periods, fill in the start of an IP address
+  if [[ ${cur} =~ ^[0-9\.]+$ ]]; then
+    COMPREPLY=( $(compgen -W "${NAO_ADDRESSES}" -- ${cur}) )
+    compopt -o nospace;
+    return 0
+  fi
+
+  # If the argument starts with letters, fill in code modules
+  if [[ ${cur} =~ ^[a-zA-Z]+$ ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_BUILD_MODULES} ${NAO_COPY_MODULES}" -- ${cur}) )
+    return 0
+  fi
+  
+  # If the argument starts with a hyphen, fill in compile/copy flags
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+    return 0
+  fi
+
+  # Otherwise provide everything as suggestions
+  if [[ ${cur} == * ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_BUILD_MODULES} ${NAO_ADDRESSES} ${flags}" -- ${cur}) );
+    return 0
+  fi
+}
+complete -F _compile compile
+
+_cpcompile() 
+{
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  flags="--debug --sound --help --optimize"
+
+  # If the argument starts with numbers and periods, fill in the start of an IP address
+  if [[ ${cur} =~ ^[0-9\.]+$ ]]; then
+    COMPREPLY=( $(compgen -W "${NAO_ADDRESSES}" -- ${cur}) )
+    compopt -o nospace;
+    return 0
+  fi
+
+  # If the argument starts with letters, fill in code modules
+  if [[ ${cur} =~ ^[a-zA-Z]+$ ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_BUILD_MODULES} ${NAO_COPY_MODULES}" -- ${cur}) )
+    return 0
+  fi
+  
+  # If the argument starts with a hyphen, fill in compile/copy flags
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+    return 0
+  fi
+
+  # Otherwise provide everything as suggestions
+  if [[ ${cur} == * ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_BUILD_MODULES} ${NAO_COPY_MODULES} ${NAO_ADDRESSES} ${flags}" -- ${cur}) );
+    return 0
+  fi
+}
+complete -F _cpcompile cpcompile
+
+_copy_robot() 
+{
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  flags="--debug --verify --copy-verify --clean --sound --help --textlog --config-file"
+
+  # If the argument starts with numbers and periods, fill in the start of an IP address
+  if [[ ${cur} =~ ^[0-9\.]+$ ]]; then
+    COMPREPLY=( $(compgen -W "${NAO_ADDRESSES}" -- ${cur}) )
+    compopt -o nospace;
+    return 0
+  fi
+
+  # If the argument starts with letters, fill in code modules
+  if [[ ${cur} =~ ^[a-zA-Z]+$ ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_COPY_MODULES}" -- ${cur}) )
+    return 0
+  fi
+ 
+  # If the argument starts with a hyphen, fill in compile/copy flags
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+    return 0
+  fi
+
+  # Otherwise provide everything as suggestions
+  if [[ ${cur} == * ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_COPY_MODULES} ${NAO_ADDRESSES} ${flags}" -- ${cur}) );
+    return 0
+  fi
+}
+complete -F _copy_robot copy_robot
+
+_UTNaoTool() 
+{
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  windows=(
+    "world" "vision" "files" "motion" "text-log" "memory-select" "joints" "state"
+    "state" "camera" "sensors" "plot" "team-config" "walk" "log-edit" "audio"
+  )
+  options=(
+    "open-log-path" "open-recent-log" "open-previous-log" "bypass-vision" "vision-only"
+    "run-core" "disable-gui" "log-bounds" "ip-address" "behavior-sim" "loc-sim" "log-server" 
+    "loop-server" "help"
+  )
+  flags=""
+  for window in "${windows[@]}"
+  do
+    flags="${flags} --${window}-window"
+  done
+  for option in "${options[@]}"
+  do
+    flags="${flags} --${option}"
+  done
+
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+    return 0
+  fi
+}
+complete -F _UTNaoTool UTNaoTool
+
+_tool() 
+{
+  _UTNaoTool "$@"
+  return 0
+}
+complete -F _tool tool
+
+_setup_robot() 
+{
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  flags="--ip --id -- hostname --wireless-only --date --nocompile --nossh"
+
+  # If the argument starts with numbers and periods, fill in the start of an IP address
+  if [[ ${cur} =~ ^[0-9\.]+$ ]]; then
+    COMPREPLY=( $(compgen -W "${NAO_ADDRESSES}" -- ${cur}) )
+    compopt -o nospace;
+    return 0
+  fi
+
+  # If the argument starts with letters, fill in code modules
+  if [[ ${cur} =~ ^[a-zA-Z]+$ ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_COPY_MODULES}" -- ${cur}) )
+    return 0
+  fi
+ 
+  # If the argument starts with a hyphen, fill in compile/copy flags
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+    return 0
+  fi
+
+  # Otherwise provide everything as suggestions
+  if [[ ${cur} == * ]] ; then
+    COMPREPLY=( $(compgen -W "${NAO_COPY_MODULES} ${NAO_ADDRESSES} ${flags}" -- ${cur}) );
+    return 0
+  fi
+}
+complete -F _setup_robot setup_robot
+
+export NAO_BUILD_MODULES="all everything nao motion vision memory_test tool sim core pythonswig behaviorsim headless"
+export NAO_ADDRESSES="192.168.1. 11.0.1."
+export NAO_COPY_MODULES="all everything nao motion vision python memory_test scripts color_table motion_file config_file autoload simple_config wireless time"

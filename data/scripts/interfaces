@@ -1,0 +1,29 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo 
+iface lo inet loopback
+#iface eth0 inet dhcp
+
+iface eth0 inet static
+        address 11.0.1.ID
+        netmask 255.255.255.0
+        gateway 11.0.1.91
+        network 11.0.1.0
+
+auto eth0
+
+# for the stuff below here to work, you need to disable connman by running "update-rc.d -f connman remove" as root
+
+
+# for dynamic ip's using wpa_supplicant
+auto wlan0
+  iface wlan0 inet manual
+  up ifconfig wlan0 up
+  up wpa_supplicant -iwlan0 -Dwext -c/etc/wpa_supplicant/wpa_supplicant.conf -B
+  up sleep 1 && ifconfig wlan0 192.168.1.ID netmask 255.255.255.0 && route add -net default gw 192.168.0.1
+  #up sleep 1 && udhcpc -iwlan0 -n
+  down killall wpa_supplicant
+  down ifconfig wlan0 down
+  up ifconfig wlan0 up
+

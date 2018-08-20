@@ -1,0 +1,54 @@
+/**
+ * @page install_codebase Installing the UT NAO Codebase
+ *
+ *
+ * @section getting_started Getting Started
+ * Since you already have this documentation, it can be assumed that you already cloned the git repo. Enter the following four commands into the terminal. The install and build process can take a long time.
+\code
+$ cd ~/nao/trunk/install
+$ ./install
+$ cd ~/nao/trunk
+$ bin/compile all
+\endcode
+ * <hr>
+ *
+ *
+ * @section setup_robot Setting Up the Robot
+ * Before you can connect to a NAO, you may need to set it up. To do this, find the robot's number (usually a number in the 30s written on a sticker on the robot). Run the following commands, where XX is the robot's number:
+\code
+$ cd $NAO_HOME
+$ install/setup_robot --ip 11.0.1.XX --id XX
+$ bin/copy_robot all 11.0.1.XX
+\endcode
+ * NOTE: you need to have ssh keys in your ~/.ssh directory. If you don't have any, run ssh-keygen before setting up the robot.
+ * <hr>
+ *
+ *
+ * @section updating_code Updating the Codebase
+ * When you pull changes from the git server, it may be necessary to re-build everything. If you are getting compile errors after a git pull, do the following:
+\code
+$ cd $NAO_HOME
+$ rm -rf build/build
+$ bin/compile --clean all
+$ bin/compile all
+\endcode
+ * Depending on the updates, you may also have to run the install procedure again if certain libraries have been updated or are now required. Do this before running "bin/compile all". It may not be necessary to re-install all interfaces (e.g. you might need to only run ./install_libs).
+\code
+$ cd $NAO_HOME/install
+$ ./install
+\endcode
+ * Once you update, send your files to the robot (XX is the robot's number).
+\code
+$ cd $NAO_HOME
+$ bin/copy_robot all 11.0.1.XX
+\endcode
+It may be necessary to restart the NAO after the update.
+ * <hr>
+ *
+ *
+ * @section troubleshooting Troubleshooting
+ * In general, ask someone in the lab.
+ *
+ * @subsection troubleshooting_stream Streaming Not Working
+ * Sometimes, streaming may not work (for example, the tool is connected to the robot, but there is no video feedback coming in, or the sensor information isn't being updated). This can be fixed by doing:
+ */

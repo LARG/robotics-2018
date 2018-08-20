@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+# Add the experimental toolchain
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+
+# Install packages
+sudo apt-get install -y build-essential ccache libmpfr-dev libdevil-dev libode-dev libnotify-bin git fping doxygen qt4-designer mpg123 python-pip g++-5
+
+# Boost
+sudo apt-get install -y libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-serialization-dev libboost-regex-dev libboost-test-dev libboost-filesystem-dev
+
+# Tool dependencies
+echo "Install tool dependencies."
+sudo add-apt-repository -y ppa:xqms/opencv-nonfree
+sudo apt-get update
+sudo apt-get install -y libbz2-dev libfftw3-dev freeglut3-dev libopencv-*-dev libqglviewer-dev-qt4 libqwt-dev libqt4-dev libqtcore4 libqt4-opengl-dev libopencv-nonfree-dev libpython2.7-dev
+
+# Latest cmake
+wget -N $NAO_LIBS/cmake-3.3.2-x86_64.deb
+sudo dpkg -i cmake-*
+
+# Install libpng
+wget -N $NAO_LIBS/libpng-1.5.23.tar.gz
+tar zxvf libpng-1.5.23.tar.gz
+cd libpng-*
+cmake .
+make
+sudo mv libpng15.so* /usr/lib/x86_64-linux-gnu/
+cd ..
+
+libs=( alglib yaml-cpp flatbuffers )
+for lib in "${libs[@]}"
+do
+  rm -rf $NAO_HOME/lib/$lib
+  wget -N $NAO_LIBS/$lib.tar.gz
+  tar zxvf $lib.tar.gz
+  mv $lib $NAO_HOME/lib/
+done
+
+set +e
+sudo apt-get remove swig* -y # This will fail if we install using the method below
+set -e
+wget $NAO_LIBS/swig-3.0.8.tar.gz
+tar zxvf swig-3.0.8.tar.gz
+cd swig-*
+./configure
+make -j8
+sudo make install
+sudo ln -sf /usr/local/bin/swig /usr/local/bin/swig3.0
+
+cd $NAO_HOME/lib/flatbuffers
+mkdir -p build
+cd build
+cmake ..
+make
+sudo make install
+
+wget $NAO_LIBS/vim.tar.gz

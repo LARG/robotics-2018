@@ -1,0 +1,48 @@
+F1: body model mode
+F2: joint values mode
+F3: joint commands mode
+F4: walk sim mode
+F5: walk mode
+F6: kick mode
+F7: kick sim mode
+F8: getup sim mode
+
+s: toggle show steps
+b: toggle show body model
+v: toggle show joint values model
+c: toggle show joint commands model
+z: toggle show zmp ref
+
+NORMAL MODE:
+left,right: prev,next frames
+up: play
+down: pause
+
+WALK SIMULATIONS:
+now unused, so not documented
+
+GETUP SIMULATIONS:
+right: step
+b: fall on back
+f: fall on front
+
+KICK SIMULATIONS:
+right: step
+0: no kick
+1: straight
+2: ik straight
+3: side
+4: angle
+5: deg30
+l: set kick leg to left
+r: set kick leg to right
+s: save spline parameters
++: increase kick distance by half meter
+-: decrease kick distance by half meter
+[: increase kick angle by 5 degrees
+]: decrease kick angle by 5 degrees
+u,h,j,k: move ball forwards and side to side
+',ao;q move spline point around
+delete: remove spline point
+insert: add spline point
+escape: unselect spline point

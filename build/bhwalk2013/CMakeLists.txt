@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(bhwalk2013)
+find_package(qibuild)
+include(../common.cmake)
+add_subdirectory(${BHWALK2013_DIR} ${CMAKE_CURRENT_BINARY_DIR}/bhwalk2013)

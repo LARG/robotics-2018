@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Install the mime type that the program will handle thumbnailing and viewing for.
+sudo xdg-mime install --mode system $INSTALL_DIR/x-yuv.xml
+
+# Install the thumbnailer definition. This specifies how to execute a program that will
+# generate thumbnails on demand given the source file (url or path), an extensionless 
+# target, and a target size.
+sudo cp install/yuv.thumbnailer /usr/share/thumbnailers/
+
+# Install the application file. This allows the program to be set as the default opener
+# for a particular mime type.
+sudo cp install/yuview.desktop /usr/share/applications/
+
+# Associate the mime type with the program.
+echo [Added Associations] >> ~/.local/share/applications/mimeapps.list
+echo image/yuv=yuview.desktop >> ~/.local/share/applications/mimeapps.list
+
+# Install to bin
+sudo ln -sf $INSTALL_DIR/../yuview /usr/bin/yuview

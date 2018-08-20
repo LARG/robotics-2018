@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+file=GameController2016-EO.zip
+wget -N $NAO_LIBS/$file
+folder=$NAO_HOME/tools/GameController
+rm -rf $folder
+mkdir -p $folder
+unzip $file -d $folder
+cd $folder
+git checkout .

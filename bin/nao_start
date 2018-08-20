@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import subprocess
+import time
+import sys
+
+def exit(procs):
+  for proc in procs:
+    if proc.poll() == None:
+      proc.terminate()
+
+def launch(cmd):
+  return subprocess.Popen(cmd)
+  
+def main():
+  args = sys.argv[1:]
+  #if ('--geode' not in args) and ('--atom' not in args):
+    #print >>sys.stderr,'Must specify either atom or geode'
+    #sys.exit(1)
+  
+  pids = []
+  cmds = ['simInterface','motion','vision']
+  for cmd in cmds:
+    if len(pids) > 0:
+      # wait if not the first
+      time.sleep(0.5)
+    cmd = ['./%s' % cmd] + args
+    pids.append(launch(cmd))
+
+  try:
+    while(True):
+      if pids[0].poll() != None:
+        break
+      time.sleep(10)
+  finally:
+    exit(pids)
+    sys.exit(0)
+
+if __name__ == '__main__':
+  main()

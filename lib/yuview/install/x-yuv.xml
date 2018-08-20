@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="image/yuv">
+    <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+    <comment>YUV image</comment>
+    <comment xml:lang="ar">صورة YUV</comment>
+    <comment xml:lang="ast">imaxe YUV</comment>
+    <comment xml:lang="az">YUV rəsmi</comment>
+    <comment xml:lang="be">Vyjava YUV</comment>
+    <comment xml:lang="be@latin">Vyjava YUV</comment>
+    <comment xml:lang="bg">Изображение — YUV</comment>
+    <comment xml:lang="bo">YUV བརྙན་གཟུགས</comment>
+    <comment xml:lang="bs">YUV slika</comment>
+    <comment xml:lang="ca">imatge YUV</comment>
+    <comment xml:lang="cs">Obrázek YUV</comment>
+    <comment xml:lang="cy">Delwedd YUV</comment>
+    <comment xml:lang="da">YUV-billede</comment>
+    <comment xml:lang="de">YUV-Bild</comment>
+    <comment xml:lang="el">εικόνα YUV</comment>
+    <comment xml:lang="en_AU">YUV image</comment>
+    <comment xml:lang="en_GB">YUV image</comment>
+    <comment xml:lang="eo">YUV-bildo</comment>
+    <comment xml:lang="es">imagen YUV</comment>
+    <comment xml:lang="eu">YUV irudia</comment>
+    <comment xml:lang="fi">YUV-kuva</comment>
+    <comment xml:lang="fo">YUV mynd</comment>
+    <comment xml:lang="fr">image YUV</comment>
+    <comment xml:lang="ga">íomhá YUV</comment>
+    <comment xml:lang="gl">imaxe YUV</comment>
+    <comment xml:lang="he">תמונת YUV</comment>
+    <comment xml:lang="hr">YUV slika</comment>
+    <comment xml:lang="hu">YUV-kép</comment>
+    <comment xml:lang="id">Citra YUV</comment>
+    <comment xml:lang="it">Immagine YUV</comment>
+    <comment xml:lang="ja">YUV 画像</comment>
+    <comment xml:lang="ka">YUV გამოსახულება</comment>
+    <comment xml:lang="kk">YUV суреті</comment>
+    <comment xml:lang="ko">YUV 그림</comment>
+    <comment xml:lang="lt">YUV paveikslėlis</comment>
+    <comment xml:lang="lv">YUV attēls</comment>
+    <comment xml:lang="ms">Imej YUV</comment>
+    <comment xml:lang="nb">YUV-bilde</comment>
+    <comment xml:lang="nl">YUV-afbeelding</comment>
+    <comment xml:lang="nn">YUV-bilete</comment>
+    <comment xml:lang="no">YUV-bilde</comment>
+    <comment xml:lang="oc">Imatge YUV</comment>
+    <comment xml:lang="pl">Obraz YUV</comment>
+    <comment xml:lang="pt">imagem YUV</comment>
+    <comment xml:lang="pt_BR">Imagem YUV</comment>
+    <comment xml:lang="ro">Imagine YUV</comment>
+    <comment xml:lang="ru">изображение YUV</comment>
+    <comment xml:lang="sk">Obrázok YUV</comment>
+    <comment xml:lang="sl">Slikovna datoteka YUV</comment>
+    <comment xml:lang="sq">Figurë YUV</comment>
+    <comment xml:lang="sr">YUV слика</comment>
+    <comment xml:lang="sv">YUV-bild</comment>
+    <comment xml:lang="tr">YUV görüntüsü</comment>
+    <comment xml:lang="ug">YUV سۈرىتى</comment>
+    <comment xml:lang="uk">зображення YUV</comment>
+    <comment xml:lang="vi">Ảnh YUV</comment>
+    <comment xml:lang="zh_CN">YUV 图像</comment>
+    <comment xml:lang="zh_TW">YUV 影像</comment>
+    <glob pattern="*.yuv"/>
+  </mime-type>
+</mime-info>

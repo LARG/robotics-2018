@@ -1,0 +1,1097 @@
+Distances on 29 by sbarrett on 6/17/13
+
+50cm
+  Goal distance for Width(591.686),Height(580.878), from width: 113.770, height: 479.469, Average: 581.089
+  Goal distance for Width(591.445),Height(580.878), from width: 113.832, height: 479.469, Average: 581.173
+  Goal distance for Width(591.385),Height(580.878), from width: 113.847, height: 479.469, Average: 581.398
+  Goal distance for Width(591.053),Height(580.878), from width: 113.932, height: 479.469, Average: 581.028
+  Goal distance for Width(591.765),Height(580.878), from width: 113.750, height: 479.469, Average: 581.524
+  Goal distance for Width(591.323),Height(580.878), from width: 113.863, height: 479.469, Average: 581.572
+  Goal distance for Width(591.637),Height(580.878), from width: 113.783, height: 479.469, Average: 581.237
+  Goal distance for Width(592.168),Height(580.878), from width: 113.648, height: 479.469, Average: 581.612
+  Goal distance for Width(592.101),Height(580.878), from width: 113.665, height: 479.469, Average: 581.636
+  Goal distance for Width(591.251),Height(580.878), from width: 113.881, height: 479.469, Average: 581.746
+  Goal distance for Width(591.059),Height(580.878), from width: 113.930, height: 479.469, Average: 581.074
+  Goal distance for Width(591.712),Height(580.878), from width: 113.764, height: 479.469, Average: 581.623
+  Goal distance for Width(591.454),Height(580.878), from width: 113.830, height: 479.469, Average: 581.420
+  Goal distance for Width(591.590),Height(580.878), from width: 113.795, height: 479.469, Average: 581.466
+  Goal distance for Width(591.377),Height(580.878), from width: 113.849, height: 479.469, Average: 581.395
+  Goal distance for Width(591.780),Height(580.878), from width: 113.747, height: 479.469, Average: 581.529
+  Goal distance for Width(591.457),Height(580.878), from width: 113.829, height: 479.469, Average: 580.893
+  Goal distance for Width(591.551),Height(580.878), from width: 113.805, height: 479.469, Average: 581.377
+  Goal distance for Width(591.250),Height(580.878), from width: 113.881, height: 479.469, Average: 581.548
+  Goal distance for Width(591.783),Height(580.878), from width: 113.746, height: 479.469, Average: 581.091
+  Goal distance for Width(591.591),Height(580.878), from width: 113.795, height: 479.469, Average: 581.027
+  Goal distance for Width(591.904),Height(580.878), from width: 113.715, height: 479.469, Average: 581.326
+
+100cm
+  Goal distance for Width(992.118),Height(984.393), from width: 57.425, height: 307.020, Average: 992.663
+  Goal distance for Width(992.118),Height(984.393), from width: 57.425, height: 307.020, Average: 992.663
+  Goal distance for Width(997.972),Height(962.320), from width: 56.980, height: 312.960, Average: 980.852
+  Goal distance for Width(997.972),Height(962.320), from width: 56.980, height: 312.960, Average: 980.852
+  Goal distance for Width(992.133),Height(984.393), from width: 57.424, height: 307.020, Average: 992.074
+  Goal distance for Width(992.133),Height(984.393), from width: 57.424, height: 307.020, Average: 992.074
+  Goal distance for Width(993.800),Height(984.393), from width: 57.296, height: 307.020, Average: 992.630
+  Goal distance for Width(993.800),Height(984.393), from width: 57.296, height: 307.020, Average: 992.630
+  Goal distance for Width(1082.135),Height(590.836), from width: 51.192, height: 472.631, Average: 751.463
+  Goal distance for Width(1082.135),Height(590.836), from width: 51.192, height: 472.631, Average: 751.463
+  Goal distance for Width(1076.585),Height(593.883), from width: 51.542, height: 470.581, Average: 751.564
+  Goal distance for Width(1076.585),Height(593.883), from width: 51.542, height: 470.581, Average: 751.564
+  Goal distance for Width(1089.524),Height(631.175), from width: 50.734, height: 446.975, Average: 781.149
+  Goal distance for Width(1089.524),Height(631.175), from width: 50.734, height: 446.975, Average: 781.149
+  Goal distance for Width(998.338),Height(962.320), from width: 56.952, height: 312.960, Average: 980.974
+  Goal distance for Width(998.338),Height(962.320), from width: 56.952, height: 312.960, Average: 980.974
+  Goal distance for Width(990.101),Height(984.393), from width: 57.580, height: 307.020, Average: 991.397
+  Goal distance for Width(990.101),Height(984.393), from width: 57.580, height: 307.020, Average: 991.397
+  Goal distance for Width(1110.717),Height(595.650), from width: 49.457, height: 469.401, Average: 764.573
+  Goal distance for Width(1110.717),Height(595.650), from width: 49.457, height: 469.401, Average: 764.573
+  Goal distance for Width(997.280),Height(962.320), from width: 57.032, height: 312.960, Average: 980.621
+
+
+150cm
+  Goal distance for Width(1761.142),Height(592.210), from width: 26.879, height: 471.704, Average: 976.502
+  Goal distance for Width(1761.142),Height(592.210), from width: 26.879, height: 471.704, Average: 976.502
+  Goal distance for Width(1665.291),Height(715.879), from width: 28.945, height: 401.851, Average: 1028.702
+  Goal distance for Width(1665.291),Height(715.879), from width: 28.945, height: 401.851, Average: 1028.702
+  Goal distance for Width(1699.661),Height(592.116), from width: 28.173, height: 471.767, Average: 956.501
+  Goal distance for Width(1699.661),Height(592.116), from width: 28.173, height: 471.767, Average: 956.501
+  Goal distance for Width(1682.205),Height(649.637), from width: 28.560, height: 436.216, Average: 988.582
+  Goal distance for Width(1682.205),Height(649.637), from width: 28.560, height: 436.216, Average: 988.582
+  Goal distance for Width(1459.499),Height(823.556), from width: 34.462, height: 356.976, Average: 1031.836
+  Goal distance for Width(1459.499),Height(823.556), from width: 34.462, height: 356.976, Average: 1031.836
+  Goal distance for Width(1694.802),Height(607.092), from width: 28.280, height: 461.913, Average: 965.065
+  Goal distance for Width(1694.802),Height(607.092), from width: 28.280, height: 461.913, Average: 965.065
+  Goal distance for Width(1720.271),Height(591.736), from width: 27.727, height: 472.024, Average: 962.244
+  Goal distance for Width(1720.271),Height(591.736), from width: 27.727, height: 472.024, Average: 962.244
+  Goal distance for Width(1729.561),Height(606.785), from width: 27.530, height: 462.111, Average: 975.651
+  Goal distance for Width(1729.561),Height(606.785), from width: 27.530, height: 462.111, Average: 975.651
+  Goal distance for Width(1736.860),Height(610.191), from width: 27.377, height: 459.930, Average: 981.315
+  Goal distance for Width(1736.860),Height(610.191), from width: 27.377, height: 459.930, Average: 981.315
+  Goal distance for Width(1642.674),Height(667.918), from width: 29.473, height: 426.104, Average: 988.806
+  Goal distance for Width(1642.674),Height(667.918), from width: 29.473, height: 426.104, Average: 988.806
+  Goal distance for Width(1744.056),Height(592.210), from width: 27.228, height: 471.704, Average: 970.971
+  Goal distance for Width(1744.056),Height(592.210), from width: 27.228, height: 471.704, Average: 970.971
+  Goal distance for Width(1763.171),Height(592.022), from width: 26.838, height: 471.830, Average: 977.690
+  Goal distance for Width(1763.171),Height(592.022), from width: 26.838, height: 471.830, Average: 977.690
+  Goal distance for Width(1745.961),Height(598.064), from width: 27.189, height: 467.799, Average: 976.063
+  Goal distance for Width(1745.961),Height(598.064), from width: 27.189, height: 467.799, Average: 976.063
+  Goal distance for Width(1707.135),Height(591.142), from width: 28.010, height: 472.424, Average: 958.144
+  Goal distance for Width(1707.135),Height(591.142), from width: 28.010, height: 472.424, Average: 958.144
+  Goal distance for Width(1678.037),Height(610.494), from width: 28.654, height: 459.737, Average: 961.774
+  Goal distance for Width(1678.037),Height(610.494), from width: 28.654, height: 459.737, Average: 961.774
+  Goal distance for Width(1695.240),Height(609.775), from width: 28.270, height: 460.196, Average: 966.933
+
+200cm
+  Goal distance for Width(1896.759),Height(692.994), from width: 24.367, height: 413.038, Average: 1089.619
+  Goal distance for Width(1896.759),Height(692.994), from width: 24.367, height: 413.038, Average: 1089.619
+  Goal distance for Width(2004.821),Height(630.878), from width: 22.645, height: 447.152, Average: 1083.700
+  Goal distance for Width(2004.821),Height(630.878), from width: 22.645, height: 447.152, Average: 1083.700
+  Goal distance for Width(2004.353),Height(696.956), from width: 22.652, height: 411.052, Average: 1127.605
+  Goal distance for Width(2004.353),Height(696.956), from width: 22.652, height: 411.052, Average: 1127.605
+  Goal distance for Width(1997.407),Height(620.687), from width: 22.756, height: 453.349, Average: 1073.925
+  Goal distance for Width(1997.407),Height(620.687), from width: 22.756, height: 453.349, Average: 1073.925
+  Goal distance for Width(1895.248),Height(628.056), from width: 24.393, height: 448.850, Average: 1044.652
+  Goal distance for Width(1895.248),Height(628.056), from width: 24.393, height: 448.850, Average: 1044.652
+  Goal distance for Width(1816.711),Height(722.535), from width: 25.797, height: 398.721, Average: 1082.697
+  Goal distance for Width(1816.711),Height(722.535), from width: 25.797, height: 398.721, Average: 1082.697
+  Goal distance for Width(2009.536),Height(655.325), from width: 22.575, height: 433.014, Average: 1101.327
+  Goal distance for Width(2009.536),Height(655.325), from width: 22.575, height: 433.014, Average: 1101.327
+  Goal distance for Width(1898.498),Height(631.267), from width: 24.337, height: 446.919, Average: 1048.353
+  Goal distance for Width(1898.498),Height(631.267), from width: 24.337, height: 446.919, Average: 1048.353
+  Goal distance for Width(1848.365),Height(782.686), from width: 25.214, height: 372.666, Average: 1133.964
+  Goal distance for Width(1848.365),Height(782.686), from width: 25.214, height: 372.666, Average: 1133.964
+  Goal distance for Width(1849.653),Height(667.208), from width: 25.191, height: 426.488, Average: 1056.083
+  Goal distance for Width(1849.653),Height(667.208), from width: 25.191, height: 426.488, Average: 1056.083
+  Goal distance for Width(1965.188),Height(823.731), from width: 23.251, height: 356.912, Average: 1201.048
+  Goal distance for Width(1965.188),Height(823.731), from width: 23.251, height: 356.912, Average: 1201.048
+  Goal distance for Width(1904.405),Height(631.823), from width: 24.238, height: 446.587, Average: 1050.578
+  Goal distance for Width(1904.405),Height(631.823), from width: 24.238, height: 446.587, Average: 1050.578
+  Goal distance for Width(2020.374),Height(620.687), from width: 22.415, height: 453.349, Average: 1081.110
+  Goal distance for Width(2020.374),Height(620.687), from width: 22.415, height: 453.349, Average: 1081.110
+  Goal distance for Width(1856.269),Height(611.814), from width: 25.072, height: 458.899, Average: 1021.040
+  Goal distance for Width(1856.269),Height(611.814), from width: 25.072, height: 458.899, Average: 1021.040
+  Goal distance for Width(1889.229),Height(697.895), from width: 24.495, height: 410.585, Average: 1090.004
+  Goal distance for Width(1889.229),Height(697.895), from width: 24.495, height: 410.585, Average: 1090.004
+  Goal distance for Width(1930.549),Height(617.583), from width: 23.804, height: 455.274, Average: 1049.442
+  Goal distance for Width(1930.549),Height(617.583), from width: 23.804, height: 455.274, Average: 1049.442
+  Goal distance for Width(1901.514),Height(611.989), from width: 24.286, height: 458.788, Average: 1036.282
+  Goal distance for Width(1901.514),Height(611.989), from width: 24.286, height: 458.788, Average: 1036.282
+  Goal distance for Width(2004.435),Height(721.493), from width: 22.651, height: 399.207, Average: 1144.492
+  Goal distance for Width(2004.435),Height(721.493), from width: 22.651, height: 399.207, Average: 1144.492
+  Goal distance for Width(1885.229),Height(655.113), from width: 24.564, height: 433.133, Average: 1060.260
+  Goal distance for Width(1885.229),Height(655.113), from width: 24.564, height: 433.133, Average: 1060.260
+  Goal distance for Width(1830.830),Height(647.970), from width: 25.534, height: 437.164, Average: 1036.784
+
+
+300cm
+  Goal distance for Width(2593.184),Height(723.721), from width: 16.112, height: 398.169, Average: 1343.516
+  Goal distance for Width(2593.184),Height(723.721), from width: 16.112, height: 398.169, Average: 1343.516
+  Goal distance for Width(2463.151),Height(809.767), from width: 17.246, height: 362.106, Average: 1360.149
+  Goal distance for Width(2463.151),Height(809.767), from width: 17.246, height: 362.106, Average: 1360.149
+  Goal distance for Width(2596.485),Height(625.402), from width: 16.084, height: 450.459, Average: 1277.718
+  Goal distance for Width(2596.485),Height(625.402), from width: 16.084, height: 450.459, Average: 1277.718
+  Goal distance for Width(2527.743),Height(819.657), from width: 16.666, height: 358.411, Average: 1387.845
+  Goal distance for Width(2527.743),Height(819.657), from width: 16.666, height: 358.411, Average: 1387.845
+  Goal distance for Width(2540.682),Height(633.221), from width: 16.553, height: 445.754, Average: 1265.281
+  Goal distance for Width(2540.682),Height(633.221), from width: 16.553, height: 445.754, Average: 1265.281
+  Goal distance for Width(2430.758),Height(652.586), from width: 17.551, height: 434.549, Average: 1242.048
+  Goal distance for Width(2430.758),Height(652.586), from width: 17.551, height: 434.549, Average: 1242.048
+  Goal distance for Width(2560.443),Height(585.418), from width: 16.385, height: 476.324, Average: 1240.115
+  Goal distance for Width(2560.443),Height(585.418), from width: 16.385, height: 476.324, Average: 1240.115
+  Goal distance for Width(2547.340),Height(710.765), from width: 16.496, height: 404.293, Average: 1320.129
+  Goal distance for Width(2547.340),Height(710.765), from width: 16.496, height: 404.293, Average: 1320.129
+  Goal distance for Width(2541.020),Height(632.758), from width: 16.550, height: 446.029, Average: 1265.194
+  Goal distance for Width(2541.020),Height(632.758), from width: 16.550, height: 446.029, Average: 1265.194
+
+
+400cm
+  Goal distance for Width(2887.223),Height(4544.266), from width: 13.978, height: 84.291, Average: 3678.997
+  Goal distance for Width(2896.019),Height(3376.780), from width: 13.921, height: 108.334, Average: 3298.375
+  Goal distance for Width(2896.019),Height(3376.780), from width: 13.921, height: 108.334, Average: 3298.375
+  Goal distance for Width(2881.938),Height(3376.780), from width: 14.011, height: 108.334, Average: 3295.135
+  Goal distance for Width(2881.938),Height(3376.780), from width: 14.011, height: 108.334, Average: 3295.135
+  Goal distance for Width(2904.903),Height(3376.780), from width: 13.865, height: 108.334, Average: 3304.814
+  Goal distance for Width(2904.903),Height(3376.780), from width: 13.865, height: 108.334, Average: 3304.814
+  Goal distance for Width(2916.236),Height(3376.780), from width: 13.794, height: 108.334, Average: 3309.033
+  Goal distance for Width(2916.236),Height(3376.780), from width: 13.794, height: 108.334, Average: 3309.033
+  Goal distance for Width(2898.710),Height(3040.333), from width: 13.904, height: 118.382, Average: 3170.500
+  Goal distance for Width(2898.710),Height(3040.333), from width: 13.904, height: 118.382, Average: 3170.500
+  Goal distance for Width(2908.426),Height(4420.310), from width: 13.843, height: 86.284, Average: 3660.306
+  Goal distance for Width(2908.426),Height(4420.310), from width: 13.843, height: 86.284, Average: 3660.306
+  Goal distance for Width(2916.367),Height(3376.780), from width: 13.793, height: 108.334, Average: 3308.433
+  Goal distance for Width(2916.367),Height(3376.780), from width: 13.793, height: 108.334, Average: 3308.433
+  Goal distance for Width(2904.587),Height(3376.780), from width: 13.867, height: 108.334, Average: 3287.267
+  Goal distance for Width(2904.587),Height(3376.780), from width: 13.867, height: 108.334, Average: 3287.267
+  Goal distance for Width(2893.738),Height(4680.086), from width: 13.936, height: 82.219, Average: 3731.723
+  Goal distance for Width(2893.738),Height(4680.086), from width: 13.936, height: 82.219, Average: 3731.723
+  Goal distance for Width(2890.624),Height(3041.521), from width: 13.956, height: 118.343, Average: 3183.263
+  Goal distance for Width(2890.624),Height(3041.521), from width: 13.956, height: 118.343, Average: 3183.263
+  Goal distance for Width(2904.708),Height(3376.780), from width: 13.866, height: 108.334, Average: 3304.093
+  Goal distance for Width(2904.708),Height(3376.780), from width: 13.866, height: 108.334, Average: 3304.093
+  Goal distance for Width(2895.542),Height(3235.371), from width: 13.924, height: 112.322, Average: 3238.122
+  Goal distance for Width(2895.542),Height(3235.371), from width: 13.924, height: 112.322, Average: 3238.122
+  Goal distance for Width(2879.334),Height(4546.822), from width: 14.028, height: 84.251, Average: 3691.618
+  Goal distance for Width(2879.334),Height(4546.822), from width: 14.028, height: 84.251, Average: 3691.618
+  Goal distance for Width(2889.992),Height(3235.371), from width: 13.960, height: 112.322, Average: 3235.598
+
+
+500cm
+  Goal distance for Width(3527.208),Height(4198.986), from width: 10.725, height: 90.112, Average: 4266.170
+  Goal distance for Width(3556.555),Height(4311.853), from width: 10.608, height: 88.115, Average: 4319.032
+  Goal distance for Width(3556.555),Height(4311.853), from width: 10.608, height: 88.115, Average: 4319.032
+  Goal distance for Width(3541.665),Height(4311.853), from width: 10.668, height: 88.115, Average: 4378.904
+  Goal distance for Width(3541.665),Height(4311.853), from width: 10.668, height: 88.115, Average: 4378.904
+  Goal distance for Width(3529.304),Height(5468.331), from width: 10.717, height: 72.085, Average: 4770.272
+  Goal distance for Width(3529.304),Height(5468.331), from width: 10.717, height: 72.085, Average: 4770.272
+  Goal distance for Width(3545.596),Height(5128.199), from width: 10.652, height: 76.105, Average: 5195.009
+  Goal distance for Width(3560.461),Height(5130.165), from width: 10.593, height: 76.081, Average: 4658.992
+  Goal distance for Width(3560.461),Height(5130.165), from width: 10.593, height: 76.081, Average: 4658.992
+  Goal distance for Width(3577.874),Height(5128.199), from width: 10.525, height: 76.105, Average: 4660.960
+  Goal distance for Width(3577.874),Height(5128.199), from width: 10.525, height: 76.105, Average: 4660.960
+  Goal distance for Width(3432.536),Height(4680.086), from width: 11.118, height: 82.219, Average: 4839.096
+  Goal distance for Width(3549.072),Height(4198.986), from width: 10.638, height: 90.112, Average: 4309.177
+  Goal distance for Width(3549.072),Height(4198.986), from width: 10.638, height: 90.112, Average: 4309.177
+  Goal distance for Width(3571.354),Height(5128.199), from width: 10.550, height: 76.105, Average: 4629.968
+  Goal distance for Width(3571.354),Height(5128.199), from width: 10.550, height: 76.105, Average: 4629.968
+  Goal distance for Width(3597.378),Height(5128.199), from width: 10.450, height: 76.105, Average: 5070.463
+  Goal distance for Width(3577.238),Height(5468.331), from width: 10.527, height: 72.085, Average: 5390.148
+  Goal distance for Width(3557.162),Height(5465.998), from width: 10.606, height: 72.111, Average: 4779.926
+  Goal distance for Width(3557.162),Height(5465.998), from width: 10.606, height: 72.111, Average: 4779.926
+  Goal distance for Width(3571.162),Height(5128.199), from width: 10.551, height: 76.105, Average: 4629.627
+  Goal distance for Width(3571.162),Height(5128.199), from width: 10.551, height: 76.105, Average: 4629.627
+  Goal distance for Width(3559.730),Height(4198.986), from width: 10.596, height: 90.112, Average: 4282.059
+  Goal distance for Width(3559.730),Height(4198.986), from width: 10.596, height: 90.112, Average: 4282.059
+  Goal distance for Width(3527.368),Height(4198.986), from width: 10.725, height: 90.112, Average: 4246.801
+  Goal distance for Width(3527.368),Height(4198.986), from width: 10.725, height: 90.112, Average: 4246.801
+  Goal distance for Width(3527.179),Height(4198.986), from width: 10.726, height: 90.112, Average: 4246.529
+  Goal distance for Width(3527.179),Height(4198.986), from width: 10.726, height: 90.112, Average: 4246.529
+  Goal distance for Width(3573.469),Height(4311.853), from width: 10.542, height: 88.115, Average: 4361.326
+  Goal distance for Width(3573.469),Height(4311.853), from width: 10.542, height: 88.115, Average: 4361.326
+  Goal distance for Width(3527.184),Height(4198.986), from width: 10.726, height: 90.112, Average: 4274.465
+  Goal distance for Width(3527.184),Height(4198.986), from width: 10.726, height: 90.112, Average: 4274.465
+  Goal distance for Width(3550.558),Height(4311.853), from width: 10.632, height: 88.115, Average: 4328.485
+
+
+600cm
+  Goal distance for Width(4209.021),Height(4818.083), from width: 8.490, height: 80.225, Average: 5002.057
+  Goal distance for Width(4209.021),Height(4818.083), from width: 8.490, height: 80.225, Average: 5002.057
+  Goal distance for Width(4121.761),Height(4820.632), from width: 8.728, height: 80.189, Average: 4981.786
+  Goal distance for Width(4121.761),Height(4820.632), from width: 8.728, height: 80.189, Average: 4981.786
+  Goal distance for Width(4164.407),Height(5287.012), from width: 8.610, height: 74.169, Average: 5169.719
+  Goal distance for Width(4164.407),Height(5287.012), from width: 8.610, height: 74.169, Average: 5169.719
+  Goal distance for Width(4148.645),Height(4820.632), from width: 8.653, height: 80.189, Average: 4986.791
+  Goal distance for Width(4148.645),Height(4820.632), from width: 8.653, height: 80.189, Average: 4986.791
+  Goal distance for Width(4158.209),Height(5460.408), from width: 8.627, height: 72.173, Average: 5240.039
+  Goal distance for Width(4158.209),Height(5460.408), from width: 8.627, height: 72.173, Average: 5240.039
+  Goal distance for Width(4096.543),Height(4820.632), from width: 8.799, height: 80.189, Average: 4971.824
+  Goal distance for Width(4096.543),Height(4820.632), from width: 8.799, height: 80.189, Average: 4971.824
+  Goal distance for Width(4114.875),Height(4820.632), from width: 8.748, height: 80.189, Average: 4974.427
+  Goal distance for Width(4114.875),Height(4820.632), from width: 8.748, height: 80.189, Average: 4974.427
+  Goal distance for Width(4142.833),Height(4820.632), from width: 8.670, height: 80.189, Average: 4987.235
+  Goal distance for Width(4142.833),Height(4820.632), from width: 8.670, height: 80.189, Average: 4987.235
+  Goal distance for Width(4148.598),Height(5460.408), from width: 8.654, height: 72.173, Average: 5234.428
+  Goal distance for Width(4148.598),Height(5460.408), from width: 8.654, height: 72.173, Average: 5234.428
+  Goal distance for Width(4170.665),Height(4820.632), from width: 8.593, height: 80.189, Average: 4992.382
+  Goal distance for Width(4170.665),Height(4820.632), from width: 8.593, height: 80.189, Average: 4992.382
+  Goal distance for Width(4123.792),Height(4820.632), from width: 8.723, height: 80.189, Average: 5012.112
+  Goal distance for Width(4123.792),Height(4820.632), from width: 8.723, height: 80.189, Average: 5012.112
+  Goal distance for Width(4227.146),Height(4820.632), from width: 8.442, height: 80.189, Average: 5011.341
+  Goal distance for Width(4227.146),Height(4820.632), from width: 8.442, height: 80.189, Average: 5011.341
+  Goal distance for Width(4131.310),Height(4818.083), from width: 8.702, height: 80.225, Average: 4980.865
+  Goal distance for Width(4131.310),Height(4818.083), from width: 8.702, height: 80.225, Average: 4980.865
+  Goal distance for Width(4142.052),Height(4820.632), from width: 8.672, height: 80.189, Average: 4987.555
+  Goal distance for Width(4142.052),Height(4820.632), from width: 8.672, height: 80.189, Average: 4987.555
+  Goal distance for Width(4130.748),Height(4820.632), from width: 8.703, height: 80.189, Average: 4981.480
+  Goal distance for Width(4130.748),Height(4820.632), from width: 8.703, height: 80.189, Average: 4981.480
+  Goal distance for Width(4179.188),Height(4820.632), from width: 8.570, height: 80.189, Average: 4997.494
+  Goal distance for Width(4179.188),Height(4820.632), from width: 8.570, height: 80.189, Average: 4997.494
+
+700cm
+  Goal distance for Width(4805.174),Height(5836.600), from width: 7.125, height: 68.222, Average: 5357.646
+  Goal distance for Width(4764.993),Height(5836.600), from width: 7.205, height: 68.222, Average: 5386.162
+  Goal distance for Width(4764.993),Height(5836.600), from width: 7.205, height: 68.222, Average: 5386.162
+  Goal distance for Width(4813.534),Height(6766.741), from width: 7.109, height: 60.208, Average: 5777.006
+  Goal distance for Width(4813.534),Height(6766.741), from width: 7.109, height: 60.208, Average: 5777.006
+  Goal distance for Width(4835.317),Height(5840.498), from width: 7.066, height: 68.184, Average: 5345.928
+  Goal distance for Width(4835.317),Height(5840.498), from width: 7.066, height: 68.184, Average: 5345.928
+  Goal distance for Width(4908.698),Height(13263.673), from width: 6.927, height: 34.092, Average: 10306.744
+  Goal distance for Width(4777.444),Height(5840.498), from width: 7.180, height: 68.184, Average: 5389.225
+  Goal distance for Width(4777.444),Height(5840.498), from width: 7.180, height: 68.184, Average: 5389.225
+  Goal distance for Width(4829.364),Height(6776.700), from width: 7.078, height: 60.133, Average: 5799.620
+  Goal distance for Width(4829.364),Height(6776.700), from width: 7.078, height: 60.133, Average: 5799.620
+  Goal distance for Width(4830.630),Height(6766.741), from width: 7.075, height: 60.208, Average: 5794.940
+  Goal distance for Width(4830.630),Height(6766.741), from width: 7.075, height: 60.208, Average: 5794.940
+  Goal distance for Width(4766.338),Height(6766.741), from width: 7.202, height: 60.208, Average: 5777.611
+  Goal distance for Width(4766.338),Height(6766.741), from width: 7.202, height: 60.208, Average: 5777.611
+  Goal distance for Width(4798.150),Height(6766.741), from width: 7.139, height: 60.208, Average: 5850.165
+  Goal distance for Width(4798.150),Height(6766.741), from width: 7.139, height: 60.208, Average: 5850.165
+  Goal distance for Width(4694.917),Height(12385.026), from width: 7.347, height: 36.125, Average: 8015.889
+  Goal distance for Width(4694.917),Height(12385.026), from width: 7.347, height: 36.125, Average: 8015.889
+  Goal distance for Width(4610.423),Height(10896.771), from width: 7.526, height: 40.252, Average: 9357.987
+  Goal distance for Width(4768.008),Height(6515.635), from width: 7.199, height: 62.163, Average: 5637.252
+  Goal distance for Width(4768.008),Height(6515.635), from width: 7.199, height: 62.163, Average: 5637.252
+  Goal distance for Width(4816.612),Height(6267.584), from width: 7.103, height: 64.236, Average: 5616.846
+  Goal distance for Width(4816.612),Height(6267.584), from width: 7.103, height: 64.236, Average: 5616.846
+  Goal distance for Width(4799.133),Height(6510.901), from width: 7.137, height: 62.201, Average: 5707.307
+  Goal distance for Width(4799.133),Height(6510.901), from width: 7.137, height: 62.201, Average: 5707.307
+  Goal distance for Width(7460.539),Height(6754.620), from width: 3.982, height: 60.299, Average: 6189.111
+  Goal distance for Width(7460.539),Height(6754.620), from width: 3.982, height: 60.299, Average: 6189.111
+  Goal distance for Width(4816.053),Height(6515.635), from width: 7.104, height: 62.163, Average: 5676.101
+  Goal distance for Width(4816.053),Height(6515.635), from width: 7.104, height: 62.163, Average: 5676.101
+  Goal distance for Width(4813.644),Height(6510.901), from width: 7.109, height: 62.201, Average: 5648.658
+  Goal distance for Width(4813.644),Height(6510.901), from width: 7.109, height: 62.201, Average: 5648.658
+  Goal distance for Width(4863.496),Height(6515.635), from width: 7.012, height: 62.163, Average: 5692.957
+  Goal distance for Width(4863.496),Height(6515.635), from width: 7.012, height: 62.163, Average: 5692.957
+  Goal distance for Width(4848.393),Height(6510.901), from width: 7.041, height: 62.201, Average: 5656.877
+
+800cm
+  Goal distance for Width(5373.985),Height(6776.700), from width: 6.145, height: 60.133, Average: 6821.083
+  Goal distance for Width(5202.479),Height(7047.546), from width: 6.414, height: 58.174, Average: 6749.898
+  Goal distance for Width(5202.479),Height(7047.546), from width: 6.414, height: 58.174, Average: 6749.898
+  Goal distance for Width(5329.953),Height(8020.150), from width: 6.212, height: 52.154, Average: 7689.056
+  Goal distance for Width(5279.197),Height(7671.801), from width: 6.291, height: 54.148, Average: 7095.988
+  Goal distance for Width(5279.197),Height(7671.801), from width: 6.291, height: 54.148, Average: 7095.988
+  Goal distance for Width(5459.217),Height(7350.317), from width: 6.018, height: 56.143, Average: 6930.942
+  Goal distance for Width(5459.217),Height(7350.317), from width: 6.018, height: 56.143, Average: 6930.942
+  Goal distance for Width(5194.368),Height(7677.612), from width: 6.428, height: 54.113, Average: 7237.307
+  Goal distance for Width(5194.368),Height(7677.612), from width: 6.428, height: 54.113, Average: 7237.307
+  Goal distance for Width(5285.756),Height(7350.317), from width: 6.281, height: 56.143, Average: 6892.983
+  Goal distance for Width(5285.756),Height(7350.317), from width: 6.281, height: 56.143, Average: 6892.983
+  Goal distance for Width(5401.255),Height(8820.038), from width: 6.104, height: 48.127, Average: 8063.859
+  Goal distance for Width(5322.399),Height(7350.317), from width: 6.224, height: 56.143, Average: 6904.416
+  Goal distance for Width(5322.399),Height(7350.317), from width: 6.224, height: 56.143, Average: 6904.416
+  Goal distance for Width(5328.501),Height(8406.172), from width: 6.214, height: 50.122, Average: 7755.812
+  Goal distance for Width(5328.501),Height(8406.172), from width: 6.214, height: 50.122, Average: 7755.812
+  Goal distance for Width(5432.602),Height(8026.699), from width: 6.057, height: 52.118, Average: 7442.482
+  Goal distance for Width(5432.602),Height(8026.699), from width: 6.057, height: 52.118, Average: 7442.482
+  Goal distance for Width(5482.882),Height(7350.317), from width: 5.984, height: 56.143, Average: 6941.231
+  Goal distance for Width(5482.882),Height(7350.317), from width: 5.984, height: 56.143, Average: 6941.231
+  Goal distance for Width(5357.725),Height(8026.699), from width: 6.170, height: 52.118, Average: 7523.102
+  Goal distance for Width(5357.725),Height(8026.699), from width: 6.170, height: 52.118, Average: 7523.102
+  Goal distance for Width(5291.382),Height(7677.612), from width: 6.272, height: 54.113, Average: 7264.816
+  Goal distance for Width(5291.382),Height(7677.612), from width: 6.272, height: 54.113, Average: 7264.816
+  Goal distance for Width(5303.950),Height(8406.172), from width: 6.253, height: 50.122, Average: 7417.762
+  Goal distance for Width(5303.950),Height(8406.172), from width: 6.253, height: 50.122, Average: 7417.762
+  Goal distance for Width(5226.243),Height(7677.612), from width: 6.376, height: 54.113, Average: 7167.010
+  Goal distance for Width(5226.243),Height(7677.612), from width: 6.376, height: 54.113, Average: 7167.010
+  Goal distance for Width(5328.108),Height(8406.172), from width: 6.215, height: 50.122, Average: 7498.229
+  Goal distance for Width(5328.108),Height(8406.172), from width: 6.215, height: 50.122, Average: 7498.229
+  Goal distance for Width(5300.864),Height(8412.612), from width: 6.257, height: 50.090, Average: 7574.522
+  Goal distance for Width(5300.864),Height(8412.612), from width: 6.257, height: 50.090, Average: 7574.522
+  Goal distance for Width(5360.841),Height(7677.612), from width: 6.165, height: 54.113, Average: 7282.511
+  Goal distance for Width(5360.841),Height(7677.612), from width: 6.165, height: 54.113, Average: 7282.511
+
+
+-----
+
+Distances on 32 by sbarrett on 6/17/13
+
+50cm
+  Goal distance for Width(511.298):,Height(606.516), from width: 235.631, height: 959.096, Average: 552.462
+  Goal distance for Width(509.805):,Height(606.640), from width: 236.392, height: 958.937, Average: 551.877
+  Goal distance for Width(511.397):,Height(606.516), from width: 235.580, height: 959.096, Average: 552.490
+  Goal distance for Width(507.870):,Height(606.389), from width: 237.387, height: 959.259, Average: 552.968
+  Goal distance for Width(509.055):,Height(606.324), from width: 236.777, height: 959.341, Average: 552.822
+  Goal distance for Width(506.387):,Height(606.192), from width: 238.155, height: 959.510, Average: 551.979
+  Goal distance for Width(508.450):,Height(606.324), from width: 237.088, height: 959.341, Average: 553.166
+  Goal distance for Width(507.867):,Height(606.057), from width: 237.389, height: 959.683, Average: 552.790
+  Goal distance for Width(510.142):,Height(605.989), from width: 236.220, height: 959.771, Average: 554.037
+  Goal distance for Width(508.527):,Height(605.989), from width: 237.048, height: 959.771, Average: 553.466
+  Goal distance for Width(510.949):,Height(605.989), from width: 235.808, height: 959.771, Average: 554.101
+  Goal distance for Width(509.042):,Height(605.849), from width: 236.784, height: 959.951, Average: 553.451
+  Goal distance for Width(510.901):,Height(605.989), from width: 235.833, height: 959.771, Average: 554.175
+  Goal distance for Width(507.775):,Height(605.919), from width: 237.436, height: 959.860, Average: 552.196
+  Goal distance for Width(509.174):,Height(605.919), from width: 236.716, height: 959.860, Average: 553.248
+  Goal distance for Width(507.437):,Height(605.849), from width: 237.611, height: 959.951, Average: 552.553
+  Goal distance for Width(509.245):,Height(605.919), from width: 236.680, height: 959.860, Average: 553.179
+  Goal distance for Width(507.953):,Height(605.919), from width: 237.344, height: 959.860, Average: 552.841
+  Goal distance for Width(509.455):,Height(605.989), from width: 236.572, height: 959.771, Average: 553.365
+  Goal distance for Width(507.872):,Height(605.849), from width: 237.386, height: 959.951, Average: 552.698
+
+100cm
+  Goal distance for Width(991.001):,Height(1099.230), from width: 113.486, height: 592.662, Average: 1011.485
+  Goal distance for Width(991.001):,Height(1099.230), from width: 113.486, height: 592.662, Average: 1011.485
+  Goal distance for Width(1023.817):,Height(887.719), from width: 109.477, height: 704.597, Average: 894.041
+  Goal distance for Width(1023.817):,Height(887.719), from width: 109.477, height: 704.597, Average: 894.041
+  Goal distance for Width(1020.333):,Height(887.654), from width: 109.890, height: 704.639, Average: 892.112
+  Goal distance for Width(1020.333):,Height(887.654), from width: 109.890, height: 704.639, Average: 892.112
+  Goal distance for Width(1030.909):,Height(933.349), from width: 108.646, height: 676.580, Average: 923.212
+  Goal distance for Width(1030.909):,Height(933.349), from width: 108.646, height: 676.580, Average: 923.212
+  Goal distance for Width(987.199):,Height(1099.230), from width: 113.969, height: 592.662, Average: 1008.245
+  Goal distance for Width(987.199):,Height(1099.230), from width: 113.969, height: 592.662, Average: 1008.245
+  Goal distance for Width(1024.824):,Height(933.349), from width: 109.358, height: 676.580, Average: 921.184
+  Goal distance for Width(1024.824):,Height(933.349), from width: 109.358, height: 676.580, Average: 921.184
+  Goal distance for Width(1049.168):,Height(617.869), from width: 106.560, height: 944.805, Average: 736.462
+  Goal distance for Width(1049.168):,Height(617.869), from width: 106.560, height: 944.805, Average: 736.462
+  Goal distance for Width(1006.722):,Height(933.277), from width: 111.531, height: 676.622, Average: 915.177
+  Goal distance for Width(1006.722):,Height(933.277), from width: 111.531, height: 676.622, Average: 915.177
+  Goal distance for Width(1023.001):,Height(954.117), from width: 109.573, height: 664.633, Average: 933.083
+  Goal distance for Width(1023.001):,Height(954.117), from width: 109.573, height: 664.633, Average: 933.083
+  Goal distance for Width(997.445):,Height(933.203), from width: 112.677, height: 676.665, Average: 912.077
+  Goal distance for Width(997.445):,Height(933.203), from width: 112.677, height: 676.665, Average: 912.077
+  Goal distance for Width(1011.475):,Height(990.863), from width: 110.953, height: 644.608, Average: 951.354
+  Goal distance for Width(1011.475):,Height(990.863), from width: 110.953, height: 644.608, Average: 951.354
+  Goal distance for Width(1019.013):,Height(933.349), from width: 110.047, height: 676.580, Average: 919.330
+  Goal distance for Width(1019.013):,Height(933.349), from width: 110.047, height: 676.580, Average: 919.330
+  Goal distance for Width(996.978):,Height(1046.681), from width: 112.735, height: 616.636, Average: 980.175
+  Goal distance for Width(996.978):,Height(1046.681), from width: 112.735, height: 616.636, Average: 980.175
+  Goal distance for Width(991.420):,Height(1099.230), from width: 113.433, height: 592.662, Average: 1009.543
+  Goal distance for Width(991.420):,Height(1099.230), from width: 113.433, height: 592.662, Average: 1009.543
+  Goal distance for Width(990.583):,Height(1099.230), from width: 113.539, height: 592.662, Average: 1008.300
+  Goal distance for Width(990.583):,Height(1099.230), from width: 113.539, height: 592.662, Average: 1008.300
+  Goal distance for Width(1025.216):,Height(673.896), from width: 109.312, height: 880.696, Average: 763.623
+  Goal distance for Width(1025.216):,Height(673.896), from width: 109.312, height: 880.696, Average: 763.623
+  Goal distance for Width(1045.112):,Height(749.013), from width: 107.017, height: 808.485, Average: 816.136
+
+150cm
+  Goal distance for Width(1506.935):,Height(1501.988), from width: 71.448, height: 460.314, Average: 1420.896
+  Goal distance for Width(1506.935):,Height(1501.988), from width: 71.448, height: 460.314, Average: 1420.896
+  Goal distance for Width(1536.839):,Height(1486.031), from width: 69.915, height: 464.311, Average: 1421.468
+  Goal distance for Width(1536.839):,Height(1486.031), from width: 69.915, height: 464.311, Average: 1421.468
+  Goal distance for Width(1531.506):,Height(1455.020), from width: 70.184, height: 472.306, Average: 1399.790
+  Goal distance for Width(1531.506):,Height(1455.020), from width: 70.184, height: 472.306, Average: 1399.790
+  Goal distance for Width(1523.189):,Height(1501.988), from width: 70.607, height: 460.314, Average: 1424.624
+  Goal distance for Width(1523.189):,Height(1501.988), from width: 70.607, height: 460.314, Average: 1424.624
+  Goal distance for Width(1483.725):,Height(1486.031), from width: 72.683, height: 464.311, Average: 1402.055
+  Goal distance for Width(1483.725):,Height(1486.031), from width: 72.683, height: 464.311, Average: 1402.055
+  Goal distance for Width(1469.899):,Height(1661.004), from width: 73.438, height: 424.302, Average: 1499.690
+  Goal distance for Width(1469.899):,Height(1661.004), from width: 73.438, height: 424.302, Average: 1499.690
+  Goal distance for Width(1459.180):,Height(1660.816), from width: 74.034, height: 424.341, Average: 1496.054
+  Goal distance for Width(1459.180):,Height(1660.816), from width: 74.034, height: 424.341, Average: 1496.054
+  Goal distance for Width(1469.969):,Height(1660.816), from width: 73.434, height: 424.341, Average: 1501.736
+  Goal distance for Width(1469.969):,Height(1660.816), from width: 73.434, height: 424.341, Average: 1501.736
+  Goal distance for Width(1479.743):,Height(1641.500), from width: 72.899, height: 428.378, Average: 1491.688
+  Goal distance for Width(1479.743):,Height(1641.500), from width: 72.899, height: 428.378, Average: 1491.688
+  Goal distance for Width(1500.369):,Height(1586.470), from width: 71.794, height: 440.368, Average: 1466.450
+  Goal distance for Width(1500.369):,Height(1586.470), from width: 71.794, height: 440.368, Average: 1466.450
+  Goal distance for Width(1471.490):,Height(1641.694), from width: 73.351, height: 428.337, Average: 1489.029
+  Goal distance for Width(1471.490):,Height(1641.694), from width: 73.351, height: 428.337, Average: 1489.029
+  Goal distance for Width(1471.547):,Height(1641.694), from width: 73.348, height: 428.337, Average: 1489.048
+  Goal distance for Width(1471.547):,Height(1641.694), from width: 73.348, height: 428.337, Average: 1489.048
+  Goal distance for Width(1501.602):,Height(1551.771), from width: 71.728, height: 448.322, Average: 1448.524
+
+
+200cm
+  Goal distance for Width(1957.229):,Height(2214.922), from width: 53.535, height: 336.121, Average: 1979.743
+  Goal distance for Width(1957.229):,Height(2214.922), from width: 53.535, height: 336.121, Average: 1979.743
+  Goal distance for Width(1973.056):,Height(2214.922), from width: 53.061, height: 336.121, Average: 1981.478
+  Goal distance for Width(1973.056):,Height(2214.922), from width: 53.061, height: 336.121, Average: 1981.478
+  Goal distance for Width(1969.752):,Height(2214.922), from width: 53.159, height: 336.121, Average: 1983.694
+  Goal distance for Width(1969.752):,Height(2214.922), from width: 53.159, height: 336.121, Average: 1983.694
+  Goal distance for Width(1969.848):,Height(2214.922), from width: 53.156, height: 336.121, Average: 1987.294
+  Goal distance for Width(1969.848):,Height(2214.922), from width: 53.156, height: 336.121, Average: 1987.294
+  Goal distance for Width(1976.150):,Height(2214.922), from width: 52.969, height: 336.121, Average: 1985.826
+  Goal distance for Width(1976.150):,Height(2214.922), from width: 52.969, height: 336.121, Average: 1985.826
+  Goal distance for Width(1969.702):,Height(2215.128), from width: 53.161, height: 336.095, Average: 1987.016
+  Goal distance for Width(1969.702):,Height(2215.128), from width: 53.161, height: 336.095, Average: 1987.016
+  Goal distance for Width(1954.080):,Height(2214.922), from width: 53.630, height: 336.121, Average: 1982.038
+  Goal distance for Width(1954.080):,Height(2214.922), from width: 53.630, height: 336.121, Average: 1982.038
+  Goal distance for Width(1957.245):,Height(2214.922), from width: 53.534, height: 336.121, Average: 1983.093
+  Goal distance for Width(1957.245):,Height(2214.922), from width: 53.534, height: 336.121, Average: 1983.093
+  Goal distance for Width(1979.233):,Height(2215.128), from width: 52.878, height: 336.095, Average: 1990.585
+  Goal distance for Width(1979.233):,Height(2215.128), from width: 52.878, height: 336.095, Average: 1990.585
+
+
+300cm
+  Goal distance for Width(2969.598):,Height(3576.835), from width: 33.787, height: 228.035, Average: 3091.441
+  Goal distance for Width(3895.119):,Height(3965.999), from width: 25.042, height: 209.745, Average: 3788.159
+  Goal distance for Width(2991.493):,Height(3577.132), from width: 33.514, height: 228.020, Average: 3090.498
+  Goal distance for Width(3872.741):,Height(3965.999), from width: 25.202, height: 209.745, Average: 3768.085
+  Goal distance for Width(2991.493):,Height(3577.132), from width: 33.514, height: 228.020, Average: 3090.498
+  Goal distance for Width(3872.741):,Height(3965.999), from width: 25.202, height: 209.745, Average: 3768.085
+  Goal distance for Width(2958.772):,Height(3576.452), from width: 33.924, height: 228.055, Average: 3071.047
+  Goal distance for Width(3810.420):,Height(3962.939), from width: 25.657, height: 209.876, Average: 3730.752
+  Goal distance for Width(2958.772):,Height(3576.452), from width: 33.924, height: 228.055, Average: 3071.047
+  Goal distance for Width(3810.420):,Height(3962.939), from width: 25.657, height: 209.876, Average: 3730.752
+  Goal distance for Width(2980.514):,Height(3577.132), from width: 33.650, height: 228.020, Average: 3078.643
+  Goal distance for Width(3799.719):,Height(3965.999), from width: 25.737, height: 209.745, Average: 3728.452
+  Goal distance for Width(2980.514):,Height(3577.132), from width: 33.650, height: 228.020, Average: 3078.643
+  Goal distance for Width(3799.719):,Height(3965.999), from width: 25.737, height: 209.745, Average: 3728.452
+  Goal distance for Width(2989.566):,Height(3576.452), from width: 33.538, height: 228.055, Average: 3089.629
+  Goal distance for Width(3872.661):,Height(3968.953), from width: 25.203, height: 209.619, Average: 3771.446
+  Goal distance for Width(2989.566):,Height(3576.452), from width: 33.538, height: 228.055, Average: 3089.629
+  Goal distance for Width(3872.661):,Height(3968.953), from width: 25.203, height: 209.619, Average: 3771.446
+  Goal distance for Width(2937.288):,Height(3575.985), from width: 34.198, height: 228.079, Average: 3071.271
+  Goal distance for Width(3938.847):,Height(3971.801), from width: 24.735, height: 209.497, Average: 3777.251
+  Goal distance for Width(2937.288):,Height(3575.985), from width: 34.198, height: 228.079, Average: 3071.271
+  Goal distance for Width(3938.847):,Height(3971.801), from width: 24.735, height: 209.497, Average: 3777.251
+  Goal distance for Width(3812.147):,Height(3968.953), from width: 25.645, height: 209.619, Average: 3733.130
+  Goal distance for Width(2999.358):,Height(3737.181), from width: 33.417, height: 220.082, Average: 3138.274
+  Goal distance for Width(3812.147):,Height(3968.953), from width: 25.645, height: 209.619, Average: 3733.130
+  Goal distance for Width(2999.358):,Height(3737.181), from width: 33.417, height: 220.082, Average: 3138.274
+  Goal distance for Width(3003.217):,Height(3575.985), from width: 33.370, height: 228.079, Average: 3094.041
+  Goal distance for Width(3854.698):,Height(3965.999), from width: 25.332, height: 209.745, Average: 3757.687
+  Goal distance for Width(3003.217):,Height(3575.985), from width: 33.370, height: 228.079, Average: 3094.041
+  Goal distance for Width(3854.698):,Height(3965.999), from width: 25.332, height: 209.745, Average: 3757.687
+  Goal distance for Width(2991.770):,Height(3576.452), from width: 33.511, height: 228.055, Average: 3082.168
+  Goal distance for Width(2991.770):,Height(3576.452), from width: 33.511, height: 228.055, Average: 3082.168
+  Goal distance for Width(2991.773):,Height(3576.452), from width: 33.511, height: 228.055, Average: 3082.169
+  Goal distance for Width(3813.112):,Height(4066.809), from width: 25.637, height: 205.526, Average: 3740.573
+  Goal distance for Width(2991.773):,Height(3576.452), from width: 33.511, height: 228.055, Average: 3082.169
+  Goal distance for Width(3813.112):,Height(4066.809), from width: 25.637, height: 205.526, Average: 3740.573
+  Goal distance for Width(2926.562):,Height(3576.452), from width: 34.336, height: 228.055, Average: 3067.975
+  Goal distance for Width(3800.570):,Height(3962.939), from width: 25.731, height: 209.876, Average: 3733.956
+  Goal distance for Width(2926.562):,Height(3576.452), from width: 34.336, height: 228.055, Average: 3067.975
+  Goal distance for Width(3800.570):,Height(3962.939), from width: 25.731, height: 209.876, Average: 3733.956
+
+400cm
+  Goal distance for Width(5304.262):,Height(5339.188), from width: 17.808, height: 164.879, Average: 4756.052
+  Goal distance for Width(5718.300):,Height(4312.356), from width: 16.390, height: 196.000, Average: 4195.881
+  Goal distance for Width(5304.262):,Height(5339.188), from width: 17.808, height: 164.879, Average: 4756.052
+  Goal distance for Width(5673.473):,Height(4662.396), from width: 16.533, height: 184.000, Average: 4402.725
+  Goal distance for Width(5553.375):,Height(5334.947), from width: 16.928, height: 164.985, Average: 4819.922
+  Goal distance for Width(5673.473):,Height(4662.396), from width: 16.533, height: 184.000, Average: 4402.725
+  Goal distance for Width(5553.375):,Height(5334.947), from width: 16.928, height: 164.985, Average: 4819.922
+  Goal distance for Width(5665.940):,Height(4423.311), from width: 16.558, height: 192.010, Average: 4262.717
+  Goal distance for Width(5377.883):,Height(4758.042), from width: 17.539, height: 181.000, Average: 4546.216
+  Goal distance for Width(5665.940):,Height(4423.311), from width: 16.558, height: 192.010, Average: 4262.717
+  Goal distance for Width(5377.883):,Height(4758.042), from width: 17.539, height: 181.000, Average: 4546.216
+  Goal distance for Width(5490.617):,Height(4539.845), from width: 17.142, height: 188.011, Average: 4325.044
+  Goal distance for Width(5512.548):,Height(4886.694), from width: 17.067, height: 177.133, Average: 4638.437
+  Goal distance for Width(5490.617):,Height(4539.845), from width: 17.142, height: 188.011, Average: 4325.044
+  Goal distance for Width(5512.548):,Height(4886.694), from width: 17.067, height: 177.133, Average: 4638.437
+  Goal distance for Width(5565.166):,Height(4662.396), from width: 16.889, height: 184.000, Average: 4371.644
+  Goal distance for Width(5107.619):,Height(5033.483), from width: 18.567, height: 172.939, Average: 4605.527
+  Goal distance for Width(5565.166):,Height(4662.396), from width: 16.889, height: 184.000, Average: 4371.644
+  Goal distance for Width(5107.619):,Height(5033.483), from width: 18.567, height: 172.939, Average: 4605.527
+  Goal distance for Width(5553.229):,Height(4423.311), from width: 16.929, height: 192.010, Average: 4259.935
+  Goal distance for Width(5159.508):,Height(5187.907), from width: 18.361, height: 168.760, Average: 4737.027
+  Goal distance for Width(5553.229):,Height(4423.311), from width: 16.929, height: 192.010, Average: 4259.935
+  Goal distance for Width(5159.508):,Height(5187.907), from width: 18.361, height: 168.760, Average: 4737.027
+  Goal distance for Width(5517.261):,Height(4790.352), from width: 17.051, height: 180.011, Average: 4463.812
+  Goal distance for Width(5159.592):,Height(4758.042), from width: 18.360, height: 181.000, Average: 4529.620
+  Goal distance for Width(5517.261):,Height(4790.352), from width: 17.051, height: 180.011, Average: 4463.812
+  Goal distance for Width(5159.592):,Height(4758.042), from width: 18.360, height: 181.000, Average: 4529.620
+  Goal distance for Width(5724.075):,Height(4662.311), from width: 16.372, height: 184.003, Average: 4445.865
+
+500cm
+  Goal distance for Width(6726.383):,Height(6505.241), from width: 13.701, height: 140.513, Average: 6100.733
+  Goal distance for Width(7021.969):,Height(6076.547), from width: 13.065, height: 148.486, Average: 5972.131
+  Goal distance for Width(7124.948):,Height(6772.958), from width: 12.857, height: 136.000, Average: 6099.715
+  Goal distance for Width(7021.969):,Height(6076.547), from width: 13.065, height: 148.486, Average: 5972.131
+  Goal distance for Width(7124.948):,Height(6772.958), from width: 12.857, height: 136.000, Average: 6099.715
+  Goal distance for Width(6487.085):,Height(6310.474), from width: 14.260, height: 144.014, Average: 5809.757
+  Goal distance for Width(6952.815):,Height(7272.276), from width: 13.209, height: 128.390, Average: 6451.706
+  Goal distance for Width(6487.085):,Height(6310.474), from width: 14.260, height: 144.014, Average: 5809.757
+  Goal distance for Width(6952.815):,Height(7272.276), from width: 13.209, height: 128.390, Average: 6451.706
+  Goal distance for Width(6917.384):,Height(6072.295), from width: 13.283, height: 148.570, Average: 5954.559
+  Goal distance for Width(7339.896):,Height(6532.868), from width: 12.442, height: 140.032, Average: 5959.558
+  Goal distance for Width(6917.384):,Height(6072.295), from width: 13.283, height: 148.570, Average: 5954.559
+  Goal distance for Width(7339.896):,Height(6532.868), from width: 12.442, height: 140.032, Average: 5959.558
+  Goal distance for Width(7173.115):,Height(6076.547), from width: 12.762, height: 148.486, Average: 6004.777
+  Goal distance for Width(7654.510):,Height(6101.019), from width: 11.879, height: 148.003, Average: 5755.005
+  Goal distance for Width(7173.115):,Height(6076.547), from width: 12.762, height: 148.486, Average: 6004.777
+  Goal distance for Width(7654.510):,Height(6101.019), from width: 11.879, height: 148.003, Average: 5755.005
+  Goal distance for Width(7178.249):,Height(6072.295), from width: 12.752, height: 148.570, Average: 5993.243
+  Goal distance for Width(6595.943):,Height(6772.732), from width: 14.000, height: 136.004, Average: 5945.116
+  Goal distance for Width(7178.249):,Height(6072.295), from width: 12.752, height: 148.570, Average: 5993.243
+  Goal distance for Width(6595.943):,Height(6772.732), from width: 14.000, height: 136.004, Average: 5945.116
+  Goal distance for Width(7927.082):,Height(6101.019), from width: 11.428, height: 148.003, Average: 5852.546
+  Goal distance for Width(6954.676):,Height(6284.307), from width: 13.205, height: 144.499, Average: 6047.136
+  Goal distance for Width(7927.082):,Height(6101.019), from width: 11.428, height: 148.003, Average: 5852.546
+  Goal distance for Width(6954.676):,Height(6284.307), from width: 13.205, height: 144.499, Average: 6047.136
+  Goal distance for Width(6817.856):,Height(6099.643), from width: 13.498, height: 148.030, Average: 5706.611
+  Goal distance for Width(6817.856):,Height(6099.643), from width: 13.498, height: 148.030, Average: 5706.611
+  Goal distance for Width(6849.054):,Height(6500.159), from width: 13.430, height: 140.602, Average: 6118.787
+  Goal distance for Width(6849.054):,Height(6500.159), from width: 13.430, height: 140.602, Average: 6118.787
+  Goal distance for Width(6880.078):,Height(6072.295), from width: 13.363, height: 148.570, Average: 5948.808
+  Goal distance for Width(6623.776):,Height(7027.141), from width: 13.935, height: 132.004, Average: 6275.663
+
+650cm
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6694.338
+  Goal distance for Width(9788.501):,Height(7018.437), from width: 9.054, height: 132.136, Average: 6784.224
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6694.338
+  Goal distance for Width(9788.501):,Height(7018.437), from width: 9.054, height: 132.136, Average: 6784.224
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10383.508):,Height(7007.288), from width: 8.483, height: 132.306, Average: 6785.363
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10383.508):,Height(7007.288), from width: 8.483, height: 132.306, Average: 6785.363
+  Goal distance for Width(10276.901):,Height(7015.212), from width: 8.580, height: 132.185, Average: 6780.591
+  Goal distance for Width(10950.107):,Height(7299.660), from width: 8.000, height: 128.000, Average: 6776.816
+  Goal distance for Width(10276.901):,Height(7015.212), from width: 8.580, height: 132.185, Average: 6780.591
+  Goal distance for Width(10950.107):,Height(7299.660), from width: 8.000, height: 128.000, Average: 6776.816
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(9654.493):,Height(7007.288), from width: 9.193, height: 132.306, Average: 6725.420
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(9654.493):,Height(7007.288), from width: 9.193, height: 132.306, Average: 6725.420
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6629.391
+  Goal distance for Width(10363.488):,Height(7011.494), from width: 8.501, height: 132.242, Average: 6755.363
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6629.391
+  Goal distance for Width(10363.488):,Height(7011.494), from width: 8.501, height: 132.242, Average: 6755.363
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(9748.313):,Height(7292.788), from width: 9.096, height: 128.098, Average: 6952.970
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(9748.313):,Height(7292.788), from width: 9.096, height: 128.098, Average: 6952.970
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10366.415):,Height(7007.288), from width: 8.499, height: 132.306, Average: 6784.053
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10366.415):,Height(7007.288), from width: 8.499, height: 132.306, Average: 6784.053
+  Goal distance for Width(10115.250):,Height(7007.288), from width: 8.732, height: 132.306, Average: 6808.051
+  Goal distance for Width(10115.250):,Height(7007.288), from width: 8.732, height: 132.306, Average: 6808.051
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10968.219):,Height(7011.494), from width: 7.985, height: 132.242, Average: 6829.548
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10968.219):,Height(7011.494), from width: 7.985, height: 132.242, Average: 6829.548
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10363.719):,Height(7011.494), from width: 8.501, height: 132.242, Average: 6785.688
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10363.719):,Height(7011.494), from width: 8.501, height: 132.242, Average: 6785.688
+  Goal distance for Width(10950.107):,Height(7027.390), from width: 8.000, height: 132.000, Average: 6656.697
+  Goal distance for Width(10962.604):,Height(7018.437), from width: 7.990, height: 132.136, Average: 6832.227
+
+800cm
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7565.534
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7621.828
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7621.828
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10979.910):,Height(8574.597), from width: 7.976, height: 112.361, Average: 8010.612
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10979.910):,Height(8574.597), from width: 7.976, height: 112.361, Average: 8010.612
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10976.958):,Height(8581.736), from width: 7.978, height: 112.285, Average: 8013.519
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10976.958):,Height(8581.736), from width: 7.978, height: 112.285, Average: 8013.519
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7570.089
+  Goal distance for Width(10978.606):,Height(8581.736), from width: 7.977, height: 112.285, Average: 7968.144
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7570.089
+  Goal distance for Width(10978.606):,Height(8581.736), from width: 7.977, height: 112.285, Average: 7968.144
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10950.107):,Height(7905.449), from width: 8.000, height: 120.000, Average: 7359.796
+  Goal distance for Width(10950.107):,Height(7905.449), from width: 8.000, height: 120.000, Average: 7359.796
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7619.155
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7621.828
+  Goal distance for Width(10982.041):,Height(8574.597), from width: 7.974, height: 112.361, Average: 8025.559
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7621.828
+  Goal distance for Width(10982.041):,Height(8574.597), from width: 7.974, height: 112.361, Average: 8025.559
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7903.012
+  Goal distance for Width(10978.606):,Height(8581.736), from width: 7.977, height: 112.285, Average: 8028.427
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7903.012
+  Goal distance for Width(10978.606):,Height(8581.736), from width: 7.977, height: 112.285, Average: 8028.427
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7845.451
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7845.451
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7961.260
+  Goal distance for Width(10950.107):,Height(8608.753), from width: 8.000, height: 112.000, Average: 7961.260
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7565.534
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7565.534
+  Goal distance for Width(10950.107):,Height(8243.550), from width: 8.000, height: 116.000, Average: 7567.463
+
+
+---------------
+
+Distances for 38 by piyushk on 6/14/12 -- a number of improvements to goal width estimation (high res scan + better estimates of when the head is stationary)
+
+50cm
+        Goal distance for Width(111.809),Height(478.026), from width: 584.723, height: 567.998, Average: 576.360, OldWidth 110.993
+        Goal distance for Width(111.671),Height(478.017), from width: 585.307, height: 568.010, Average: 576.658, OldWidth 110.996
+        Goal distance for Width(111.816),Height(478.026), from width: 584.697, height: 567.998, Average: 576.347, OldWidth 110.995
+        Goal distance for Width(111.574),Height(478.026), from width: 585.718, height: 567.998, Average: 576.858, OldWidth 110.995
+        Goal distance for Width(112.309),Height(478.038), from width: 582.624, height: 567.983, Average: 575.304, OldWidth 111.992
+        Goal distance for Width(112.242),Height(478.026), from width: 582.905, height: 567.998, Average: 575.451, OldWidth 111.992
+        Goal distance for Width(112.350),Height(478.017), from width: 582.455, height: 568.010, Average: 575.232, OldWidth 111.995
+
+100cm
+        Goal distance for Width(56.631),Height(318.002), from width: 1012.144, height: 874.877, Average: 943.510, OldWidth 56.000
+        Goal distance for Width(56.631),Height(318.002), from width: 1012.144, height: 874.877, Average: 943.510, OldWidth 56.000
+        Goal distance for Width(57.069),Height(316.002), from width: 1005.873, height: 880.746, Average: 943.309, OldWidth 57.000
+        Goal distance for Width(57.069),Height(316.002), from width: 1005.873, height: 880.746, Average: 943.309, OldWidth 57.000
+        Goal distance for Width(57.189),Height(316.000), from width: 1004.174, height: 880.750, Average: 942.462, OldWidth 57.000
+        Goal distance for Width(57.189),Height(316.000), from width: 1004.174, height: 880.750, Average: 942.462, OldWidth 57.000
+
+150cm
+        Goal distance for Width(37.386),Height(230.009), from width: 1414.846, height: 1233.214, Average: 1324.030, OldWidth 36.998
+        Goal distance for Width(37.386),Height(230.009), from width: 1414.846, height: 1233.214, Average: 1324.030, OldWidth 36.998
+        Goal distance for Width(37.443),Height(232.009), from width: 1413.122, height: 1221.951, Average: 1317.536, OldWidth 36.998
+        Goal distance for Width(37.443),Height(232.009), from width: 1413.122, height: 1221.951, Average: 1317.536, OldWidth 36.998
+        Goal distance for Width(37.196),Height(230.020), from width: 1420.680, height: 1233.152, Average: 1326.916, OldWidth 36.998
+        Goal distance for Width(37.196),Height(230.020), from width: 1420.680, height: 1233.152, Average: 1326.916, OldWidth 36.998
+
+200cm
+        Goal distance for Width(27.441),Height(188.011), from width: 1815.676, height: 1526.976, Average: 1671.326, OldWidth 26.999
+        Goal distance for Width(27.441),Height(188.011), from width: 1815.676, height: 1526.976, Average: 1671.326, OldWidth 26.999
+        Goal distance for Width(26.884),Height(188.003), from width: 1845.976, height: 1527.045, Average: 1686.511, OldWidth 26.000
+        Goal distance for Width(26.884),Height(188.003), from width: 1845.976, height: 1527.045, Average: 1686.511, OldWidth 26.000
+        Goal distance for Width(26.820),Height(188.003), from width: 1849.510, height: 1527.045, Average: 1688.278, OldWidth 25.999
+        Goal distance for Width(26.820),Height(188.003), from width: 1849.510, height: 1527.045, Average: 1688.278, OldWidth 25.999
+
+250cm
+        Goal distance for Width(21.456),Height(160.003), from width: 2214.261, height: 1811.641, Average: 2012.951, OldWidth 20.999
+        Goal distance for Width(21.456),Height(160.003), from width: 2214.261, height: 1811.641, Average: 2012.951, OldWidth 20.999
+        Goal distance for Width(21.634),Height(162.000), from width: 2199.557, height: 1787.985, Average: 1993.771, OldWidth 21.000
+        Goal distance for Width(21.634),Height(162.000), from width: 2199.557, height: 1787.985, Average: 1993.771, OldWidth 21.000
+        Goal distance for Width(21.739),Height(160.003), from width: 2190.958, height: 1811.641, Average: 2001.299, OldWidth 20.999
+        Goal distance for Width(21.739),Height(160.003), from width: 2190.958, height: 1811.641, Average: 2001.299, OldWidth 20.999
+
+300cm
+        Goal distance for Width(17.173),Height(136.004), from width: 2649.900, height: 2152.125, Average: 2401.012, OldWidth 16.999
+        Goal distance for Width(17.173),Height(136.004), from width: 2649.900, height: 2152.125, Average: 2401.012, OldWidth 16.999
+        Goal distance for Width(16.926),Height(136.004), from width: 2681.061, height: 2152.125, Average: 2416.593, OldWidth 15.999
+        Goal distance for Width(16.926),Height(136.004), from width: 2681.061, height: 2152.125, Average: 2416.593, OldWidth 15.999
+        Goal distance for Width(17.000),Height(136.000), from width: 2671.649, height: 2152.186, Average: 2411.918, OldWidth 17.000
+        Goal distance for Width(17.000),Height(136.000), from width: 2671.649, height: 2152.186, Average: 2411.918, OldWidth 17.000
+
+400cm
+        Goal distance for Width(12.105),Height(118.000), from width: 3513.469, height: 2501.618, Average: 3007.544, OldWidth 12.000
+        Goal distance for Width(12.105),Height(118.000), from width: 3513.469, height: 2501.618, Average: 3007.544, OldWidth 12.000
+        Goal distance for Width(13.123),Height(118.000), from width: 3291.998, height: 2501.618, Average: 2896.808, OldWidth 13.000
+        Goal distance for Width(13.123),Height(118.000), from width: 3291.998, height: 2501.618, Average: 2896.808, OldWidth 13.000
+        Goal distance for Width(13.000),Height(118.000), from width: 3317.057, height: 2501.618, Average: 2909.338, OldWidth 13.000
+        Goal distance for Width(13.000),Height(118.000), from width: 3317.057, height: 2501.618, Average: 2909.338, OldWidth 13.000
+        Goal distance for Width(12.203),Height(118.004), from width: 3490.655, height: 2501.523, Average: 2996.089, OldWidth 12.000
+        Goal distance for Width(12.203),Height(118.004), from width: 3490.655, height: 2501.523, Average: 2996.089, OldWidth 12.000
+        Goal distance for Width(12.357),Height(110.005), from width: 3455.584, height: 2694.717, Average: 3075.151, OldWidth 12.000
+        Goal distance for Width(12.357),Height(110.005), from width: 3455.584, height: 2694.717, Average: 3075.151, OldWidth 12.000
+        Goal distance for Width(12.440),Height(120.004), from width: 3436.889, height: 2457.365, Average: 2947.127, OldWidth 12.000
+        Goal distance for Width(12.440),Height(120.004), from width: 3436.889, height: 2457.365, Average: 2947.127, OldWidth 12.000
+        Goal distance for Width(12.172),Height(120.004), from width: 3497.814, height: 2457.365, Average: 2977.589, OldWidth 12.000
+        Goal distance for Width(12.172),Height(120.004), from width: 3497.814, height: 2457.365, Average: 2977.589, OldWidth 12.000
+        Goal distance for Width(12.542),Height(120.004), from width: 3414.355, height: 2457.365, Average: 2935.860, OldWidth 12.000
+        Goal distance for Width(12.542),Height(120.004), from width: 3414.355, height: 2457.365, Average: 2935.860, OldWidth 12.000
+
+500cm
+        Goal distance for Width(8.744),Height(94.005), from width: 4567.342, height: 3183.098, Average: 3875.220, OldWidth 8.000
+        Goal distance for Width(8.744),Height(94.005), from width: 4567.342, height: 3183.098, Average: 3875.220, OldWidth 8.000
+        Goal distance for Width(8.893),Height(92.005), from width: 4505.529, height: 3256.470, Average: 3880.999, OldWidth 8.000
+        Goal distance for Width(8.893),Height(92.005), from width: 4505.529, height: 3256.470, Average: 3880.999, OldWidth 8.000
+        Goal distance for Width(9.066),Height(88.006), from width: 4436.260, height: 3413.526, Average: 3924.893, OldWidth 8.999
+        Goal distance for Width(9.066),Height(88.006), from width: 4436.260, height: 3413.526, Average: 3924.893, OldWidth 8.999
+        Goal distance for Width(9.628),Height(88.006), from width: 4226.266, height: 3413.526, Average: 3819.896, OldWidth 9.000
+        Goal distance for Width(9.628),Height(88.006), from width: 4226.266, height: 3413.526, Average: 3819.896, OldWidth 9.000
+        Goal distance for Width(9.283),Height(90.000), from width: 4352.518, height: 3333.419, Average: 3842.969, OldWidth 9.000
+        Goal distance for Width(9.283),Height(90.000), from width: 4352.518, height: 3333.419, Average: 3842.969, OldWidth 9.000
+        Goal distance for Width(9.370),Height(90.000), from width: 4319.880, height: 3333.419, Average: 3826.650, OldWidth 9.000
+        Goal distance for Width(9.370),Height(90.000), from width: 4319.880, height: 3333.419, Average: 3826.650, OldWidth 9.000
+        Goal distance for Width(9.428),Height(68.000), from width: 4298.102, height: 4486.396, Average: 4392.249, OldWidth 9.000
+        Goal distance for Width(9.428),Height(68.000), from width: 4298.102, height: 4486.396, Average: 4392.249, OldWidth 9.000
+
+600cm
+        Goal distance for Width(7.568),Height(72.000), from width: 5132.101, height: 4222.705, Average: 4677.403, OldWidth 7.000
+        Goal distance for Width(7.568),Height(72.000), from width: 5132.101, height: 4222.705, Average: 4677.403, OldWidth 7.000
+        Goal distance for Width(7.556),Height(70.000), from width: 5138.681, height: 4350.670, Average: 4744.676, OldWidth 7.000
+        Goal distance for Width(7.556),Height(70.000), from width: 5138.681, height: 4350.670, Average: 4744.676, OldWidth 7.000
+        Goal distance for Width(7.256),Height(68.007), from width: 5308.831, height: 4485.881, Average: 4897.356, OldWidth 6.999
+        Goal distance for Width(7.256),Height(68.007), from width: 5308.831, height: 4485.881, Average: 4897.356, OldWidth 6.999
+        Goal distance for Width(7.861),Height(70.000), from width: 4976.960, height: 4350.670, Average: 4663.815, OldWidth 7.000
+        Goal distance for Width(7.861),Height(70.000), from width: 4976.960, height: 4350.670, Average: 4663.815, OldWidth 7.000
+        Goal distance for Width(7.111),Height(70.007), from width: 5396.393, height: 4350.200, Average: 4873.296, OldWidth 7.000
+        Goal distance for Width(7.111),Height(70.007), from width: 5396.393, height: 4350.200, Average: 4873.296, OldWidth 7.000
+        Goal distance for Width(7.914),Height(74.000), from width: 4949.975, height: 4101.856, Average: 4525.916, OldWidth 7.000
+        Goal distance for Width(7.914),Height(74.000), from width: 4949.975, height: 4101.856, Average: 4525.916, OldWidth 7.000
+        Goal distance for Width(7.391),Height(36.056), from width: 5230.756, height: 8788.188, Average: 7009.472, OldWidth 6.992
+
+
+---------
+
+Distances for 37 by sbarrett and katie on 6/12/12 -- high contrast color table
+
+50cm
+        Goal distance for Width(117.867),Height(478.205), from width: 515.794, height: 587.353, Average: 551.573
+        Goal distance for Width(116.981),Height(478.067), from width: 519.124, height: 587.537, Average: 553.330
+        Goal distance for Width(115.994),Height(478.017), from width: 522.886, height: 587.603, Average: 555.245
+        Goal distance for Width(115.989),Height(478.004), from width: 522.905, height: 587.620, Average: 555.262
+        Goal distance for Width(114.993),Height(478.004), from width: 526.767, height: 587.620, Average: 557.193
+        Goal distance for Width(115.988),Height(478.038), from width: 522.909, height: 587.576, Average: 555.242
+        Goal distance for Width(115.989),Height(478.038), from width: 522.906, height: 587.576, Average: 555.241
+        Goal distance for Width(115.992),Height(478.017), from width: 522.894, height: 587.603, Average: 555.249
+        Goal distance for Width(115.990),Height(478.038), from width: 522.902, height: 587.576, Average: 555.239
+        Goal distance for Width(115.993),Height(478.004), from width: 522.891, height: 587.620, Average: 555.255
+
+100cm
+        Goal distance for Width(58.957),Height(296.331), from width: 931.175, height: 985.884, Average: 958.529
+        Goal distance for Width(58.957),Height(296.331), from width: 931.175, height: 985.884, Average: 958.529
+        Goal distance for Width(56.000),Height(296.007), from width: 972.957, height: 987.052, Average: 980.005
+        Goal distance for Width(56.000),Height(296.007), from width: 972.957, height: 987.052, Average: 980.005
+        Goal distance for Width(55.995),Height(296.061), from width: 973.032, height: 986.857, Average: 979.945
+        Goal distance for Width(55.995),Height(296.061), from width: 973.032, height: 986.857, Average: 979.945
+        Goal distance for Width(55.998),Height(296.007), from width: 972.978, height: 987.052, Average: 980.015
+        Goal distance for Width(55.998),Height(296.007), from width: 972.978, height: 987.052, Average: 980.015
+        Goal distance for Width(55.994),Height(292.027), from width: 973.036, height: 1001.617, Average: 987.326
+        Goal distance for Width(55.994),Height(292.027), from width: 973.036, height: 1001.617, Average: 987.326
+        Goal distance for Width(54.993),Height(294.027), from width: 988.124, height: 994.246, Average: 991.185
+        Goal distance for Width(54.993),Height(294.027), from width: 988.124, height: 994.246, Average: 991.185
+        Goal distance for Width(55.994),Height(294.027), from width: 973.041, height: 994.246, Average: 983.644
+        Goal distance for Width(55.994),Height(294.027), from width: 973.041, height: 994.246, Average: 983.644
+        Goal distance for Width(55.994),Height(294.027), from width: 973.046, height: 994.246, Average: 983.646
+        Goal distance for Width(55.994),Height(294.027), from width: 973.046, height: 994.246, Average: 983.646
+        Goal distance for Width(54.995),Height(294.027), from width: 988.098, height: 994.246, Average: 991.172
+        Goal distance for Width(54.995),Height(294.027), from width: 988.098, height: 994.246, Average: 991.172
+        Goal distance for Width(55.993),Height(294.027), from width: 973.051, height: 994.246, Average: 983.649
+        Goal distance for Width(55.993),Height(294.027), from width: 973.051, height: 994.246, Average: 983.649
+        Goal distance for Width(68.903),Height(290.028), from width: 815.271, height: 1009.093, Average: 912.182
+        Goal distance for Width(68.903),Height(290.028), from width: 815.271, height: 1009.093, Average: 912.182
+        Goal distance for Width(58.989),Height(288.007), from width: 930.753, height: 1016.757, Average: 973.755
+        Goal distance for Width(58.989),Height(288.007), from width: 930.753, height: 1016.757, Average: 973.755
+        Goal distance for Width(55.999),Height(288.007), from width: 972.964, height: 1016.757, Average: 994.860
+        Goal distance for Width(55.999),Height(288.007), from width: 972.964, height: 1016.757, Average: 994.860
+        Goal distance for Width(55.999),Height(288.007), from width: 972.967, height: 1016.757, Average: 994.862
+        Goal distance for Width(55.999),Height(288.007), from width: 972.967, height: 1016.757, Average: 994.862
+        Goal distance for Width(55.999),Height(288.007), from width: 972.962, height: 1016.757, Average: 994.860
+        Goal distance for Width(55.999),Height(288.007), from width: 972.962, height: 1016.757, Average: 994.860
+        Goal distance for Width(56.000),Height(292.007), from width: 972.952, height: 1001.693, Average: 987.323
+        Goal distance for Width(56.000),Height(292.007), from width: 972.952, height: 1001.693, Average: 987.323
+        Goal distance for Width(54.999),Height(292.007), from width: 988.027, height: 1001.693, Average: 994.860
+        Goal distance for Width(54.999),Height(292.007), from width: 988.027, height: 1001.693, Average: 994.860
+        Goal distance for Width(55.000),Height(292.000), from width: 988.020, height: 1001.718, Average: 994.869
+        Goal distance for Width(55.000),Height(292.000), from width: 988.020, height: 1001.718, Average: 994.869
+        Goal distance for Width(56.000),Height(288.007), from width: 972.959, height: 1016.757, Average: 994.858
+        Goal distance for Width(56.000),Height(288.007), from width: 972.959, height: 1016.757, Average: 994.858
+
+150cm
+        Goal distance for Width(41.982),Height(194.165), from width: 1243.930, height: 1557.862, Average: 1400.896
+        Goal distance for Width(41.982),Height(194.165), from width: 1243.930, height: 1557.862, Average: 1400.896
+        Goal distance for Width(37.995),Height(194.000), from width: 1354.405, height: 1559.295, Average: 1456.850
+        Goal distance for Width(37.995),Height(194.000), from width: 1354.405, height: 1559.295, Average: 1456.850
+        Goal distance for Width(35.000),Height(194.010), from width: 1452.638, height: 1559.205, Average: 1505.922
+        Goal distance for Width(35.000),Height(194.010), from width: 1452.638, height: 1559.205, Average: 1505.922
+        Goal distance for Width(34.999),Height(194.000), from width: 1452.679, height: 1559.295, Average: 1505.987
+        Goal distance for Width(34.999),Height(194.000), from width: 1452.679, height: 1559.295, Average: 1505.987
+        Goal distance for Width(36.000),Height(194.000), from width: 1418.156, height: 1559.295, Average: 1488.726
+        Goal distance for Width(36.000),Height(194.000), from width: 1418.156, height: 1559.295, Average: 1488.726
+        Goal distance for Width(34.998),Height(196.010), from width: 1452.710, height: 1541.996, Average: 1497.353
+        Goal distance for Width(34.998),Height(196.010), from width: 1452.710, height: 1541.996, Average: 1497.353
+        Goal distance for Width(35.000),Height(194.010), from width: 1452.650, height: 1559.205, Average: 1505.928
+        Goal distance for Width(35.000),Height(194.010), from width: 1452.650, height: 1559.205, Average: 1505.928
+        Goal distance for Width(33.998),Height(196.000), from width: 1489.063, height: 1542.083, Average: 1515.573
+        Goal distance for Width(33.998),Height(196.000), from width: 1489.063, height: 1542.083, Average: 1515.573
+
+200cm
+        Goal distance for Width(29.989),Height(144.056), from width: 1657.232, height: 2151.937, Average: 1904.584
+        Goal distance for Width(29.989),Height(144.056), from width: 1657.232, height: 2151.937, Average: 1904.584
+        Goal distance for Width(28.988),Height(142.056), from width: 1705.912, height: 2184.731, Average: 1945.321
+        Goal distance for Width(28.988),Height(142.056), from width: 1705.912, height: 2184.731, Average: 1945.321
+        Goal distance for Width(25.999),Height(144.000), from width: 1871.819, height: 2152.835, Average: 2012.327
+        Goal distance for Width(25.999),Height(144.000), from width: 1871.819, height: 2152.835, Average: 2012.327
+        Goal distance for Width(24.998),Height(146.000), from width: 1935.496, height: 2120.937, Average: 2028.216
+        Goal distance for Width(24.998),Height(146.000), from width: 1935.496, height: 2120.937, Average: 2028.216
+        Goal distance for Width(25.998),Height(144.014), from width: 1871.830, height: 2152.610, Average: 2012.220
+        Goal distance for Width(25.998),Height(144.014), from width: 1871.830, height: 2152.610, Average: 2012.220
+        Goal distance for Width(25.999),Height(146.000), from width: 1871.792, height: 2120.937, Average: 1996.365
+        Goal distance for Width(25.999),Height(146.000), from width: 1871.792, height: 2120.937, Average: 1996.365
+        Goal distance for Width(25.999),Height(146.000), from width: 1871.813, height: 2120.937, Average: 1996.375
+        Goal distance for Width(25.999),Height(146.000), from width: 1871.813, height: 2120.937, Average: 1996.375
+        Goal distance for Width(25.999),Height(144.000), from width: 1871.813, height: 2152.835, Average: 2012.324
+        Goal distance for Width(25.999),Height(144.000), from width: 1871.813, height: 2152.835, Average: 2012.324
+        Goal distance for Width(26.999),Height(142.000), from width: 1812.517, height: 2185.668, Average: 1999.093
+        Goal distance for Width(26.999),Height(142.000), from width: 1812.517, height: 2185.668, Average: 1999.093
+        Goal distance for Width(25.999),Height(144.014), from width: 1871.819, height: 2152.610, Average: 2012.215
+        Goal distance for Width(25.999),Height(144.014), from width: 1871.819, height: 2152.610, Average: 2012.215
+
+250cm
+        Goal distance for Width(23.998),Height(118.017), from width: 2004.086, height: 2670.143, Average: 2337.115
+        Goal distance for Width(23.998),Height(118.017), from width: 2004.086, height: 2670.143, Average: 2337.115
+        Goal distance for Width(22.998),Height(118.068), from width: 2078.204, height: 2668.899, Average: 2373.552
+        Goal distance for Width(22.998),Height(118.068), from width: 2078.204, height: 2668.899, Average: 2373.552
+        Goal distance for Width(20.000),Height(118.068), from width: 2341.078, height: 2668.899, Average: 2504.989
+        Goal distance for Width(20.000),Height(118.068), from width: 2341.078, height: 2668.899, Average: 2504.989
+        Goal distance for Width(20.000),Height(116.000), from width: 2341.050, height: 2720.424, Average: 2530.737
+        Goal distance for Width(20.000),Height(116.000), from width: 2341.050, height: 2720.424, Average: 2530.737
+        Goal distance for Width(20.000),Height(118.000), from width: 2341.073, height: 2670.558, Average: 2505.816
+        Goal distance for Width(20.000),Height(118.000), from width: 2341.073, height: 2670.558, Average: 2505.816
+        Goal distance for Width(19.000),Height(120.000), from width: 2445.738, height: 2622.422, Average: 2534.080
+        Goal distance for Width(19.000),Height(120.000), from width: 2445.738, height: 2622.422, Average: 2534.080
+        Goal distance for Width(19.000),Height(120.000), from width: 2445.759, height: 2622.422, Average: 2534.091
+        Goal distance for Width(19.000),Height(120.000), from width: 2445.759, height: 2622.422, Average: 2534.091
+        Goal distance for Width(19.999),Height(120.000), from width: 2341.112, height: 2622.422, Average: 2481.767
+        Goal distance for Width(19.999),Height(120.000), from width: 2341.112, height: 2622.422, Average: 2481.767
+        Goal distance for Width(19.000),Height(120.017), from width: 2445.753, height: 2622.028, Average: 2533.891
+        Goal distance for Width(19.000),Height(120.017), from width: 2445.753, height: 2622.028, Average: 2533.891
+        Goal distance for Width(19.999),Height(118.017), from width: 2341.104, height: 2670.143, Average: 2505.624
+        Goal distance for Width(19.999),Height(118.017), from width: 2341.104, height: 2670.143, Average: 2505.624
+
+300cm
+        Goal distance for Width(17.000),Height(96.021), from width: 2689.055, height: 3337.944, Average: 3013.500
+        Goal distance for Width(17.000),Height(96.021), from width: 2689.055, height: 3337.944, Average: 3013.500
+        Goal distance for Width(13.992),Height(94.021), from width: 3174.818, height: 3414.836, Average: 3294.827
+        Goal distance for Width(13.992),Height(94.021), from width: 3174.818, height: 3414.836, Average: 3294.827
+        Goal distance for Width(13.996),Height(94.000), from width: 3174.113, height: 3415.673, Average: 3294.893
+        Goal distance for Width(13.996),Height(94.000), from width: 3174.113, height: 3415.673, Average: 3294.893
+        Goal distance for Width(14.993),Height(94.021), from width: 2993.222, height: 3414.836, Average: 3204.029
+        Goal distance for Width(14.993),Height(94.021), from width: 2993.222, height: 3414.836, Average: 3204.029
+        Goal distance for Width(14.993),Height(94.021), from width: 2993.192, height: 3414.836, Average: 3204.014
+        Goal distance for Width(14.993),Height(94.021), from width: 2993.192, height: 3414.836, Average: 3204.014
+        Goal distance for Width(13.995),Height(94.021), from width: 3174.159, height: 3414.836, Average: 3294.498
+        Goal distance for Width(13.995),Height(94.021), from width: 3174.159, height: 3414.836, Average: 3294.498
+        Goal distance for Width(14.992),Height(96.021), from width: 2993.227, height: 3337.944, Average: 3165.585
+        Goal distance for Width(14.992),Height(96.021), from width: 2993.227, height: 3337.944, Average: 3165.585
+        Goal distance for Width(13.996),Height(96.000), from width: 3174.095, height: 3338.728, Average: 3256.412
+        Goal distance for Width(13.996),Height(96.000), from width: 3174.095, height: 3338.728, Average: 3256.412
+        Goal distance for Width(14.994),Height(96.021), from width: 2993.021, height: 3337.944, Average: 3165.482
+        Goal distance for Width(14.994),Height(96.021), from width: 2993.021, height: 3337.944, Average: 3165.482
+
+400cm 
+        Goal distance for Width(11.955),Height(72.028), from width: 3876.522, height: 4293.960, Average: 4085.241
+        Goal distance for Width(9.969),Height(82.219), from width: 4541.956, height: 3725.012, Average: 4133.484
+        Goal distance for Width(9.969),Height(82.219), from width: 4541.956, height: 3725.012, Average: 4133.484
+        Goal distance for Width(8.991),Height(82.098), from width: 4969.647, height: 3730.943, Average: 4350.295
+        Goal distance for Width(8.991),Height(82.098), from width: 4969.647, height: 3730.943, Average: 4350.295
+        Goal distance for Width(7.997),Height(80.225), from width: 5504.182, height: 3824.573, Average: 4664.377
+        Goal distance for Width(7.997),Height(80.225), from width: 5504.182, height: 3824.573, Average: 4664.377
+        Goal distance for Width(8.990),Height(80.100), from width: 4970.005, height: 3830.971, Average: 4400.488
+        Goal distance for Width(8.990),Height(80.100), from width: 4970.005, height: 3830.971, Average: 4400.488
+        Goal distance for Width(8.990),Height(74.108), from width: 4970.268, height: 4164.634, Average: 4567.451
+        Goal distance for Width(8.990),Height(74.108), from width: 4970.268, height: 4164.634, Average: 4567.451
+        Goal distance for Width(8.994),Height(76.105), from width: 4967.974, height: 4047.365, Average: 4507.669
+        Goal distance for Width(8.994),Height(76.105), from width: 4967.974, height: 4047.365, Average: 4507.669
+        Goal distance for Width(8.992),Height(82.098), from width: 4969.096, height: 3730.943, Average: 4350.020
+        Goal distance for Width(8.992),Height(82.098), from width: 4969.096, height: 3730.943, Average: 4350.020
+        Goal distance for Width(8.993),Height(66.030), from width: 4968.394, height: 4714.236, Average: 4841.315
+        Goal distance for Width(8.993),Height(66.030), from width: 4968.394, height: 4714.236, Average: 4841.315
+        Goal distance for Width(8.995),Height(74.108), from width: 4967.821, height: 4164.634, Average: 4566.227
+        Goal distance for Width(8.995),Height(74.108), from width: 4967.821, height: 4164.634, Average: 4566.227
+
+------------------
+
+
+Distances for 37 by sbarrett and piyushk on 6/12/12
+
+50cm
+        Goal distance for Width(117.995),Height(470.004), from width: 592.005, height: 547.100, Average: 569.552
+Goal distance for Width(116.975),Height(478.105), from width: 595.695, height: 538.375, Average: 567.035
+        Goal distance for Width(115.994),Height(478.038), from width: 599.295, height: 538.446, Average: 568.871
+        Goal distance for Width(116.985),Height(478.105), from width: 595.659, height: 538.375, Average: 567.017
+        Goal distance for Width(116.989),Height(478.067), from width: 595.642, height: 538.415, Average: 567.029
+        Goal distance for Width(118.984),Height(452.071), from width: 588.476, height: 567.494, Average: 577.985
+        Goal distance for Width(118.984),Height(452.071), from width: 588.476, height: 567.494, Average: 577.985
+        Goal distance for Width(116.981),Height(478.105), from width: 595.674, height: 538.375, Average: 567.025
+        Goal distance for Width(115.990),Height(478.105), from width: 599.310, height: 538.375, Average: 568.843
+        Goal distance for Width(117.985),Height(458.070), from width: 592.040, height: 560.499, Average: 576.270
+        Goal distance for Width(117.985),Height(458.070), from width: 592.040, height: 560.499, Average: 576.270
+        Goal distance for Width(116.996),Height(478.038), from width: 595.620, height: 538.446, Average: 567.033
+
+
+100cm
+        Goal distance for Width(56.968),Height(294.245), from width: 997.013, height: 849.983, Average: 923.498
+        Goal distance for Width(56.968),Height(294.245), from width: 997.013, height: 849.983, Average: 923.498
+        Goal distance for Width(55.998),Height(292.007), from width: 1009.351, height: 856.110, Average: 932.730
+        Goal distance for Width(55.998),Height(292.007), from width: 1009.351, height: 856.110, Average: 932.730
+        Goal distance for Width(54.999),Height(294.000), from width: 1022.436, height: 850.649, Average: 936.542
+        Goal distance for Width(54.999),Height(294.000), from width: 1022.436, height: 850.649, Average: 936.542
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(54.999),Height(294.000), from width: 1022.436, height: 850.649, Average: 936.542
+        Goal distance for Width(54.999),Height(294.000), from width: 1022.436, height: 850.649, Average: 936.542
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(54.000),Height(294.000), from width: 1035.946, height: 850.649, Average: 943.298
+        Goal distance for Width(54.000),Height(294.000), from width: 1035.946, height: 850.649, Average: 943.298
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.007), from width: 1022.427, height: 850.630, Average: 936.529
+        Goal distance for Width(55.000),Height(294.000), from width: 1022.430, height: 850.649, Average: 936.539
+        Goal distance for Width(55.000),Height(294.000), from width: 1022.430, height: 850.649, Average: 936.539
+
+150cm
+        Goal distance for Width(37.976),Height(202.158), from width: 1332.849, height: 1209.957, Average: 1271.403
+        Goal distance for Width(37.976),Height(202.158), from width: 1332.849, height: 1209.957, Average: 1271.403
+        Goal distance for Width(35.000),Height(202.000), from width: 1413.030, height: 1210.849, Average: 1311.940
+        Goal distance for Width(35.000),Height(202.000), from width: 1413.030, height: 1210.849, Average: 1311.940
+        Goal distance for Width(33.996),Height(202.040), from width: 1442.765, height: 1210.626, Average: 1326.695
+        Goal distance for Width(33.996),Height(202.040), from width: 1442.765, height: 1210.626, Average: 1326.695
+        Goal distance for Width(33.998),Height(200.010), from width: 1442.725, height: 1222.180, Average: 1332.452
+        Goal distance for Width(33.998),Height(200.010), from width: 1442.725, height: 1222.180, Average: 1332.452
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.942, height: 1210.626, Average: 1342.284
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.942, height: 1210.626, Average: 1342.284
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.959, height: 1210.626, Average: 1342.292
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.959, height: 1210.626, Average: 1342.292
+        Goal distance for Width(32.997),Height(202.010), from width: 1473.902, height: 1210.793, Average: 1342.348
+        Goal distance for Width(32.997),Height(202.010), from width: 1473.902, height: 1210.793, Average: 1342.348
+        Goal distance for Width(33.995),Height(202.040), from width: 1442.800, height: 1210.626, Average: 1326.713
+        Goal distance for Width(33.995),Height(202.040), from width: 1442.800, height: 1210.626, Average: 1326.713
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.949, height: 1210.626, Average: 1342.288
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.949, height: 1210.626, Average: 1342.288
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.932, height: 1210.626, Average: 1342.279
+        Goal distance for Width(32.996),Height(202.040), from width: 1473.932, height: 1210.626, Average: 1342.279
+
+200cm
+        Goal distance for Width(27.987),Height(154.052), from width: 1658.311, height: 1562.437, Average: 1610.374
+        Goal distance for Width(27.987),Height(154.052), from width: 1658.311, height: 1562.437, Average: 1610.374
+        Goal distance for Width(25.995),Height(154.013), from width: 1748.344, height: 1562.808, Average: 1655.576
+        Goal distance for Width(25.995),Height(154.013), from width: 1748.344, height: 1562.808, Average: 1655.576
+        Goal distance for Width(24.000),Height(150.053), from width: 1851.191, height: 1601.575, Average: 1726.383
+        Goal distance for Width(24.000),Height(150.053), from width: 1851.191, height: 1601.575, Average: 1726.383
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.455, height: 1543.955, Average: 1726.205
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.455, height: 1543.955, Average: 1726.205
+        Goal distance for Width(22.000),Height(156.013), from width: 1970.158, height: 1543.955, Average: 1757.057
+        Goal distance for Width(22.000),Height(156.013), from width: 1970.158, height: 1543.955, Average: 1757.057
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.452, height: 1544.075, Average: 1726.263
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.452, height: 1544.075, Average: 1726.263
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.451, height: 1543.955, Average: 1726.203
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.451, height: 1543.955, Average: 1726.203
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.453, height: 1544.075, Average: 1726.264
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.453, height: 1544.075, Average: 1726.264
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.462, height: 1544.075, Average: 1726.268
+        Goal distance for Width(23.000),Height(156.000), from width: 1908.462, height: 1544.075, Average: 1726.268
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.451, height: 1543.955, Average: 1726.203
+        Goal distance for Width(23.000),Height(156.013), from width: 1908.451, height: 1543.955, Average: 1726.203
+
+250cm
+        Goal distance for Width(22.965),Height(126.143), from width: 1910.549, height: 1885.666, Average: 1898.107
+        Goal distance for Width(22.965),Height(126.143), from width: 1910.549, height: 1885.666, Average: 1898.107
+        Goal distance for Width(16.000),Height(126.000), from width: 2474.641, height: 1887.676, Average: 2181.159
+        Goal distance for Width(16.000),Height(126.000), from width: 2474.641, height: 1887.676, Average: 2181.159
+        Goal distance for Width(18.000),Height(126.016), from width: 2274.511, height: 1887.452, Average: 2080.982
+        Goal distance for Width(18.000),Height(126.016), from width: 2274.511, height: 1887.452, Average: 2080.982
+        Goal distance for Width(18.999),Height(128.000), from width: 2188.259, height: 1859.915, Average: 2024.087
+        Goal distance for Width(18.999),Height(128.000), from width: 2188.259, height: 1859.915, Average: 2024.087
+        Goal distance for Width(16.000),Height(126.016), from width: 2474.607, height: 1887.452, Average: 2181.030
+        Goal distance for Width(16.000),Height(126.016), from width: 2474.607, height: 1887.452, Average: 2181.030
+        Goal distance for Width(17.999),Height(128.000), from width: 2274.583, height: 1859.915, Average: 2067.249
+        Goal distance for Width(17.999),Height(128.000), from width: 2274.583, height: 1859.915, Average: 2067.249
+        Goal distance for Width(16.000),Height(128.000), from width: 2474.622, height: 1859.915, Average: 2167.269
+        Goal distance for Width(16.000),Height(128.000), from width: 2474.622, height: 1859.915, Average: 2167.269
+        Goal distance for Width(17.000),Height(128.000), from width: 2369.509, height: 1859.915, Average: 2114.712
+        Goal distance for Width(17.000),Height(128.000), from width: 2369.509, height: 1859.915, Average: 2114.712
+
+300cm
+        Goal distance for Width(14.999),Height(90.089), from width: 2591.771, height: 2588.185, Average: 2589.978
+        Goal distance for Width(14.999),Height(90.089), from width: 2591.771, height: 2588.185, Average: 2589.978
+        Goal distance for Width(14.996),Height(100.020), from width: 2592.134, height: 2345.687, Average: 2468.911
+        Goal distance for Width(14.996),Height(100.020), from width: 2592.134, height: 2345.687, Average: 2468.911
+        Goal distance for Width(15.000),Height(102.000), from width: 2591.615, height: 2302.826, Average: 2447.220
+        Goal distance for Width(15.000),Height(102.000), from width: 2591.615, height: 2302.826, Average: 2447.220
+        Goal distance for Width(12.000),Height(100.000), from width: 3040.495, height: 2346.128, Average: 2693.312
+        Goal distance for Width(12.000),Height(100.000), from width: 3040.495, height: 2346.128, Average: 2693.312
+        Goal distance for Width(11.999),Height(100.000), from width: 3040.610, height: 2346.128, Average: 2693.369
+        Goal distance for Width(11.999),Height(100.000), from width: 3040.610, height: 2346.128, Average: 2693.369
+        Goal distance for Width(13.999),Height(100.020), from width: 2722.974, height: 2345.687, Average: 2534.331
+        Goal distance for Width(13.999),Height(100.020), from width: 2722.974, height: 2345.687, Average: 2534.331
+        Goal distance for Width(12.000),Height(84.024), from width: 3040.502, height: 2763.573, Average: 2902.037
+        Goal distance for Width(12.000),Height(84.024), from width: 3040.502, height: 2763.573, Average: 2902.037
+        Goal distance for Width(12.999),Height(102.000), from width: 2871.282, height: 2302.826, Average: 2587.054
+        Goal distance for Width(12.999),Height(102.000), from width: 2871.282, height: 2302.826, Average: 2587.054
+        Goal distance for Width(13.000),Height(96.000), from width: 2871.201, height: 2437.981, Average: 2654.591
+        Goal distance for Width(13.000),Height(96.000), from width: 2871.201, height: 2437.981, Average: 2654.591
+        Goal distance for Width(12.000),Height(98.000), from width: 3040.502, height: 2391.145, Average: 2715.823
+        Goal distance for Width(12.000),Height(98.000), from width: 3040.502, height: 2391.145, Average: 2715.823
+
+400cm
+        Goal distance for Width(13.916),Height(129.553), from width: 2734.645, height: 1838.932, Average: 2286.788
+        Goal distance for Width(13.916),Height(129.553), from width: 2734.645, height: 1838.932, Average: 2286.788
+        Goal distance for Width(14.934),Height(134.536), from width: 2599.864, height: 1774.783, Average: 2187.323
+        Goal distance for Width(14.934),Height(134.536), from width: 2599.864, height: 1774.783, Average: 2187.323
+        Goal distance for Width(13.954),Height(132.378), from width: 2729.240, height: 1801.988, Average: 2265.614
+        Goal distance for Width(13.954),Height(132.378), from width: 2729.240, height: 1801.988, Average: 2265.614
+        Goal distance for Width(14.962),Height(132.378), from width: 2596.304, height: 1801.988, Average: 2199.146
+        Goal distance for Width(14.962),Height(132.378), from width: 2596.304, height: 1801.988, Average: 2199.146
+        Goal distance for Width(13.969),Height(130.384), from width: 2727.182, height: 1827.904, Average: 2277.543
+        Goal distance for Width(13.969),Height(130.384), from width: 2727.182, height: 1827.904, Average: 2277.543
+        Goal distance for Width(13.880),Height(70.456), from width: 2739.674, height: 3261.566, Average: 3000.620
+        Goal distance for Width(10.930),Height(36.222), from width: 3250.821, height: 6098.979, Average: 4674.900
+        Goal distance for Width(12.000),Height(44.000), from width: 3040.495, height: 5078.980, Average: 4059.738
+
+--------------------------------------------
+
+Colby's distances by sbarrett on 5/22/12
+
+
+50cm
+Goal distance for Width(112),Height(464.276), from width: 237.173, height: 502.862, Average: 370.018
+
+100cm
+Goal distance for Width(56),Height(256.195), from width: 1006.413, height: 1687.322, Average: 1346.868
+Goal distance for Width(56),Height(264.008), from width: 1006.371, height: 1612.349, Average: 1309.360
+
+150cm
+Goal distance for Width(35),Height(178.000), from width: 1730.667, height: 2659.322, Average: 2194.995
+
+200cm
+Goal distance for Width(24),Height(122.000), from width: 2298.616, height: 3683.529, Average: 2991.073
+
+250cm
+Goal distance for Width(18),Height(98.000), from width: 2684.179, height: 4235.493, Average: 3459.836
+
+300cm
+Goal distance for Width(17),Height(71.021), from width: 2773.832, height: 4955.305, Average: 3864.569
+
+400cm
+Goal distance for Width(8),Height(60.000), from width: 3474.030, height: 5283.443, Average: 4378.737
+
+500cm
+Goal distance for Width(5),Height(42.048), from width: 3754.977, height: 5865.118, Average: 4810.047
+
+
+600cm
+Goal distance for Width(4),Height(36.222), from width: 3853.995, height: 6067.324, Average: 4960.659
+
+
+---------------------------------------------------
+todd's calibrations
+
+50 cm
+frame 338:         Goal distance from Width (84): 921.665, from Height (452.994): 1454.213
+frame 1056:         Goal distance from Width (98): 818.722, from Height (485.675): 1367.747
+
+100cm
+frame 2163:         Goal distance from Width (51): 1419.889, from Height (366.022): 1754.299
+frame 2828:         Goal distance from Width (44): 1614.612, from Height (308.006): 2042.006
+
+150cm
+frame 3909:         Goal distance from Width (27): 2469.454, from Height (290.558): 2149.536
+frame 4677:         Goal distance from Width (33): 2077.607, from Height (278.718): 2229.686
+
+200cm
+frame 5194:         Goal distance from Width (26): 2555.429, from Height (228.709): 2653.504
+frame 5846:         Goal distance from Width (20): 3205.678, from Height (216.009): 2790.320
+
+250cm
+frame 6573:         Goal distance from Width (15): 4122.837, from Height (188.096): 3151.637
+frame 6978:         Goal distance from Width (21): 3090.741, from Height (185.084): 3196.727
+
+300cm
+frame 7938:         Goal distance from Width (18): 3530.854, from Height (152.840): 3783.220
+frame 8429:         Goal distance from Width (12): 5000.507, from Height (158.051): 3673.237
+frame 10091:         Goal distance from Width (14): 4604.570, from Height (150.053): 3844.975
+
+400cm
+frame 11373:         Goal distance from Width (8): 7116.344, from Height (100.080): 5491.414
+frame 12316:         Goal distance from Width (9): 6460.870, from Height (86.833): 6222.233
+
+
+500cm
+frame 13211:         Goal distance from Width (4): 13002.186, from Height (94.000): 5802.794
+
+
+600 cm
+frame 14220:         Goal distance from Width (4): 13001.996, from Height (68.000): 7715.816

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+cd $NAO_HOME/lib
+wget $NAO_LIBS/libfft.tar.gz
+tar -zxvf libfft.tar.gz
+rm libfft.tar.gz

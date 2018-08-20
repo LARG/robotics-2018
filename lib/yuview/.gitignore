@@ -1,0 +1,7 @@
+build
+*.png
+*.bmp
+*.yuv
+*_generated.h
+*.swp
+tags

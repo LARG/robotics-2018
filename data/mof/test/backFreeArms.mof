@@ -1,0 +1,10 @@
+motion_id = backFreeArms
+"free the arms of the robot when it's on its back
+label start
+
+"HY   HP   LSP    LSR   LEY   LER     RSP    RSR    REY   RER    LHYP   LHR     LHP    LKP   LAP    LAR   RHYP    RHR    RHP     RKP    RAP    RAR   Int  Dur
+0   -20  -51.4   85.2  91.3  -89.7  -42.8   88.5    107   -60.6  -2.3   12.7   -32.9  -5.2   2.3    1     -2.3    -4.5   -32.5   -4.9   -6.9   6.2   1    400
+0   -20  -57.7   82.7  81.6  -80.8  -67.2   86.2    94    -60.6  0.4    -4.8   -16.2  -5.3   -1.2   -5.8  0.4     1.2    -13.2   -5     -5.8   -4.8  1    200
+0   -20  -57.7   82.7  81.6  -80.8  -67.2   86.2    94    -60.6  0.4    -4.8   -16.2  -5.3   -1.2   -5.8  0.4     1.2    -13.2   -5     -5.8   -4.8  1    300
+transition allMotions extern start  
+transition allMotions extern start   

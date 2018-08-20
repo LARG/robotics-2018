@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UTVisionWindow</class>
+ <widget class="QMainWindow" name="UTVisionWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1201</width>
+    <height>672</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Vision Window</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0,0" columnstretch="1,0">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="ImageWidget" name="bigImage" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>800</width>
+          <height>480</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>640</width>
+          <height>480</height>
+         </size>
+        </property>
+        <property name="selectionEnabled" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>60</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Modes</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="overlayCheck">
+         <property name="text">
+          <string>Overlay</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="horizonCheck">
+         <property name="text">
+          <string>Horizon</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="tristate">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="toolCheck">
+         <property name="text">
+          <string>Tooltips</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="calibrationBox">
+         <property name="text">
+          <string>Calibrate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkerboardBox">
+         <property name="text">
+          <string>Checkerboard</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveImgCheck">
+         <property name="text">
+          <string>Save Images</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+      <zorder>horizonCheck</zorder>
+      <zorder>overlayCheck</zorder>
+      <zorder>toolCheck</zorder>
+      <zorder>calibrationBox</zorder>
+      <zorder>saveImgCheck</zorder>
+      <zorder>checkerboardBox</zorder>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>65</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Pixel info</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="yuvLabel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>YUV (0,0,0)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="rgbLabel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>RGB (0,0,0)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="xyLabel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>XY (0,0)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="segLabel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Seg (N/A)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="3">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>375</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <kerning>false</kerning>
+       </font>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="layersTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Layers</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="ImageWidget" name="rawImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="rawImageBottom" native="true"/>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>18</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="horizontalBlobImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="horizontalBlobImageBottom" native="true"/>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>18</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="objImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="objImageBottom" native="true"/>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="ImageWidget" name="segImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="segImageBottom" native="true"/>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>18</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="verticalBlobImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="verticalBlobImageBottom" native="true"/>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>18</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="transformedImageTop" native="true"/>
+          </item>
+          <item>
+           <widget class="ImageWidget" name="transformedImageBottom" native="true"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="annotTab">
+       <attribute name="title">
+        <string>Annot</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="AnnotationWidget" name="annot" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="ctTab">
+       <attribute name="title">
+        <string>C Tables</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="ClassificationWidget" name="classification" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="analysisTab">
+       <attribute name="title">
+        <string>Analysis</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="AnalysisWidget" name="analysis" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="calibTab">
+       <attribute name="title">
+        <string>Calib</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Intrinsic</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="IntrinsicCalibrationWidget" name="icalibration" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Extrinsic</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <widget class="ExtrinsicCalibrationWidget" name="ecalibration" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1201</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuColour_Table">
+    <property name="title">
+     <string>Bottom Table</string>
+    </property>
+    <addaction name="actionNew_Bottom"/>
+    <addaction name="actionOpen_Bottom"/>
+    <addaction name="actionSave_Bottom"/>
+    <addaction name="actionSave_As_Bottom"/>
+   </widget>
+   <widget class="QMenu" name="menuTop_Table">
+    <property name="title">
+     <string>Top Table</string>
+    </property>
+    <addaction name="actionNew_Top"/>
+    <addaction name="actionOpen_Top"/>
+    <addaction name="actionSave_Top"/>
+    <addaction name="actionSave_As_Top"/>
+   </widget>
+   <addaction name="menuColour_Table"/>
+   <addaction name="menuTop_Table"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen_Bottom">
+   <property name="text">
+    <string>Open Bottom</string>
+   </property>
+  </action>
+  <action name="actionSave_Bottom">
+   <property name="text">
+    <string>Save Bottom</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Bottom">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionNew_Bottom">
+   <property name="text">
+    <string>New Bottom</string>
+   </property>
+  </action>
+  <action name="actionYUV">
+   <property name="text">
+    <string>YUV</string>
+   </property>
+  </action>
+  <action name="actionLAB">
+   <property name="text">
+    <string>LAB</string>
+   </property>
+  </action>
+  <action name="actionHSI">
+   <property name="text">
+    <string>HSI</string>
+   </property>
+  </action>
+  <action name="actionNew_Top">
+   <property name="text">
+    <string>New Top</string>
+   </property>
+  </action>
+  <action name="actionOpen_Top">
+   <property name="text">
+    <string>Open Top</string>
+   </property>
+  </action>
+  <action name="actionSave_Top">
+   <property name="text">
+    <string>Save Top</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Top">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageWidget</class>
+   <extends>QWidget</extends>
+   <header>ImageWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnnotationWidget</class>
+   <extends>QWidget</extends>
+   <header>AnnotationWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ClassificationWidget</class>
+   <extends>QWidget</extends>
+   <header>ClassificationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisWidget</class>
+   <extends>QWidget</extends>
+   <header>AnalysisWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>IntrinsicCalibrationWidget</class>
+   <extends>QWidget</extends>
+   <header>IntrinsicCalibrationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ExtrinsicCalibrationWidget</class>
+   <extends>QWidget</extends>
+   <header>ExtrinsicCalibrationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

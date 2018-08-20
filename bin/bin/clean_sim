@@ -1,0 +1,3 @@
+#!/bin/bash
+
+killall -9 motion vision sim rcssserver3d

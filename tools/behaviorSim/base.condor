@@ -1,0 +1,20 @@
+# executable and args
+Executable = /u/sbarrett/Nao/trunk/tools/behaviorSim/runJob.py
+Arguments = $(ARGUMENTS) 
+#Requirements = Lucid && (Arch == "x86_64") && (Memory >= 4000)
+Requirements = Lucid && (Arch == "x86_64")
+#Image_Size = 1000 Meg
+Universe = vanilla
+getenv = true
+
+# output
+Error  = $(BASE_DIR)/$(Process).err
+Output = $(BASE_DIR)/$(Process).out
+Log    = $(BASE_DIR)/$(Process).log
+
+# CS Specific
++Group = "Grad"
++Project="AI_ROBOTICS"
++ProjectDescription="SPL RoboCup research"
+
+Queue $(NUM_JOBS)

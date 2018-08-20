@@ -1,0 +1,36 @@
+{
+  "offensive": 500,
+  "midfield": -1000,
+
+  "SUPPORTER": {
+    "fwdDist": -550,
+    "sideDist": 650,
+    "maxY": 1600,
+    "maxX": 1800,
+    "minX": -2000
+  },
+
+  "FORWARD": {
+    "fwdDist": 1800,
+    "sideDist": 700,
+    "maxY": 1600,
+    "maxX": 2000,
+    "minX": -2000
+  },
+
+  "DEFENDER": {
+    "fwdDist": -1800,
+    "sideDist": 1500,
+    "maxY": 1400,
+    "maxX": -600,
+    "minX": -2000
+  },
+
+  "MIDFIELD": {
+    "fwdDist": 1300,
+    "sideDist": 700,
+    "maxY": 1600,
+    "maxX": 2600, 
+    "minX": -1200
+  }
+}

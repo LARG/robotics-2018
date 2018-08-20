@@ -1,0 +1,60 @@
+F1: Simple mode
+F2: Show all robots mode
+F3: Localization mode
+F4: Vision mode
+F5: behavior mode
+F6: live mode
+
+BEHAVIOR SIMULATIONS:
+F7: 1 player behavior simulation
+F8: full team behavior simulation
+F9: penalty kick behavior simulation
+
+LOCALIZATION SIMULATION:
+F10: 1 player localization simulation
+F11: full team localization simulation
+F12: penalty kick localization simulation
+
+c: show kick region
+z/x: change region resolution
+
+/: show best kick
+[]: loop through possible kicks
+
+b: show role names
+n: show robot numbers
+k: show kick names
+
+1-6: different views
+o: show object id's
+t: show teammates
+e: show opponents
+
+ctrl+1-5: show packets from teammate #
+
+
+SIMULATION MODE:
+i/j/k/l: move robot
+u/o: rotate robot
+w/a/s/d: move ball
+r: ready
+e: set (with ctrl forces manual placement, shift forces placement into the desired positions)
+p: playing
+q: penalize
+f: make fall over
+m: switch kickoff
+1-(1)0: switch to this player's view
+` (backtick): see ground truth view
+ctrl+1-(1)0: highlight this robot
+right: simulate one step
+up:    simulate 3 steps
+down: fast forward to a frame with localization error
+ctrl+r: restart lua for players
+ctrl+p: set debugging_positioning to true (no falling, kicking, or pushing)
+
+
+In Live mode:
+r/b: listen to red/blue team packets
+0 or `(backtick): show all teammate packets
+1-5: show teammate packets from this mate only
+v/c: change view of which goal is on which side

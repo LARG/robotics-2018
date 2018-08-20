@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+export NAO_LIBS=www.cs.utexas.edu/~AustinVilla/software
+export NAO_DATA=www.cs.utexas.edu/~AustinVilla/data

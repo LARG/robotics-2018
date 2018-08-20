@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+export PYTHONPATH=$NAO_HOME/lib/caffe/python:$PYTHONPATH
+export LD_LIBRARY_PATH=$NAO_HOME/lib/caffe/build/lib:$LD_LIBRARY_PATH
+export GLOG_minloglevel=2

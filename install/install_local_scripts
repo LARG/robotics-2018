@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+LINK_PATH=/etc/bash_completion.d/nao_completion
+LINK_TARGET=$NAO_HOME/bin/bash_completion
+
+sudo rm -f $LINK_PATH
+sudo ln -sf $LINK_TARGET $LINK_PATH

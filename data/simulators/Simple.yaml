@@ -1,0 +1,7 @@
+---
+options:
+  - SHOWFIELD
+  - SHOWROBOT
+  - SHOWBALL
+  - SHOWLOCATIONTEXTOVERLAY
+...

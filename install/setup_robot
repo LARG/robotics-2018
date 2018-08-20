@@ -1,0 +1,177 @@
+#!/usr/bin/env python
+
+from time import sleep
+import os, getopt, re
+from common import *
+
+NAO_HOME = os.environ["NAO_HOME"]
+USER_HOME = "/home/%s" % os.environ["USER"]
+
+def setDatetime(ip):
+  runRemoteCommand(ip, "ln -sf /usr/share/zoneinfo/US/Central /etc/localtime", root=True, output=False)
+  date = runLocalCommand("date",output=False)
+  runRemoteCommand(ip, 'date --set="%s"' % date, root=True, output=False)
+
+def setHostname(ip,hostname):
+  runRemoteCommand(ip, 'echo %s > /etc/hostname' % hostname, root=True)
+
+def checkPasswordlessSSH(ip):
+  try:
+    output = runLocalCommand('ssh -t nao@%s "echo test"' % ip, output=False)
+    if re.search('WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED', output):
+      return False
+  except Exception, e:
+    return False
+  return True
+
+def setupPasswordlessSSH(ip):
+  if checkPasswordlessSSH(ip): return
+  print "setting up passwordless ssh"
+  runLocalCommand('ssh-keygen -f "%s/.ssh/known_hosts" -R %s' % (USER_HOME,ip), output=False)
+  runLocalCommand('ssh-copy-id nao@%s' % ip, password='nao', output=False)
+
+def filloutID(name,robotID,d):
+  with open('../data/scripts/%s' % name,'r') as f:
+    contents = f.read()
+  contents = contents.replace('${ID}',robotID)
+  with open(os.path.join(d,name + ".tmp"),'w') as f:
+    f.write(contents)
+      
+def setupNetworking(ip,robotID,wireless_only):
+  tempdir = makeTempDir()
+  try:
+    scriptpath = '%s/install/script_wireless.sh' % NAO_HOME
+    if not wireless_only:
+      filloutID('utwired',robotID,tempdir)
+    filloutID('utwireless',robotID,tempdir)
+    copyFiles(ip,os.path.join(tempdir,'utwire*'))
+    copyFiles(ip,'../data/scripts/wpa_supplicant.conf','~/wpa_supplicant.conf.tmp')
+    runLocalScriptRemotely(ip, scriptpath,output=True)
+  finally:
+    removeTempDir(tempdir)
+
+def compile(geode=False):
+  origDir = os.getcwd()
+  os.chdir('%s/build/' % NAO_HOME)
+  cmd = './compile robot memory_test'
+  if geode:
+    cmd += ' --geode'
+  runLocalCommand(cmd)
+  os.chdir(origDir)
+
+
+def copyRobot(ip, robot_id, geode=False):
+  """Copies all code, configs, color tables, and scripts to robot."""
+  os.chdir('%s/build/' % NAO_HOME)
+  orig_dir = os.getcwd()
+  cmd = './copy_robot %s install --id %s' % (ip, robot_id)
+  if geode:
+    cmd += ' --geode'
+  runLocalCommand(cmd)
+  os.chdir(orig_dir)
+
+
+def setupVim(ip):
+  copyFiles(ip,'%s/install/vim.tar.gz' % NAO_HOME)
+  runRemoteCommand(ip, 'rm -rf vim && tar zxvf vim.tar.gz')
+  runRemoteCommand(ip, '/home/nao/vim/install', root=True)
+  runRemoteCommand(ip, 'rm vim.tar.gz')
+
+def setupCaffe(ip):
+  copyFiles(ip,'%s/install/caffe-32.tar.gz' % NAO_HOME)
+  runRemoteCommand(ip, 'rm -rf caffe-32 && tar zxvf caffe-32.tar.gz')
+  runRemoteCommand(ip, 'rm caffe-32.tar.gz')
+
+def setupProfile(ip):
+  copyFiles(ip,'%s/data/scripts/profile_addendum.sh' % NAO_HOME,'bin/')
+  runRemoteCommand(ip, "echo \"alias vim='LD_LIBRARY_PATH=/home/nao/vim/lib vim'\" > /root/.bashrc",root=True)
+  runRemoteCommand(ip, "echo source /home/nao/bin/profile_addendum.sh >> /etc/profile", root=True)
+
+def setupGccLibs(ip):
+  runRemoteCommand(ip,'rm -f /usr/lib/libstdc++*',root=True)
+  copyFiles(ip,'%s/naoqi/link_libs/libstdc++.so.6.0.21' % NAO_HOME,'/usr/lib/',root=True)
+  runRemoteCommand(ip, 
+    'cd /usr/lib && '
+    'ln -sf libstdc++.so.6.0.21 libstdc++.so.6',
+    root=True
+  )
+
+def main(options):
+  if options.include_ssh:
+    setupPasswordlessSSH(options.ip)
+  if options.hostname:
+    setHostname(options.ip,options.hostname)
+  if options.include_all or options.wireless_only:
+    print 'setting up networking'
+    setupNetworking(options.ip,options.id,options.wireless_only)
+  if options.include_all or options.include_date:
+    setDatetime(options.ip)
+  if options.include_all:
+    if options.include_compile:
+      print 'compiling lib and bins for robot'
+      compile()
+    runRemoteCommand(options.ip,'mkdir -p lua logs data bin data/mof data/config scripts')
+    copyRobot(options.ip, options.id)
+    setupProfile(options.ip)
+    copyFiles(options.ip,'../data/scripts/bootprogress_100','scripts/')
+    copyFiles(options.ip,'../data/scripts/autoload.ini','scripts/')
+    copyFiles(options.ip,'../data/scripts/naoqi','scripts/')
+    setupGccLibs(options.ip)
+    setupVim(options.ip)
+    setupCaffe(options.ip)
+    runLocalScriptRemotely(options.ip, '%s/install/script_setup.sh' % NAO_HOME)
+    print "The robot's server will now reboot to force a cache write."
+  print 'complete'
+
+
+def parseArgs(args):
+  from optparse import OptionParser
+  parser = OptionParser('''setup_robot [options]
+  Examples:
+  
+  Initial setup for robot 51 on default wired ip: 
+    
+      ./setup_robot --ip 169.254.12.15 --id 51
+
+  Update wireless configuration without altering wired:
+
+      ./setup_robot --ip 11.0.1.45 --id 45 --wireless-only
+
+  Update the robot's name:
+
+      ./setup_robot --ip 11.0.1.52 --id 52 -n "Samuel Swiss"
+  ''')
+  parser.add_option('--ip', dest='ip', action='store', default=None, help='The current ip address you will use to access the robot during setup.')
+  parser.add_option('--id', dest='id', action='store', default=None, help="The robot's 2-digit id used for configuration and as the last octet of wired and wireless ip addresses. When running with --wireless-only, this id is used *only* for the last octet of the wireless ip address.")
+  parser.add_option('--hostname', '-n', dest='hostname', action='store', default=None, help="The robot's hostname that will appear on the command line when connecting over ssh.")
+  parser.add_option('--wireless-only', '-w', dest='wireless_only', action='store_true', default=False, help='Deploy only wireless settings - do not deploy code or other configurations.')
+  parser.add_option('--date', '-d', dest='include_date', action='store_true', default=False, help="Update the robot's current date/time.")
+  parser.add_option('--nocompile', dest='include_compile', action='store_false' ,default=True, help='Disable automatic compilation before deploying binaroies.')
+  parser.add_option('--nossh', dest='include_ssh', action='store_false' ,default=True, help='Disable automatic passwordless ssh setup.')
+ 
+  options,args = parser.parse_args(args)
+  options.include_all = not options.wireless_only and not options.include_date
+  return options,args
+
+if __name__ == '__main__':
+  options, _ = parseArgs(sys.argv[1:])
+  if not options.ip:
+    if 'CURRENT_ROBOT' in os.environ:
+      options.ip = os.environ['CURRENT_ROBOT']
+      if options.ip:
+        print "Using current robot ip: %s" % options.ip
+    if not options.ip:
+      print "You must specify the robot IP"
+      sys.exit(2)
+  if not options.id:
+    try:
+      options.id = str(int(options.ip.split('.')[3]))
+      print "Extracted id from ip address: %s" % options.id
+    except:
+      print "ID was not supplied and could not be inferred from the robot's IP address"
+      print "IP: %s" % options.ip
+      sys.exit(2)
+  if not options.id and (options.include_all or options.wireless_only):
+    print "You must specify the robot ID"
+    sys.exit(2)
+  main(options)

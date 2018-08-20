@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+FULL_VERSION=2.1.4.13
+ATOM_CROSS=ctc-linux64-atom-$FULL_VERSION
+
+setup_naoqi_base_sdk() {
+  # This copies over the base naoqi folder. There
+  # are a lot of files so rather than copying over
+  # it's fastest and most reliable to rm -rf the 
+  # current one and move the extracted folder over
+  sdk=naoqi-sdk-$FULL_VERSION-linux64
+  wget -N $NAO_LIBS/$sdk.tar.gz
+  tar zxvf $sdk.tar.gz
+  sudo rm -rf $NAO_HOME/naoqi
+  mv $sdk $NAO_HOME/naoqi
+}
+
+setup_cross_toolchain() {
+  # Copy over Aldebaran's official cross toolchain
+  # with a really old version of a gcc 64->32 cross
+  # compiler
+  cross_path=$NAO_HOME/naoqi/crosstoolchain
+  mkdir -p $cross_path
+  wget -N $NAO_LIBS/$ATOM_CROSS.zip
+  unzip -o $ATOM_CROSS.zip
+  rm -rf $cross_path/atom
+  mv $ATOM_CROSS $cross_path/atom
+}
+
+setup_gcc_cross_compiler() {
+  # This copies over the gcc cross compiler
+  # into naoqi's base cross compiler path,
+  # overwriting the gcc 4.5 cross compiler
+  # shipped with naoqi.
+  gcc=linux64-cross-i686-aldebaran-linux-gnu-gcc-5.3.0
+  wget -N $NAO_LIBS/$gcc.tar.gz
+  tar zxvf $gcc.tar.gz
+  cp -r $gcc/* $NAO_HOME/naoqi/crosstoolchain/atom/cross/
+
+  # Add a link for QT resource compilation
+  sudo ln -sf /usr/bin/rcc $NAO_HOME/naoqi/crosstoolchain/atom/cross/bin/i686-aldebaran-linux-gnu-rcc
+}
+
+setup_qibuild() {
+  # Set up the qibuild infrastructure for building with
+  # Aldebaran's naoqi toolchain
+  sudo pip install qibuild==3.8.2 --upgrade
+  qitoolchain create atom $NAO_HOME/naoqi/crosstoolchain/atom/toolchain.xml
+  qibuild add-config atom -t atom
+}
+
+setup_link_libs() {
+  # Copy over some link libs which were just copied from
+  # /usr/lib32, /usr/lib/i386-linux-gnu, etc a long long
+  # time ago from someone's machine.
+  link_libs=naoqi-link-libs-14.04
+  wget -N $NAO_LIBS/$link_libs.tar.gz
+  tar zxvf $link_libs.tar.gz
+  rm -rf $NAO_HOME/naoqi/link_libs
+  mv $link_libs $NAO_HOME/naoqi/link_libs
+}
+
+setup_includes() {
+  # Copy over headers taken from /usr/include, etc
+  # on someone's machine.
+  wget -N $NAO_LIBS/includes.tar.gz
+  tar zxvf includes.tar.gz
+  rm -rf $NAO_HOME/naoqi/includes
+  mv includes $NAO_HOME/naoqi/includes
+}
+
+setup_naoqi_base_sdk
+setup_cross_toolchain
+setup_gcc_cross_compiler
+setup_qibuild
+setup_link_libs
+setup_includes

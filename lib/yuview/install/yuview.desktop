@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=YUV Viewer
+Comment=View YUV files with basic metadata
+TryExec=yuview
+Exec=yuview %U
+Icon=yuview
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Graphics;2DGraphics;RasterGraphics;Viewer;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=YUView
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=3.10.2
+X-GNOME-DocPath=yuview/yuview.xml
+MimeType=image/yuv;
+Keywords=Picture;Slideshow;Graphics;
+X-Ubuntu-Gettext-Domain=yuview
+

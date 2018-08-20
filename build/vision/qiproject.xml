@@ -1,0 +1,12 @@
+<project version="3">
+  <!-- Add your name and e-mail here
+    <maintainer email="...">Your Name</maintainer>
+  -->
+
+  <qibuild name="vision">
+    <depends buildtime="true" runtime="true" names="nao" />
+    <depends buildtime="true" runtime="true" names="core" />
+    <depends buildtime="true" runtime="true" names="pythonswig" />
+ </qibuild>
+
+</project>

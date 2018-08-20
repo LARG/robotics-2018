@@ -1,0 +1,6 @@
+From Sam on 4/6/11:
+
+I've added some scripts to help with starting our other processes.
+naoqi-common.sh - belongs in /etc/init.d/ - overwrites Aldebaran's nao start and stop to also call the scripts below
+villa-start.sh belongs in /home/nao - starts motion and vision if memory is live
+villa-stop.sh belongs in /home/nao - kills motion and vision regardless (i.e. killall -9)

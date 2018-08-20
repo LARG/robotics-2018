@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+import os, sys, shutil
+from common import runLocalCommand, verifyPassword
+import pexpect, getpass
+
+if os.geteuid():  # check if already root
+    while True:
+        PASSWORD = getpass.getpass(
+            '[sudo] password for %s: ' % getpass.getuser())
+        if verifyPassword(PASSWORD): break
+        print 'Sorry, try again.'
+
+
+def runSysConfigCommand(command):
+    print("RUNNING COMMAND: " + command)
+    p = pexpect.spawn(command, timeout=7200)
+    while True:
+        i = p.expect([r'\[sudo\] password.*', r'.*\[Y\/n\]', '.+\n', '.+', pexpect.EOF])
+        if i == 0:
+            print p.after
+            p.sendline(PASSWORD)
+        elif i == 1:
+            print p.after
+            p.sendline("Y")
+        if i == 2: print p.after.strip()
+        if i == 3: 
+            sys.stdout.write('\r' + p.after.strip())
+            sys.stdout.flush()
+        if i == 4: break
+    p.close()
+    if p.exitstatus:
+        print("Error completing command: %s" % command)
+        sys.exit(p.exitstatus)
+
+
+NAO_HOME = os.environ['NAO_HOME'] = '/home/' + os.environ['USER'] + '/nao/trunk'
+os.chdir(NAO_HOME + '/install')
+runSysConfigCommand('./install_libs')
+runLocalCommand('sudo rm -rf %s/naoqi' % NAO_HOME, password=PASSWORD)
+runSysConfigCommand('./install_naoqi')
+runSysConfigCommand('./install_python')
+runSysConfigCommand('./install_qt')
+runSysConfigCommand('./install_fft')
+runSysConfigCommand('./install_local_scripts')
+# runSysConfigCommand('./install_caffe')
+os.system('echo export NAO_HOME=~/nao/trunk >> ~/.bashrc')
+os.system('echo source $NAO_HOME/install/bashrc_addendum >> ~/.bashrc')

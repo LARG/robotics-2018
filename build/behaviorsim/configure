@@ -1,0 +1,115 @@
+#!/bin/bash
+
+if [ $# -ge 1 ]; then
+  arch=$1
+else
+  arch="atom"
+fi
+if [ $# -ge 2 ]; then
+  release=$2
+else
+  release="-release"
+fi
+
+buildDir="build-$arch$release"
+BUILD_PATH="$NAO_HOME/build/build/$buildDir"
+#CORE="$BUILD_PATH/core/sdk/lib/libcore_tool_complete.a"
+YAML="$BUILD_PATH/yaml-cpp/libyaml-cpp.a"
+BHWALK="$BUILD_PATH/core/bhwalk/libbhwalk.a"
+CORE_PATH="$NAO_HOME/core"
+CORE_SRCS=`find $CORE_PATH -name "*.cpp" | grep -v bhwalk`
+CORE_SRCS=${CORE_SRCS//$'\n'/ \\$'\n'  }
+ALGLIB_SRCS=`find $NAO_HOME/lib/alglib/ -name "*.cpp"`
+ALGLIB_SRCS=${ALGLIB_SRCS//$'\n'/ \\$'\n'  }
+SWIG_SRCS=`find $NAO_HOME/build/build/swig/cpp -name "*.cpp"`
+SWIG_SRCS=${SWIG_SRCS//$'\n'/ \\$'\n'  }
+TOOL_SRCS="$NAO_HOME/tools/UTNaoTool/BehaviorSim.cpp $NAO_HOME/tools/UTNaoTool/SimulatedPlayer.cpp"
+
+if [ "$USER" == "jake" ]; then
+  sed -i -e 's/-lGL//g' Makefile
+  GL_LIBS="LIBS+=-lGL
+  LIBS+=-lGLU";
+fi
+
+if [ $USER == "sbarrett" ]; then # for compiling on lab machines
+  LIBZ=/usr/lib/libz.a
+  ADDITIONAL_INCLUDEPATH="INCLUDEPATH+= \
+    ../../tools/UTNaoTool \
+    ../../tools/UTNaoTool/Annotations \
+    ../../tools/UTNaoTool/calibration \
+    ../../tools/UTNaoTool/utOpenGL \
+    /usr/include/opencv-2.3.1 \
+    /u/sbarrett/apps/include \
+    /u/sbarrett/apps/usr/local/qwt-6.1.0-rc3/include"
+  ADDITIONAL_LIBS="LIBS+= \
+    -L/u/sbarrett/apps/lib \
+    -L/u/sbarrett/apps/usr/local/qwt-6.1.0-rc3/lib \
+    -lQGLViewer \
+    -lqwt"
+  ADDITIONAL_DEFINES="DEFINES+=ON_LAB_MACHINE"
+else 
+  LIBZ="$NAO_HOME/lib/32/libz.a"
+  ADDITIONAL_INCLUDEPATH=""
+  ADDITIONAL_LIBS="LIBS+= \
+    -lqglviewer-qt4 \
+    -lqwt-qt4"
+  ADDITIONAL_DEFINES=""
+fi
+
+qmake-qt4 -project -o behaviorSim.pro -nopwd \
+  "INCLUDEPATH+=$NAO_HOME/lib/yaml-cpp/include" \
+  "INCLUDEPATH+=$CORE_PATH" \
+  "INCLUDEPATH+=/usr/include/qwt-qt4" \
+  "INCLUDEPATH+=/usr/include/eigen3" \
+  "INCLUDEPATH+=/usr/include" \
+  "DEPENDPATH+=$CORE_PATH" \
+  "$ADDITIONAL_INCLUDEPATH" \
+  "MOC_DIR=./build/moc" \
+  "OBJECTS_DIR=./build/obj" \
+  "UI_DIR=./build/ui" \
+  "QT += opengl" \
+  "QT += xml" \
+  "QT += network" \
+  "CXXFLAGS+=-D2QT_NO_DEBUG" \
+  "DEFINES+=TOOL" \
+  "DEFINES+=ALLOW_DEBUG_LOG " \
+  "DEFINES+=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED" \
+  "DEFINES+=ENABLE_OPENCV" \
+  "$ADDITIONAL_DEFINES" \
+  "LIBS+=-L/usr/lib32" \
+  "LIBS+=-lopencv_core" \
+  "LIBS+=-lopencv_features2d"\
+  "LIBS+=-lopencv_highgui" \
+  "LIBS+=-lopencv_calib3d" \
+  "LIBS+=-lopencv_imgproc" \
+  "$GL_LIBS" \
+  "$ADDITIONAL_LIBS" \
+  "LIBS+=-lboost_system" \
+  "LIBS+=-lboost_thread" \
+  "LIBS+=$LIBZ" \
+  "LIBS+=$YAML" \
+  "LIBS+=$BHWALK" \
+  "SOURCES += $CORE_SRCS" \
+  "SOURCES += $ALGLIB_SRCS" \
+  "SOURCES += $SWIG_SRCS" \
+  "SOURCES += $TOOL_SOURCES" \
+  $NAO_HOME/tools/behaviorSim/
+
+if [ $USER == "sbarrett" ]; then # for compiling on lab machines
+  qmake-qt4 behaviorSim.pro -o Makefile
+else
+  qmake-qt4 behaviorSim.pro -spec linux-g++-32 -o Makefile
+fi
+
+if [ "$USER" != "jake" ]; then
+  sed -i -e 's/-lGL\>//g' Makefile
+fi
+sed -i -e 's/= g++/= g++/g' Makefile
+#sed -i -e "s#\$(TARGET): #\$(TARGET): $CORE $BHWALK #g" Makefile
+sed -i -e "s#\$(TARGET): #\$(TARGET): $BHWALK #g" Makefile
+
+if [ `uname -m` == 'x86_64' ]; then
+  sed -i -e 's/-L\/usr\/lib\ //g' Makefile
+  sed -i -e 's/-L\/usr\/lib\/x86_64-linux-gnu/-L\/usr\/lib32\/i386-linux-gnu -L\/usr\/lib32\/mesa\//g' Makefile
+  sed -i -e 's/-L\/usr\/X11R6\/lib/-L\/usr\/lib32/g' Makefile
+fi

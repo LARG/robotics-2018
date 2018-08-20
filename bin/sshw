@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# HOW IT WORKS:
+# $ bin/sshw X
+# >>> this will ssh you into robot number X using wireless
+# $ bin/sshw
+# >>> this will log you into whatever robot you logged into last using the
+#     bin/sshlog file.
+
+IP="192.168.1"
+num=$1
+if [ -z "$num" ] ; then
+  if [ -e "$NAO_HOME/bin/sshlog" ] ; then
+    num=`cat $NAO_HOME/bin/sshlog`
+  else
+    echo "Please provide a robot number.";
+    exit
+  fi
+fi
+re="^[2-5][0-9]$"
+if ! [[ $num =~ $re ]] ; then
+  echo "Invalid robot ID: $num";
+  exit
+fi
+
+echo $num > $NAO_HOME/bin/sshlog
+echo "Logging into #$num (using wireless)..."
+ssh "nao@$IP.$num"

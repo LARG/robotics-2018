@@ -1,0 +1,114 @@
+
+
+Last Week Todo
+
+1) Odometry values off during the rotate
+
+2) Go over each component of behavior
+
+
+Todo for Robocup
+
+1) Take care of big steps when starting 
+	- #7 looks like it took care of this	
+
+2) Arm pushed on issue with foot sensors
+	- Bring arms in helps some
+
+3) Stand to prevent over heating - done
+
+4) Goalie behaviour with new walk - done (walk looks fine, goalie dives are slow and late)
+	- Consider writing a new behavior
+
+5) Ref pickup fix - done
+
+6) Rotate around ball too close
+
+7) Hip / ankle balance adjustments - done
+
+8) Stop with legs together
+
+******************************************************************************888
+
+Todo for US Open
+
+1) Calibrate gyroscopes
+	-this helps
+	-how do we calibrate automatically? include something in the tool?
+
+2) Getting the robot to sit
+
+3) Goalie static behaviors?
+
+4) Test dribble and scoring
+
+5) Get ball information from memory block <-- should be relative position
+
+6) Odometry updates (rotations are very important)
+
+7) Vision crashed sometimes ! figure out why
+
+From BHuman
+
+1) Detect if feet on ground and switch to stand if flying
+
+2) Extend angle and stiff time if standing and not in process of standing
+
+
+Walk Issues:
+
+1) GyroY is currently being converted to radians before makeJoints. It might already be in radians. <-- should be dividing by motion_frame_rate
+
+2) Robot should sit down when it is not receiving any command
+
+3) Walk is very unstable <-- looks like converting to radians / second (dividing by motion_frame_rate) does the trick
+-may also due to calibration. Do a calibration
+
+4) Robot can stand if stand speed is reduced by half. Would like to get it to full speed. Probably related to walk stability issues.
+
+5) Too stiff when sitting
+
+6) Ball location is hard-coded in right now. Get this from memory blocks.
+
+
+Kick Issues:
+
+1) Need handleStepIntoKick() function in RSWalkModule.cpp
+
+
+*** Walk2014Generator uses following arguments:
+Sensors: GyroX and GyroY for balanceAdjustments
+Joints: LKneePitch for calculating hip height
+Odometry: Updated for localisation but not used
+Request: Used for determining Walk2014Option <-- important
+bodyModel: Used for determining walk variables but takes care of updating itself so we shouldn't have to worry too much about it.
+ballX and ballY: ballX is not used in walkgenerator. ballY is used for kicking.
+
+
+
+
+1. RS_params
+	- forward, left, and turn body action commands define step size per second.
+	- behavior clips these values so that they fit into correct range
+	
+
+RS walk motion adapter class reads action request from blackboard
+Gets sensor values from touch 
+
+
+In function MotionAdapter::tick()
+I think what we need is to create the ActionCommand, Get Odometry configured correctly, convert our sensorvalues to their SensorValues object, cr
+	ActionCommand - Figure out how to make Walk Action Command
+		- request is of type ActionCommand::ALL
+		- request.sonar is set from sensor values
+		- Learn more about ActionCommand in types/ActionCommand.hpp
+	Odometry
+		- This copies odometry from the front of the odometryBuffer.
+		- After calling walk engine the new odometry is pushed to the back of the buffer
+	SensorValues
+		- Read our sensor data from memory
+		- Convert values to what they expect
+	bodyModel
+		- This module should have a bodyModel object
+	ball position
+		- get position relative to robot

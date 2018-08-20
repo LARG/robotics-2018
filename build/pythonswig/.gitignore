@@ -1,0 +1,3 @@
+*.pyc
+pythonswig_module.py
+_pythonswig_module.so

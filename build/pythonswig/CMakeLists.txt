@@ -1,0 +1,145 @@
+cmake_minimum_required(VERSION 2.8)
+
+PROJECT(pythonswig)
+INCLUDE($ENV{NAO_HOME}/build/common.cmake)
+SET(SWIG_GEN_DIR "${NAO_HOME}/build/build/swig")
+SET(PYTHONSWIG_DIR ${CMAKE_SOURCE_DIR}/../pythonswig)
+  
+IF(NOT(${DEFINED_SWIG_MODULE_DIR}))
+  SET(DEFINED_SWIG_MODULE_DIR True)
+  IF(TOOL_BUILD)
+    SET(SWIG_MODULE_DIR ${CMAKE_BINARY_DIR})
+    ADD_DEFINITIONS(-DSWIG_MODULE_DIR="${SWIG_MODULE_DIR}")
+  ELSE(TOOL_BUILD)
+    ADD_DEFINITIONS(-DSWIG_MODULE_DIR="/home/nao/bin")
+  ENDIF(TOOL_BUILD)
+ENDIF(NOT(${DEFINED_SWIG_MODULE_DIR}))
+
+# Read in the swig file list
+SET(SWIG_LIST_FILE "${SRC_DIR}/python/SwigFiles.txt")
+FILE(READ ${SWIG_LIST_FILE} SWIG_ORIG_FILES_STR)
+STRING(REPLACE "\n" ";" SWIG_ORIG_FILES ${SWIG_ORIG_FILES_STR})
+FOREACH(header ${SWIG_ORIG_FILES})
+  LIST(APPEND HEADERS "${NAO_HOME}/core/${header}")
+ENDFOREACH(header ${SWIG_ORIG_FILES})
+
+# Construct macro-free versions of the memory block headers
+FILE(GLOB MEMORY_HEADERS ${SRC_DIR}/memory/*Block.h ${SRC_DIR}/memory/schema/internal/*.h)
+LIST(REMOVE_ITEM MEMORY_HEADERS ${SRC_DIR}/memory/MemoryBlock.h)
+LIST(REMOVE_ITEM MEMORY_HEADERS ${SRC_DIR}/memory/SynchronizedBlock.h)
+SET(SCHEMA_GENERATOR_SOURCE_DIR $ENV{NAO_HOME}/build/schema)
+SET(SCHEMA_GENERATOR "${SCHEMA_GENERATOR_SOURCE_DIR}/generator.py")
+FILE(GLOB SCHEMA_GENERATOR_SOURCES ${SCHEMA_GENERATOR_SOURCE_DIR}/*.py)
+SET(SWIG_MEMORY_HEADER_DIR ${SWIG_GEN_DIR}/include)
+FILE(MAKE_DIRECTORY ${SWIG_MEMORY_HEADER_DIR})
+FOREACH(header ${MEMORY_HEADERS})
+  GET_FILENAME_COMPONENT(header_name ${header} NAME)
+  SET(SWIG_HEADER ${SWIG_MEMORY_HEADER_DIR}/${header_name})
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${SWIG_HEADER}
+    COMMAND ${SCHEMA_GENERATOR} --action swig --header ${header} --swig ${SWIG_MEMORY_HEADER_DIR}
+    DEPENDS ${header} ${SCHEMA_GENERATOR_SOURCES}
+  )
+  LIST(APPEND HEADERS ${SWIG_HEADER})
+ENDFOREACH(header ${MEMORY_HEADERS})
+
+SET(GENERATE_SWIG ${PYTHONSWIG_DIR}/generate.py)
+LIST(APPEND SWIG_TEMPLATE_SOURCES "${NAO_HOME}/core/math/Vector2.h" "${NAO_HOME}/core/math/Vector3.h")
+
+FOREACH(src ${SWIG_TEMPLATE_SOURCES})
+  LIST(APPEND SWIG_TEMPLATE_ARGS --include)
+  LIST(APPEND SWIG_TEMPLATE_ARGS ${src})
+ENDFOREACH(src ${SWIG_TEMPLATE_SOURCES})
+
+SET(SWIG_CPP_DIR "${SWIG_GEN_DIR}/gen")
+SET(SWIG_I_DIR "${SWIG_GEN_DIR}/i")
+SET(SWIG_PY_DIR "${SWIG_GEN_DIR}/gen")
+FILE(MAKE_DIRECTORY ${SWIG_CPP_DIR})
+FILE(MAKE_DIRECTORY ${SWIG_I_DIR})
+FILE(MAKE_DIRECTORY ${SWIG_PY_DIR})
+FILE(WRITE ${SWIG_PY_DIR}/__init__.py)
+
+# Create a template interface
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${SWIG_I_DIR}/templates.i
+  COMMAND ${GENERATE_SWIG} --action templates --tfile ${SWIG_I_DIR}/templates.i ${SWIG_TEMPLATE_ARGS}
+  DEPENDS ${GENERATE_SWIG} ${SWIG_TEMPLATE_SOURCES}
+)
+
+# Create a template cpp source
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${SWIG_CPP_DIR}/templates.cpp ${SWIG_PY_DIR}/templates.py
+  COMMAND ${GENERATE_SWIG} --action cpp --ifile ${SWIG_I_DIR}/templates.i --cppfile ${SWIG_CPP_DIR}/templates.cpp
+  DEPENDS ${GENERATE_SWIG} ${SWIG_I_DIR}/templates.i
+)
+LIST(APPEND SWIG_CPP_SOURCES ${SWIG_CPP_DIR}/templates.cpp)
+LIST(APPEND SWIG_MODULES ${SWIG_I_DIR}/templates.i)
+
+# Generate main swig interfaces
+FOREACH(HEADER ${HEADERS})
+  GET_FILENAME_COMPONENT(HEADER_NAME ${HEADER} NAME_WE)
+  SET(CPP_FILE ${SWIG_CPP_DIR}/${HEADER_NAME}.cpp)
+  SET(I_FILE ${SWIG_I_DIR}/${HEADER_NAME}.i)
+  SET(PY_FILE ${SWIG_PY_DIR}/${HEADER_NAME}.py)
+
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${I_FILE}
+    COMMAND ${GENERATE_SWIG} --action i --ifile ${I_FILE} --header ${HEADER}
+    DEPENDS ${GENERATE_SWIG} ${HEADER}
+  )
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CPP_FILE} ${PY_FILE}
+    COMMAND ${GENERATE_SWIG} --action cpp --ifile ${I_FILE} --cppfile ${CPP_FILE}
+    DEPENDS ${GENERATE_SWIG} ${I_FILE}
+  )
+
+  LIST(APPEND SWIG_MODULES ${I_FILE})
+  LIST(APPEND SWIG_CPP_SOURCES ${CPP_FILE})
+ENDFOREACH(HEADER ${HEADERS})
+
+
+FOREACH(MODULE ${SWIG_MODULES})
+  LIST(APPEND MODULE_ARGS --module)
+  LIST(APPEND MODULE_ARGS ${MODULE})
+  GET_FILENAME_COMPONENT(MODULE_NAME ${MODULE} NAME_WE)
+ENDFOREACH(MODULE ${SWIG_MODULES})
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${SWIG_I_DIR}/pythonswig_module.i
+  COMMAND ${GENERATE_SWIG} --action importer --importer ${SWIG_I_DIR}/pythonswig_module.i ${MODULE_ARGS}
+  DEPENDS ${SWIG_MODULES} 
+)
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${SWIG_CPP_DIR}/pythonswig_module_base.cpp ${SWIG_PY_DIR}/pythonswig_module.py
+  COMMAND ${GENERATE_SWIG} --action cpp --ifile ${SWIG_I_DIR}/pythonswig_module.i --cppfile ${SWIG_CPP_DIR}/pythonswig_module_base.cpp
+  DEPENDS ${SWIG_I_DIR}/pythonswig_module.i
+)
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${SWIG_CPP_DIR}/pythonswig_module.cpp
+  COMMAND ${GENERATE_SWIG} --action clean --cppfile ${SWIG_CPP_DIR}/pythonswig_module_base.cpp
+  DEPENDS ${SWIG_CPP_DIR}/pythonswig_module_base.cpp
+)
+
+ADD_LIBRARY(_pythonswig_module SHARED ${SWIG_CPP_DIR}/pythonswig_module.cpp ${PYTHONSWIG_DIR}/PythonInterface.cpp)
+
+# Create a swig interface for each pre-specified header
+ADD_DEPENDENCIES(_pythonswig_module generated_schemas)
+INCLUDE_DIRECTORIES(${PYTHONSWIG_DIR} ${NAO_HOME}/core)
+
+IF(TOOL_BUILD)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
+  TARGET_LINK_LIBRARIES(_pythonswig_module ${PYTHON_LIBRARIES})
+  SET(PYTHONSWIG_LIB ${SWIG_MODULE_DIR}/_pythonswig_module.so)
+  SET(PYTHONSWIG_MODULE ${SWIG_MODULE_DIR}/pythonswig_module.py)
+  ADD_CUSTOM_TARGET(pythonswig_links
+    ln -sf ${CMAKE_CURRENT_BINARY_DIR}/lib_pythonswig_module.so ${PYTHONSWIG_LIB}
+    COMMAND ln -sf ${SWIG_PY_DIR}/pythonswig_module.py ${PYTHONSWIG_MODULE}
+  )
+  ADD_DEPENDENCIES(_pythonswig_module pythonswig_links)
+ELSE(TOOL_BUILD)
+  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE})
+  TARGET_LINK_LIBRARIES(_pythonswig_module ${NAOQI_LIB}/libpython2.7.a)
+ENDIF(TOOL_BUILD)

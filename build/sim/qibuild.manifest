@@ -1,0 +1,4 @@
+[project sim]
+# Add your project dependencies here:
+depends = core
+

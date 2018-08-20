@@ -1,0 +1,12 @@
+/**
+ * @defgroup behavior
+ * @defgroup communications
+ * @defgroup kinematics
+ * @defgroup localization
+ * @defgroup math
+ * @defgroup memory
+ * @defgroup motion
+ * @defgroup python
+ * @defgroup sonar
+ * @defgroup vision
+ */

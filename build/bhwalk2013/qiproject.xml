@@ -1,0 +1,10 @@
+<project version="3">
+  <!-- Add your name and e-mail here
+    <maintainer email="...">Your Name</maintainer>
+  -->
+
+  <qibuild name="bhwalk2013">
+    <depends buildtime="true" runtime="true" names="core" />
+ </qibuild>
+
+</project>

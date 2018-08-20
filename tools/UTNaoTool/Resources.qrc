@@ -1,0 +1,17 @@
+<RCC>
+  <qresource>
+    <file>images/question.png</file>
+    <file>images/error.png</file>
+    <file>images/wireless.png</file>
+    <file>images/field.png</file>
+    <file>images/forward.png</file>
+    <file>images/back.png</file>
+    <file>images/faster.png</file>
+    <file>images/slower.png</file>
+    <file>images/pause.png</file>
+    <file>images/play.png</file>
+    <file>images/restart.png</file>
+    <file>images/up.png</file>
+    <file>images/down.png</file>
+  </qresource>
+</RCC>

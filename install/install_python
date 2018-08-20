@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# Installer Preamble #
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $DIR/common.sh
+#--------------------#
+
+current=`pwd`
+python_version=2.7.5
+python_name=Python-$python_version
+python_directory=$current/$python_name
+root_dir=$NAO_HOME/naoqi/crosstoolchain/atom/sysroot
+core_dir=$root_dir/lib/python2.7
+module_dir=$NAO_HOME/naoqi/lib/python2.7
+include_dir=$root_dir/usr/include/python2.7
+mkdir -p $core_dir
+mkdir -p $include_dir
+
+copy_python_core() {
+  cd $python_directory
+  rm -rf $core_dir
+  mkdir -p $core_dir
+  cp -r build/lib.linux*/* $core_dir/
+  rm -rf $module_dir
+  mkdir -p $module_dir
+  cp -r Lib/* $module_dir/
+  cp Include/* $include_dir/
+  mkdir -p $root_dir/usr/lib
+  sudo cp libpython* $root_dir/usr/lib/
+  #mkdir -p $NAO_HOME/naoqi/lib
+  sudo cp libpython* $NAO_HOME/naoqi/lib/
+  #sudo cp libpython* /usr/lib32/
+}
+
+install_python_core_prebuilt() {
+  extension=tar.gz
+  filename=$python_name.$extension
+  file=$NAO_LIBS/$filename
+  wget --trust-server-name -N $file
+  rm -rf $python_name
+  tar -zxvf $filename
+  cd $python_directory
+  copy_python_core
+}
+
+install_python_core_source() {
+  extension=tar.bz2
+  filename=$python_name.$extension
+  file=http://www.python.org/ftp/python/$python_version/$filename
+  unzipcmd="tar jxf"
+  wget --trust-server-name -N $file
+  rm -rf $python_name
+  $unzipcmd $filename
+  cd $python_directory
+  OPT=-m32 LDFLAGS=-m32 ./configure --enable-shared --enable-unicode=ucs4 --prefix=/opt/pym32 CFLAGS=-m32 CC='gcc -m32' BASECFLAGS='-m32'
+  make
+  copy_python_core
+}
+
+setup_dependencies() {
+  cd $current
+  mkdir -p hashlib && cd hashlib
+  rm -rf ./*
+  filename=hashlib.tar.gz
+  file=$NAO_LIBS/$filename
+  wget --trust-server-name -N $file
+  tar zxvf $filename
+  cp _sha256.so $python_directory/Lib/
+  cp _sha512.so $python_directory/Lib/
+  cd $current
+}
+
+install_numpy_prebuilt() {
+  cd $current
+  version=1.8.0
+  extension=tar.gz
+  filename=numpy-${version}.$extension
+  file=$NAO_LIBS/$filename
+  wget --trust-server-name -N $file
+  rm -rf numpy-$version
+  tar -zxvf $filename
+  cd numpy-$version
+  target=$module_dir/numpy
+  mkdir -p $target
+  cp -r build/lib/python2.7/site-packages/numpy/* $target/
+}
+
+install_numpy_source() {
+  cd $current
+  version=1.8.0
+  extension=tar.gz
+  filename=numpy-${version}.$extension
+  file=http://downloads.sourceforge.net/project/numpy/NumPy/$version/$filename
+  wget --trust-server-name -N $file
+  rm -rf numpy-$version
+  tar -zxvf $filename
+  cd numpy-$version
+  CFLAGS=-m32 LDFLAGS=-m32 BLAS=None LAPACK=None ATLAS=None $python_directory/python setup.py install --prefix=build
+  target=$module_dir/numpy
+  mkdir -p $target
+  cp -r build/lib/python2.7/site-packages/numpy/* $target/
+}
+
+install_scipy_prebuilt() {
+  cd $current
+  file=$NAO_LIBS/scipy32.tar.gz
+  wget -N $file
+  rm -rf scipy
+  tar -zxvf scipy32.tar.gz
+  target=$module_dir/scipy
+  mkdir -p $target
+  cp -r scipy/* $target/
+}
+
+install_scipy_source() {
+  cd $current
+  version=0.13.0
+  extension=tar.gz
+  filename=scipy-${version}.$extension
+  file=http://downloads.sourceforge.net/project/scipy/scipy/$version/$filename
+  wget --trust-server-name -N $file
+  rm -rf scipy-$version
+  tar -zxvf $filename
+  cd scipy-$version
+  BLAS=$current/BLAS/libfblas.a LAPACK=$current/lapack-*/liblapack.a PYTHONPATH=$install_dir FFLAGS=-m32 CFLAGS=-m32 LDFLAGS=-m32 $python_directory/python setup.py install --prefix=build
+  target=$module_dir/scipy
+  mkdir -p $target
+}
+
+remove_tests() {
+  rm -rf $module_dir/test $module_dir/*/test $module_dir/*/tests
+  rm -rf $module_dir/numpy/tests $module_dir/numpy/*/tests $module_dir/numpy/*/*/tests $module_dir/numpy/*/*/*/tests
+  rm -rf $module_dir/scipy/tests $module_dir/scipy/*/tests $module_dir/scipy/*/*/tests $module_dir/scipy/*/*/*/tests
+}
+
+install_python_core_prebuilt
+setup_dependencies
+install_numpy_prebuilt
+install_scipy_prebuilt
+remove_tests

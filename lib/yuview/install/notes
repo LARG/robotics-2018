@@ -1,0 +1,7 @@
+1. Run "sudo xdg-mime install --mode system ./install/x-yuv.xml
+2. Copy the thumbnailer script to /usr/share/thumbnailers/
+3. Copy the desktop script to /usr/share/applications
+4. Add this to ~/.local/share/applications/mimeapps.list:
+
+  [Added Associations]
+  image/yuv=yuview.desktop;

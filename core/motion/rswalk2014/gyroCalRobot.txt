@@ -1,0 +1,14 @@
+testing robot 29: 
+GyroX,Y offsets are about 24.0 rad/frame
+testing robot 41:
+-0.008, 0.03
+
+* these offsets are not consistent across robot, need calibrate each one individually
+
+running robot 46 for 20 minutes:
+joint temperature high (3 of them above 70).
+
+GyroX,Y offset before: 0.0087, 0.0078
+after: 0.0097, 0.0148 
+
+*need to calibrate whenever in still position

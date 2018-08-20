@@ -1,0 +1,9 @@
+.utnaotoolrc
+teamConfig*
+config.yaml
+*_config*.yaml
+*calibration.yaml
+*.cal
+audio_processing_tree.*
+*.dat
+keyframe.yaml

@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+import subprocess
+
+def main():
+  # kill the previous
+  subprocess.call('killall -9 rcssserver3d',shell=True)
+  #cmd = 'rcsoccersim3d'
+  cmd = 'rcssserver3d'  #modified for new simulator
+  p = subprocess.Popen(cmd)
+  try:
+    p.wait()
+  finally:
+    if p.poll() == None:
+      p.terminate()
+    subprocess.call('killall -9 rcssserver3d',shell=True)
+    #subprocess.call('killall -9 rcsoccersim3d',shell=True)
+
+if __name__ == '__main__':
+  main()

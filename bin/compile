@@ -1,0 +1,210 @@
+#!/usr/bin/env python
+
+import sys, subprocess, os, shutil, glob
+from common import onLabMachine
+
+validInterfaces = ['nao','motion','vision','memory_test','tool','core','pythonswig','headless']
+allInterfaces = validInterfaces[:]
+allInterfaces.remove('headless')
+localInterfaces = ["tool", 'headless']
+robotInterfaces = ['nao','motion','vision']
+
+NAO_HOME = os.getenv('NAO_HOME')
+NAO_SOUND = os.getenv('NAO_SOUND') == "true" 
+
+options = None
+
+def getNumProcs():
+  try:
+    procs = int(os.getenv("NUM_PROCS"))
+    return procs
+  except: pass
+  try:
+    import multiprocessing
+    return multiprocessing.cpu_count()
+  except:
+    print 'Getting number of processors via multiprocessing failed, using /proc/cpuinfo'
+    p = subprocess.Popen('grep -c ^processor /proc/cpuinfo',shell=True,stdout=subprocess.PIPE)
+    p.wait()
+    out, err = p.communicate()
+    numProcs = int(out)
+    return numProcs
+
+def makeUnique(seq, idfun=None): 
+  # order preserving
+  if idfun is None:
+    def idfun(x): return x
+  seen = {}
+  result = []
+  for item in seq:
+    marker = idfun(item)
+    # in old Python versions:
+    # if seen.has_key(marker)
+    # but in new ones:
+    if marker in seen: continue
+    seen[marker] = 1
+    result.append(item)
+  return result
+
+def sysCall(cmd,failureMessage='Command failed'):
+  retcode = subprocess.call(cmd,shell=True)
+  if retcode != 0:
+    print >>sys.stderr,failureMessage
+    playSound()
+    if retcode <= 127:
+      sys.exit(retcode)
+    else:
+      sys.exit(2)
+
+def compileInterfaces(interfaces,options):
+  flags='-j ' + str(getNumProcs())
+  if len(interfaces) == 0:
+    return
+  for local in localInterfaces:
+    if local in interfaces:
+      interfaces.remove(local)
+      print "COMPILING %s" % local
+      if not compileLocal(local):
+        print "Compile failed for %s" % local
+        return False
+  if len(interfaces) == 0: return True
+  interfaceStr = ' '.join(interfaces)
+  cmd = 'qibuild make -c atom --build-prefix=%s %s %s' % (options.build_dir,interfaceStr,flags)
+  print '-----------------------------------------'
+  print 'COMPILING interfaces: %s' % interfaceStr
+  print cmd
+  sysCall(cmd,'Compile failed')
+
+def configureInterfaces(interfaces,flags,options):
+  if len(interfaces) == 0:
+    return
+  for local in localInterfaces:
+    if local in interfaces:
+      interfaces.remove(local)
+      print "CONFIGURING %s" % local
+      if not configureLocal(local,options):
+        print "Configure failed for %s" % local
+        return False
+  if len(interfaces) == 0: return True
+  interfaceStr = ' '.join(interfaces)
+  flags += ' -DFORCE_NO_CCACHE=1 '
+  if options.textlog:
+    flags += ' -D ALLOW_DEBUG_LOG=true'
+  if options.optimize:
+    flags += " -D OPTIMIZE=true"
+  cmd = 'qibuild configure -c atom --build-prefix=%s %s %s' % (options.build_dir,interfaceStr,flags)
+  print '-----------------------------------------'
+  print 'CONFIGURING interfaces: %s' % interfaceStr
+  print cmd
+  sysCall(cmd,'Configure failed')
+
+def parseArgs(args):
+  from optparse import OptionParser
+  parser = OptionParser('''compile [options] interface [interface ...]
+  all: %s
+  everything: %s
+  robot: %s''' % (' '.join(allInterfaces),' '.join(validInterfaces),' '.join(robotInterfaces))
+  )
+  parser.add_option('--debug',dest='debug',action='store_true',default=False,help='Compile debug version')
+  parser.add_option('--textlog',dest='textlog',action='store_true',default=False,help='Enable text logging for the robot build')
+  parser.add_option('--fast',dest='configure',action='store_false',default=True,help='Does NOT run configure before compiling, good if you\'re not add files, bad if you are')
+  parser.add_option('--clean',dest='clean',action='store_true',default=False,help='Removes all build files for the specified interfaces (Need to specify debug or geode like normal)')
+  parser.add_option("--sound",'-s',dest='enable_sound',action='store_true',default=False,help='Makes a sound when finished compiling')
+  parser.add_option("--optimize",dest="optimize",action='store_true',default=False,help='Enable build optimizations for demos and games.')
+
+  options,args = parser.parse_args(args)
+  if len(args) == 0:
+    parser.parse_args(['--help'])
+    sys.exit(1)
+  return options,args
+ 
+def compileLocal(interface):
+  build_dir = os.path.join(options.build_dir,interface)
+  sysCall("%s/build/%s/link %s" % (NAO_HOME,interface,options.build_type))
+  os.chdir(build_dir)
+  sysCall("make -j%i" % getNumProcs())
+  return True
+
+def configureLocal(interface,options):
+  build_dir = os.path.join(options.build_dir,interface)
+  sysCall("mkdir -p %s" % build_dir)
+  sysCall("%s/build/%s/link %s" % (NAO_HOME,interface,options.build_type))
+  os.chdir(build_dir)
+  build_type = ""
+  if options.debug: build_type = "-DCMAKE_BUILD_TYPE=Debug"
+  sysCall('cmake %s/build/%s %s' % (NAO_HOME,interface,build_type))
+  return True
+
+def cleanInterfaces(interfaces,options):
+  for interface in interfaces:
+    base = options.build_dir
+    path = os.path.join(base,interface)
+    print 'REMOVING %s' % path
+    if os.path.exists(path):
+      shutil.rmtree(path)
+
+def playSound():
+  if options.enable_sound or NAO_SOUND:
+    try:
+      p = subprocess.Popen('mpg123 %s/bin/ding.mp3' % NAO_HOME,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+      p.communicate()
+    except: pass
+
+def main(args):
+  buildDir = os.path.join(NAO_HOME,'build')
+  os.chdir(buildDir)
+  global options
+  options,args = parseArgs(args)
+  options.build_dir = os.path.join(NAO_HOME,'build','build')
+  if options.debug:
+    options.build_type = 'debug'
+  elif options.optimize:
+    options.build_type = 'optimized'
+  else:
+    options.build_type = 'release'
+  options.build_dir = os.path.join(options.build_dir,options.build_type)
+
+  flags = ''
+  if options.debug:
+    flags += '--debug '
+  else:
+    flags += '--release '
+
+  # get interfaces to be compiled (e.g. vision, all)
+  interfaces = []
+  for arg in args:
+    arg = arg.lower()
+    if arg == 'all':
+      interfaces.extend(allInterfaces)
+    elif arg == 'everything':
+      interfaces.extend(validInterfaces)
+    elif arg == 'robot':
+      interfaces.extend(robotInterfaces)
+    elif arg == "python":
+      interfaces.append("pythonswig")
+    else:
+      interfaces.append(arg.replace('/',''))
+  # make interfaces unique
+  interfaces = makeUnique(interfaces)
+  # check interfaces
+  for interface in interfaces:
+    if interface not in validInterfaces:
+      print >>sys.stderr,'Interface not in list of validInterfaces: %s' % interface
+      print >>sys.stderr,validInterfaces
+      sys.exit(1)
+  # do it
+  origInterfaces = list(interfaces)
+  if options.clean:
+    response = raw_input('Clean %s (y/n): ' % ' '.join(interfaces))
+    if response.lower() in ['y','yes']:
+      cleanInterfaces(interfaces,options)
+    else:
+      print 'Aborting'
+  else:
+    if options.configure:  
+      configureInterfaces(interfaces[:],flags,options)
+    compileInterfaces(interfaces[:],options)
+  playSound()
+
+if __name__ == '__main__':
+  main(sys.argv[1:])

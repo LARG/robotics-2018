@@ -1,0 +1,10 @@
+<worktree>
+  <project src="nao" />
+  <project src="pythonswig" />
+  <project src="core" />
+  <project src="vision" />
+  <project src="motion" />
+  <project src="rswalk2014" />
+  <project src="memory_test" />
+  <project src="headless" />
+</worktree>
