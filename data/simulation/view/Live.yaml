@@ -1,0 +1,9 @@
+---
+options:
+  - SHOW_FIELD
+  - SHOW_ROBOT
+  - SHOW_TEAM_BALL_PACKETS
+  - SHOW_ROLES
+  - SHOW_NUMBERS
+  - SHOW_GOALS
+...

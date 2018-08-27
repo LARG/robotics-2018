@@ -1,0 +1,10 @@
+---
+options:
+  - SHOW_FIELD
+  - SHOW_ROBOT
+  - SHOW_BALL
+  - SHOW_BALL_VEL
+  - SHOW_ODOMETRY
+  - SHOW_TARGET_POINT
+  - SHOW_GOALS
+...

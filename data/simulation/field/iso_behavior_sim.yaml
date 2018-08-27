@@ -1,0 +1,134 @@
+---
+game_state: PLAYING
+blue_goals: 3
+red_goals: 0
+roles:
+  {}
+states:
+  {}
+objects:
+  gtconfig:
+    placements_:
+      0:
+        x: 940.512
+        y: 2482.78
+        orientation: 0
+        height: 0
+      1:
+        x: 3474.3
+        y: 353
+        orientation: 6
+        height: 0
+      2:
+        x: 194.235
+        y: -145
+        orientation: 0
+        height: 0
+      3:
+        x: 710.142
+        y: -1307
+        orientation: 0
+        height: 0
+      4:
+        x: 1076.17
+        y: 1000
+        orientation: 0
+        height: 0
+      5:
+        x: 3664.53
+        y: 2892.65
+        orientation: 134
+        height: 0
+      6:
+        x: 296.759
+        y: 930
+        orientation: 0
+        height: 0
+      7:
+        x: 1802.1
+        y: -202
+        orientation: 0
+        height: 0
+      8:
+        x: 3441.67
+        y: 817
+        orientation: 0
+        height: 0
+      9:
+        x: 2896.18
+        y: 1421
+        orientation: 0
+        height: 0
+      10:
+        x: 1121.66
+        y: -561
+        orientation: 0
+        height: 0
+      11:
+        x: 50.6961
+        y: 1108.8
+        orientation: 30
+        height: 0
+  bconfig:
+    placements_:
+      0:
+        x: 940.512
+        y: 2482.78
+        orientation: 0
+        height: 0
+      1:
+        x: 3474.3
+        y: 353
+        orientation: 6
+        height: 0
+      2:
+        x: 194.235
+        y: -145
+        orientation: 0
+        height: 0
+      3:
+        x: 710.142
+        y: -1307
+        orientation: 0
+        height: 0
+      4:
+        x: 1076.17
+        y: 1000
+        orientation: 0
+        height: 0
+      5:
+        x: 3664.53
+        y: 2892.65
+        orientation: 134
+        height: 0
+      6:
+        x: 296.759
+        y: 930
+        orientation: 0
+        height: 0
+      7:
+        x: 1802.1
+        y: -202
+        orientation: 0
+        height: 0
+      8:
+        x: 3441.67
+        y: 817
+        orientation: 0
+        height: 0
+      9:
+        x: 2896.18
+        y: 1421
+        orientation: 0
+        height: 0
+      10:
+        x: 1121.66
+        y: -561
+        orientation: 0
+        height: 0
+      11:
+        x: 50.6961
+        y: 1108.8
+        orientation: 30
+        height: 0
+...
