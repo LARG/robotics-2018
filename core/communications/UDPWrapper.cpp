@@ -1,16 +1,12 @@
 #include "UDPWrapper.h"
 #include <iostream>
 
-#define inbound() (direction_ == Inbound || direction_ == Bidirectional)
-#define outbound() (direction_ == Outbound || direction_ == Bidirectional)
-
 UDPWrapper::UDPWrapper (unsigned short port, bool broadcast, std::string dest_ip, Direction direction):
   in_sock_(io_service_),
   out_sock_(io_service_),
   port_(port),
   direction_(direction),
   destruct_(false),
-  listen_thread_(NULL),
   destination_(NULL)
 {
 
@@ -67,8 +63,6 @@ UDPWrapper::~UDPWrapper() {
   // Cleanup
   if(inbound()) {
     receiveEmptyPacket();
-    if(listen_thread_)
-      delete listen_thread_;
     in_sock_.close();
   }
   if(outbound()) {
@@ -76,17 +70,6 @@ UDPWrapper::~UDPWrapper() {
       delete destination_;
     out_sock_.close();
   }
-}
-
-void UDPWrapper::startListenThread(std::function<void(void*)> method, void *core) {
-  if(!inbound()) return;
-  auto func = [=] {
-    while(true) {
-      method(core);
-      if(destruct_) break;
-    }
-  };
-  listen_thread_ = new std::thread(func);
 }
 
 boost::asio::ip::address UDPWrapper::senderAddress() {

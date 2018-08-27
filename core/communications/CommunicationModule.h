@@ -8,12 +8,13 @@
 #include <common/Profiling.h>
 #include <common/CameraParams.h>
 
-using boost::asio::ip::tcp;
+#include <mutex>
+#include <condition_variable>
 
 class VisionCore;
 class LogWriter;
 class StreamingMessage;
-class Lock;
+class TCPServer;
 
 class RobotStateBlock;
 class GameStateBlock;
@@ -26,8 +27,8 @@ class OdometryBlock;
 class CameraBlock;
 class BehaviorBlock;
 class AudioProcessingBlock;
-
-void* stream(void *arg);
+class TeamPacket;
+class JointCommandBlock;
 
 /** @ingroup communications
  * Responsible for managing communications between the teammates,
@@ -42,16 +43,19 @@ class CommunicationModule: public Module {
   void specifyMemoryBlocks();
   void initSpecificModule();
   void initUDP();
-  void cleanUDP();
+  void cleanupUDP();
+  void stream();
 
   void processFrame();
   void optionallyStream();
 
   static bool *interpreter_restart_requested_;
+  bool streaming();
 
  private:
   void sendTeamUDP();
   void sendCoachUDP();
+  void tryUpdateRelayData(const TeamPacket& packet, int robotNumber);
 
   VisionCore *core_;
 
@@ -67,54 +71,52 @@ class CommunicationModule: public Module {
   CameraBlock *camera_;
   BehaviorBlock *behavior_;
   AudioProcessingBlock *audio_processing_;
-
+  JointCommandBlock *joint_commands_;
+    
   //Udp for robot team communication
   //ThreadedUDPSocket teamUDP;
   UDPWrapper* teamUDP;
-  static void listenTeamUDP( void * );
+  void listenTeamUDP();
 
   //Udp for coach communication
   UDPWrapper* coachUDP;
-  static void listenCoachUDP( void * );
+  void listenCoachUDP();
 
   //Udp for the tools commands to the robot
   //ThreadedUDPSocket toolUDP;
   UDPWrapper* toolUDP;
-  static void listenToolUDP( void * );
+  void listenToolUDP();
   void handleCameraParamsMessage(CameraParams &params, char *msg);
 
-  void handleLoggingBlocksMessage(char *);
+  void handleLoggingBlocksMessage(const ToolPacket& tp);
 
   //Messages from game controller
   //ThreadedUDPSocket gameControllerUDP;
-  UDPWrapper* gameControllerUDP;
-  static void listenGameControllerUDP( void * );
+  UDPWrapper *gcDataUDP, *gcReturnUDP;
+  void listenGameControllerUDP();
   void sendGameControllerUDP();
 
-  // for streaming to tool
-public:
-  bool tcp_connected_;
-  void sendTCP();
+ public:
   void sendToolResponse(ToolPacket message);
   void sendToolRequest(ToolPacket message);
 
   uint32_t getVirtualTime();
   void updateVirtualTime(uint32_t received);
   void incrementVirtualTime();
+  void startTCPServer();
 private:
-  boost::asio::io_service io_service;
-  tcp::socket sock;
-  void startTCP();
+  void cleanupTCPServer();
+  void cleanupStreamThread();
+  std::condition_variable streaming_cv_;
+  std::mutex streaming_mutex_;
   void prepareSendTCP();
   std::unique_ptr<LogWriter> streaming_logger_;
-  StreamingMessage *stream_msg_;
-  StreamBuffer cbuffer_;
   char *log_buffer_;
-  Lock *stream_lock_;
-  pthread_t stream_thread_;
-  bool connected_;
+  std::unique_ptr<std::thread> stream_thread_;
   uint32_t vtime_;
-  Timer coachTimer_;
+  Timer coachTimer_, teamTimer_, gcTimer_;
+  std::unique_ptr<TCPServer> tcpserver_;
+  bool connected_, stopping_stream_ = false;
 };
 
 #endif /* end of include guard: COMMUNICATIONS_MODULE */
