@@ -19,6 +19,7 @@ class ButtonModule;
 class LEDModule;
 class AudioModule;
 class ImageCapture;
+class ToolPacket;
 
 class LocalizationModule;
 class LocalizationMethod {
@@ -49,6 +50,10 @@ public:
   void updateMemory(MemoryFrame* memory, bool locOnly = false);
   void setMemoryVariables();
 
+#ifndef SWIG
+  void setLogSelections(const ToolPacket& selections);
+#endif
+
   MemoryFrame *memory_;
   bool delete_memory_on_destruct_;
   CoreType type_;
@@ -64,7 +69,7 @@ public:
   LEDModule *leds_;
   AudioModule *audio_;
 
-#ifndef SWIG   // Lua can't handle the file IO
+#ifndef SWIG   // Swig can't handle the file IO
   LogWriter* log_;
   std::unique_ptr<TextLogger> textlog_;
 #endif
@@ -103,6 +108,7 @@ public:
   void receiveData();
   void motionLock();
   void motionUnlock();
+  static bool isStreaming();
 
 private:
   // synchronized data
@@ -136,7 +142,10 @@ private:
   void initMemory();
   void initModules(LocalizationMethod::Type locMethod);
   bool isToolCore();
-   Timer vtimer_, camtimer_, logtimer_;
- };
+  Timer vtimer_, camtimer_, logtimer_;
+#ifndef SWIG
+  std::unique_ptr<ToolPacket> logging_selections_;
+#endif
+};
 
 #endif /* end of include guard: CORE_2H7QHCY7 */

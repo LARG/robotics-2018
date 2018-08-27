@@ -4,5 +4,6 @@ BottomCamera::BottomCamera(const ImageParams& iparams, CameraParams& p, CameraPa
     device_path_ = "/dev/video1";
     vflip_ = false;
     hflip_ = false;
+    exposure = 200;
     init();
 }

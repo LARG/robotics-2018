@@ -7,17 +7,11 @@ Module::Module():
 }
 
 void Module::init(MemoryFrame *memory, TextLogger* tl) {
-  std::cout << "init" << std::endl;
   memory_ = memory;
-  std::cout << "mem assign" << std::endl;
   textlogger = tl;
-  std::cout << "tl assign" << std::endl;
   specifyMemoryDependency();
-  std::cout << "spec Mem Dep" << std::endl;
   specifyMemoryBlocks();
-  std::cout << "specMemBloc" << std::endl;
   initSpecificModule();
-  std::cout << "initSpecificMod" << std::endl;
 }
 
 void Module::updateModuleMemory(MemoryFrame *memory) {

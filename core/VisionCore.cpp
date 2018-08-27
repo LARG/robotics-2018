@@ -38,6 +38,12 @@
 
 #include <iostream>
 
+bool VisionCore::isStreaming() {
+  if(inst_ == nullptr) return false;
+  if(inst_->communications_ == nullptr) return false;
+  return inst_->communications_->streaming();
+}
+
 VisionCore *VisionCore::inst_ = NULL;
 LocalizationMethod::Type LocalizationMethod::DEFAULT = LocalizationMethod::Default;
 const bool VisionCore::useOffFieldLocalization = false;
@@ -128,7 +134,8 @@ VisionCore::~VisionCore() {
 void VisionCore::processVisionFrame() {
   vtimer_.start();
   camtimer_.start();
-  interpreter_->processFrame(); // main control is done in lua
+  preVision();
+  interpreter_->processFrame(); // main control is done in the interpreter
 
   if (communications_ != NULL && interpreter_->is_ok_) {
     communications_->processFrame();
@@ -156,6 +163,7 @@ void VisionCore::processVisionFrame() {
       communications_->sendToolResponse(ToolPacket::LogComplete);
     }
   }
+  postVision();
   vtimer_.stop();
   camtimer_.stop();
   if(vtimer_.ready() && interpreter_->is_ok_) {
@@ -166,6 +174,10 @@ void VisionCore::processVisionFrame() {
   }
 }
 
+void VisionCore::setLogSelections(const ToolPacket& selections) {
+  logging_selections_ = std::make_unique<ToolPacket>(selections);
+}
+
 void VisionCore::optionallyWriteLog() {
   if(!is_logging_)
     return;
@@ -174,6 +186,17 @@ void VisionCore::optionallyWriteLog() {
   bool headReady = (!robot_vision_->reported_head_moving) && (vision_frame_info_->seconds_since_start - robot_vision_->reported_head_stop_time > HEAD_STOP_THRESHOLD);
   if ((log_interval_ > 1e-5) && !headReady && (logtimer_.elapsed() - log_interval_ < 0.34)) // logging by frequency, but head is moving, so let's wait a bit (at most 0.34s)
     return;
+  if(logging_selections_ != nullptr and logging_selections_->hasRequiredObjects) {
+    bool allow = false;
+    for(int i = 0; i < NUM_WorldObjectTypes; i++) {
+      if(logging_selections_->requiredObjects[i] && world_objects_->objects_[i].seen) {
+        allow = true;
+        break;
+      }
+    }
+    if(!allow) return;
+  }
+
   logMemory();
   logtimer_.restart();
   if(log_by_frame_) frames_to_log_--;
@@ -233,19 +256,17 @@ void VisionCore::init(int team_num, int player_num) {
 void VisionCore::initModules(LocalizationMethod::Type locMethod) {
 
   if (!isToolCore()) {
-    std::cout << "INIT COMMS 0" << std::endl;
     communications_ = new CommunicationModule(this);
-    std::cout << "INIT COMMS 1" << std::endl;
     communications_->init(memory_, textlog_.get());
-    std::cout << "INIT COMMS 2" << std::endl;
+#ifndef TOOL
+    communications_->startTCPServer();
+#endif
   }
 
   if ((type_ != CORE_TOOLSIM) && (type_ != CORE_TOOL_NO_VISION)){
-    std::cout << "INIT VISION" << std::endl;
     vision_ = new VisionModule();
     vision_->init(memory_, textlog_.get());
   }
-  std::cout << "INIT LEDS" << std::endl;
   leds_ = new LEDModule();
   leds_->init(memory_, textlog_.get());
 
@@ -289,11 +310,6 @@ void VisionCore::initMemory() {
   // get raw info for vision interface
   memory_->getOrAddBlockByName(raw_vision_frame_info_,"raw_vision_frame_info");
   memory_->getOrAddBlockByName(raw_camera_info_,"raw_camera_info");
-  /*
-    ImageBlock *imageBlockPtr;
-    memory_->getOrAddBlockByName(imageBlockPtr, "raw_image");
-    imageBlockPtr->log_block = true;
-  */
   //Add required memory blocks
   memory_->getOrAddBlockByName(camera_info_,"camera_info");
   memory_->getOrAddBlockByName(vision_frame_info_,"vision_frame_info");
@@ -451,26 +467,14 @@ void VisionCore::updateMemory(MemoryFrame* memory, bool locOnly) {
 void VisionCore::setMemoryVariables() {
 
   // Set the data path for the data folder
-  switch (type_) {
-  case CORE_ROBOT:
-    memory_->data_path_ = "/home/nao/data/";
-    break;
-  case CORE_SIM:
-  case CORE_TOOLSIM:
-  case CORE_TOOL:
-  case CORE_TOOL_NO_VISION:
-    memory_->data_path_ = (std::string(getenv("NAO_HOME")) + "/data/").c_str();
-    break;
-  default:
-    std::cerr << "VisionCore::init - problem setting data_path" << std::endl;
-  }
+  memory_->data_path_ = util::cfgpath(util::Data);
 
   // Pass the coretype to the memory so that it can be accessed by different modules
   memory_->core_type_ = type_;
 }
 
 void VisionCore::preVision() {
-  // called from lua befor vision module
+  // called from interpretor before vision module
   //std::cout << "pre vision" << std::endl << std::flush;
 
   // don't need to lock or receive data in tool
@@ -479,13 +483,14 @@ void VisionCore::preVision() {
 
   vtimer_.pause();
   // get the vision lock
-  memory_->vision_lock_->lock();
+  // memory_->vision_lock_->lock();
 
   // see if we've already processed this frame
-  while (raw_vision_frame_info_->frame_id == last_frame_processed_) {
-    //std::cout << "WAITING" << std::endl << std::flush;
-    memory_->vision_lock_->wait();
-  }
+  image_capture_->requeue();
+  // while (raw_vision_frame_info_->frame_id == last_frame_processed_) {
+  //   //std::cout << "WAITING" << std::endl << std::flush;
+  //   memory_->vision_lock_->wait();
+  // }
   vtimer_.unpause();
 
   receiveData();
@@ -495,7 +500,7 @@ void VisionCore::postVision() {
   // don't need unlock for tool
   if (isToolCore())
     return;
-  memory_->vision_lock_->unlock();
+  // memory_->vision_lock_->unlock();
 }
 
 void VisionCore::publishData() {
@@ -534,9 +539,9 @@ void VisionCore::publishData() {
   memory_->motion_vision_lock_->unlock();
 
   // copy over data to the interface's vision thread
-  memory_->vision_lock_->lock();
+  // memory_->vision_lock_->lock();
   camera_info_->copyToImageCapture(raw_camera_info_);
-  memory_->vision_lock_->unlock();
+  // memory_->vision_lock_->unlock();
 }
 
 void VisionCore::receiveData() {

@@ -43,7 +43,8 @@ class InterpreterModule: public Module {
     ImageBlock *image_;
     AudioProcessingBlock *audio_processing_;
 
-    std::vector<float> joint_values_, sensor_values_, joint_stiffness_;
+    std::vector<float> joint_values_, joint_stiffness_;
+    std::vector<float> sensor_values_;
 
     InterpreterModule(VisionCore* core);
     ~InterpreterModule();
@@ -84,7 +85,6 @@ class InterpreterModule: public Module {
     void setPose3D(Pose3D *arr,int ind, Pose3D val);
     Pose3D* getPose3DPtr(Pose3D *arr,int ind);
     void log(int level, std::string message);
-
   protected:
     VisionCore* core_;
 };

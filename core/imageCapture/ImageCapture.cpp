@@ -2,17 +2,8 @@
 #include "TopCamera.h"
 #include "BottomCamera.h"
 #include "DummyCamera.h"
+#include <common/Profiling.h>
 
-// for threading, not in class
-void* threadedTakeImage(void *arg) {
-  std::cout << "Starting Take Image thread" << std::endl << std::flush;
-  ImageCapture* image_capture = reinterpret_cast<ImageCapture*>(arg);
-
-  while (true) {
-    image_capture->takeV4LPicture();
-  }
-  return NULL;
-}
 
 ImageCapture::ImageCapture(MemoryFrame *memory):
   memory_(memory), top_params_loaded_(false), bottom_params_loaded_(false), topImageParams_(Camera::TOP), bottomImageParams_(Camera::BOTTOM)
@@ -53,11 +44,12 @@ void ImageCapture::initVision() {
 
   std::cout << "ImageCapture: Done creating V4L2 cameras" << std::endl << std::flush;
 
-  std::cout << "ImageCapture: Creating thread to take images" << std::endl << std::flush;
-  pthread_create(&image_thread_, NULL, (threadedTakeImage), this );
-  std::cout << "ImageCapture: Done creating thread to take images" << std::endl << std::flush;
-
   std::cout << "ImageCapture: Done initializing Vision Interface" << std::endl << std::flush;
+  top_camera_->updateBuffers();
+  bottom_camera_->updateBuffers();
+  buffer_requeued_ = true;
+  buffer_dequeued_ = false;
+  buffer_thread_ = std::make_unique<std::thread>(&ImageCapture::dequeueThread, this);
 }
 
 void ImageCapture::testCameras() {
@@ -74,7 +66,7 @@ void ImageCapture::testCameras() {
       std::cerr << "ImageCapture: Top camera failed self test, resetting...\n";
       delete top_camera_;
       top_camera_ = new TopCamera(topImageParams_, camera_info_->params_top_camera_,camera_info_->read_params_top_camera_);
-      top_camera_->updateBuffer();
+      top_camera_->updateBuffers();
     }
  
 
@@ -87,7 +79,7 @@ void ImageCapture::testCameras() {
       std::cerr << "ImageCapture: Bottom camera failed self test, resetting...\n";
       delete bottom_camera_;
       bottom_camera_ = new BottomCamera(bottomImageParams_, camera_info_->params_bottom_camera_,camera_info_->read_params_bottom_camera_);
-      bottom_camera_->updateBuffer();
+      bottom_camera_->updateBuffers();
     }
  
 
@@ -96,23 +88,48 @@ void ImageCapture::testCameras() {
   }
 }
 
-void ImageCapture::takeV4LPicture(){
-  vision_lock_->lock();
-  checkCameraParams();
-  vision_lock_->unlock();
+void ImageCapture::enableAutoWB(){
+  top_camera_->enableAutoWB();
+  bottom_camera_->enableAutoWB();
+}
 
-  top_camera_->updateBuffer();
-  bottom_camera_->updateBuffer();
-  vision_lock_->lock();
+void ImageCapture::lockWB(){
+  top_camera_->lockWB();
+  bottom_camera_->lockWB();
+}
+  
+void ImageCapture::dequeueThread() {
+  while(true) {
+    std::unique_lock<std::mutex> lock(buffer_mutex_);
+    dequeue_cv_.wait(lock, [this] { return static_cast<bool>(buffer_requeued_); });
+    top_camera_->dequeueBuffer();
+    bottom_camera_->dequeueBuffer();
+    buffer_requeued_ = false;
+    buffer_dequeued_ = true;
+    requeue_cv_.notify_one();
+  }
+}
+
+void ImageCapture::requeue() {
+  std::unique_lock<std::mutex> lock(buffer_mutex_);
+  requeue_cv_.wait(lock, [this] { return static_cast<bool>(buffer_dequeued_); });
+  // Pull images from next buffer
   image_->setImgTop(top_camera_->getImage());
   image_->setImgBottom(bottom_camera_->getImage());
+  // Requeue previous buffer
+  top_camera_->enqueueBuffer();
+  bottom_camera_->enqueueBuffer();
+  // Update metadata
   image_->setLoaded();
-
   vision_frame_info_->frame_id = top_camera_->getTimeStamp();
   vision_frame_info_->seconds_since_start = getSystemTime() - vision_frame_info_->start_time;
-
-  vision_lock_->unlock();
-  vision_lock_->notify_one();
+  // Set "next" to "previous" for the next round
+  top_camera_->swapBuffers();
+  bottom_camera_->swapBuffers();
+  // Signal to the dequeue thread that we can start dequeueing the next buffer
+  buffer_dequeued_ = false;
+  buffer_requeued_ = true;
+  dequeue_cv_.notify_one();
 }
 
 void ImageCapture::checkCameraParams() {

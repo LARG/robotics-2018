@@ -4,5 +4,6 @@ TopCamera::TopCamera(const ImageParams& iparams, CameraParams& p, CameraParams& 
     device_path_ = "/dev/video0";
     vflip_ = true;
     hflip_ = true;
+    exposure = 300;
     init();
 }

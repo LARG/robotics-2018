@@ -33,8 +33,11 @@
 class NaoCamera
 {
 public:
-  void updateBuffer();
-  unsigned char* getImage();
+  void updateBuffers();
+  void enqueueBuffer();
+  void dequeueBuffer();
+  void swapBuffers();
+  uint8_t* getImage();
   unsigned getTimeStamp() const;
   int getControlSetting(unsigned int id);
   bool setControlSetting(unsigned int id, int value);
@@ -44,6 +47,9 @@ public:
   bool selfTest();
   ~NaoCamera();
 
+  void enableAutoWB();
+  int lockWB();
+
 protected:
     bool vflip_, hflip_;
     std::string device_path_;
@@ -51,6 +57,7 @@ protected:
     CameraParams& read_camera_params_;
     NaoCamera(const ImageParams& iparams, CameraParams&, CameraParams&);
     void init();
+    int exposure; 
 
 private:
   const ImageParams& iparams_;
@@ -63,7 +70,7 @@ private:
   void* mem[frameBufferCount]; /**< Frame buffer addresses. */
   int memLength[frameBufferCount]; /**< The length of each frame buffer. */
   struct v4l2_buffer* buf; /**< Reusable parameter struct for some ioctl calls. */
-  struct v4l2_buffer* currentBuf; /**< The last dequeued frame buffer. */
+  struct v4l2_buffer *nextBuf, *prevBuf; /**< The last dequeued frame buffer. */
   unsigned timeStamp, /**< Timestamp of the last captured image. */
            storedTimeStamp; /**< Timestamp when the next image recording starts. */
 

@@ -45,7 +45,7 @@ void InterpreterModule::specifyMemoryDependency() {
   requiresMemoryBlock("audio_processing");
   
   // Disabling these for the tool because they are huge and the allocations fail due to fragmentation, and this restricts the number of log frames we can run. - JM 4/21/15
-#if !defined(TOOL) || !defined(USER_jake) || !defined(USER_sanmit)
+#ifndef TOOL
   requiresMemoryBlock("robot_vision");
   requiresMemoryBlock("raw_image");
 #endif
@@ -82,16 +82,16 @@ void InterpreterModule::specifyMemoryBlocks() {
   getOrAddMemoryBlock(audio_processing_,"audio_processing");
 
   // Disabling these for the tool because they are huge and the allocations fail due to fragmentation, and this restricts the number of log frames we can run. - JM 4/21/15
-#if !defined(TOOL) || !defined(USER_jake) || !defined(USER_sanmit)
+#ifndef TOOL
   getOrAddMemoryBlock(robot_vision_,"robot_vision");
   getOrAddMemoryBlock(image_,"raw_image");
 #endif
 }
 
 void InterpreterModule::updatePercepts() {
-  memcpy(&joint_values_[0], joint_angles_->values_.data(), NUM_JOINTS * sizeof(float));
-  memcpy(&joint_stiffness_[0], joint_angles_->stiffness_.data(), NUM_JOINTS * sizeof(float));
-  memcpy(&sensor_values_[0], sensors_->values_.data(), NUM_SENSORS * sizeof(float));
+  std::copy(joint_angles_->values_.begin(), joint_angles_->values_.end(), joint_values_.begin());
+  std::copy(joint_angles_->stiffness_.begin(), joint_angles_->stiffness_.end(), joint_stiffness_.begin());
+  std::copy(sensors_->values_.begin(), sensors_->values_.end(), sensor_values_.begin());
 }
 
 void InterpreterModule::readConfig() {

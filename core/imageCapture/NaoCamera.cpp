@@ -22,7 +22,7 @@
   //    b. maybe unmap buffers and re-map after change?
   //    c. possibly after camera default init.. we have re-init the other things (framerate, format, etc)?
 
-NaoCamera::NaoCamera(const ImageParams& iparams, CameraParams& camera_params, CameraParams& read_camera_params) : iparams_(iparams), currentBuf(0), timeStamp(0), storedTimeStamp(0), initialized(false), camera_params_(camera_params), read_camera_params_(read_camera_params) {}
+NaoCamera::NaoCamera(const ImageParams& iparams, CameraParams& camera_params, CameraParams& read_camera_params) : iparams_(iparams), nextBuf(0), prevBuf(0), timeStamp(0), storedTimeStamp(0), initialized(false), camera_params_(camera_params), read_camera_params_(read_camera_params) {}
 
 void NaoCamera::init() {
 
@@ -49,7 +49,7 @@ void NaoCamera::reset() {
 }
 
 bool NaoCamera::selfTest(){
-  unsigned char* image = getImage();
+  uint8_t* image = getImage();
   for(int i=0; i <= iparams_.rawSize - 2; i+=2){
       int y = image[i];
       int uv = image[i + 1];
@@ -57,6 +57,22 @@ bool NaoCamera::selfTest(){
           return true; // non-black area of image found, test passed
   }
   return false; // entire image is black
+}
+
+// Turns on automatic white balancing
+void NaoCamera::enableAutoWB(){
+
+  if(!setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 1)) std::cerr << "Error setting auto white balance: " << errno << "\n";
+  
+}
+
+// Reads the current white balance and locks it to that by turning off auto WB
+int NaoCamera::lockWB(){
+  
+  int wb = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
+  if(!setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0)) std::cerr << "Error setting manual white balance: " << errno << "\n";
+  if(!setControlSetting(V4L2_CID_DO_WHITE_BALANCE, wb)) std::cerr << "Error setting manual white balance: " << errno << "\n"; // 2700-6500
+  return wb;
 }
 
 NaoCamera::~NaoCamera() {
@@ -69,6 +85,8 @@ void NaoCamera::unmapAndFreeBuffers() {
   for(int i = 0; i < frameBufferCount; ++i)
     munmap(mem[i], memLength[i]);
   free(buf);
+  free(prevBuf);
+  free(nextBuf);
 }
 
 void NaoCamera::initRequestAndMapBuffers() {
@@ -83,6 +101,8 @@ void NaoCamera::initRequestAndMapBuffers() {
 
   // map the buffers
   buf = static_cast<struct v4l2_buffer*>(calloc(1, sizeof(struct v4l2_buffer)));
+  prevBuf = static_cast<struct v4l2_buffer*>(calloc(1, sizeof(struct v4l2_buffer)));
+  nextBuf = static_cast<struct v4l2_buffer*>(calloc(1, sizeof(struct v4l2_buffer)));
   for(int i = 0; i < frameBufferCount; ++i) {
     buf->index = i;
     buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -207,13 +227,11 @@ void NaoCamera::setDefaultSettings() {
   if(!setControlSetting(V4L2_CID_HUE, 0)) std::cerr << "Error setting hue: " << errno << "\n"; // ONLY VALUE
 
   // We have to set the camera exposure twice because of Aldebaran's world-class hardware.
-  // sanmit: Changing the exposure affects framerate. Increasing above 300 will drop below 30Hz!! Use gain/brightness to compensate. It seems like exposure is like shutter speed. Gain might be like aperture size??? 
-  const int exposure = 300;
   if(!setControlSetting(V4L2_CID_EXPOSURE, exposure-1)) std::cerr << "Error setting exposure: " << errno << "\n";
-  if(!setControlSetting(V4L2_CID_EXPOSURE, exposure)) std::cerr << "Error setting exposure: " << errno << "\n";
+  if(!setControlSetting(V4L2_CID_EXPOSURE, exposure)) std::cerr << "Error setting exposure: " << errno << "\n";           // This only works if autoexposure is off (i.e. using manual exposure)
   if(!setControlSetting(V4L2_CID_GAIN, 64)) std::cerr << "Error setting gain: " << errno << "\n"; // 0-255         // 32
-  if(!setControlSetting(V4L2_CID_SHARPNESS, 0)) std::cerr << "Error setting sharpness: " << errno << "\n"; //0-7
-  static_assert(exposure <= 300, "If you set exposure to higher than 300 the framerate will drop below 30hz, change the gain instead");
+  // if(!setControlSetting(V4L2_CID_SHARPNESS, 0)) std::cerr << "Error setting sharpness: " << errno << "\n"; //0-7
+  assert(exposure <= 300); // "If you set exposure to higher than 300 the framerate will drop below 30hz, change the gain instead");
 }
 
 void NaoCamera::setCameraParams(){
@@ -333,30 +351,44 @@ void NaoCamera::getCameraParams() {
   read_camera_params_.kCameraSharpness = getControlSetting(V4L2_CID_SHARPNESS);
 }
 
-void NaoCamera::updateBuffer() {
-  // requeue the buffer of the last captured image which is obselete now
-  if(currentBuf) {
-    int result = ioctl(videoDeviceFd, VIDIOC_QBUF, currentBuf);
+void NaoCamera::updateBuffers() {
+  dequeueBuffer();
+  swapBuffers();
+  dequeueBuffer();
+  enqueueBuffer();
+  swapBuffers();
+}
+
+void NaoCamera::enqueueBuffer() {
+  if(prevBuf) {
+    int result = ioctl(videoDeviceFd, VIDIOC_QBUF, prevBuf);
     if(result < 0) std::cout << "NaoCamera: Error queuing current buffer\n";
   }
+}
 
+void NaoCamera::dequeueBuffer() {
   // dequeue a frame buffer (this call blocks when there is no new image available) */
   int result = ioctl(videoDeviceFd, VIDIOC_DQBUF, buf);
   if(result < 0) {
     std::cout << "NaoCamera: Error dequeuing buffer: " << errno << "\n";
   }
 
-  currentBuf = buf;
+  *nextBuf = *buf;
   timeStamp = storedTimeStamp+1;
   storedTimeStamp++;
 }
 
-unsigned char* NaoCamera::getImage() {
-  if (!currentBuf) {
+void NaoCamera::swapBuffers() {
+  *prevBuf = *nextBuf;
+  nextBuf->index = -1;
+}
+
+uint8_t* NaoCamera::getImage() {
+  if (!nextBuf || nextBuf->index < 0) {
     std::cerr << "NaoCamera(FATAL): Image buffer requested when not ready. Call updateBuffer first!!" << std::endl;
     return NULL;
   }
-  return (unsigned char*)mem[currentBuf->index];
+  return static_cast<uint8_t*>(mem[nextBuf->index]);
 }
 
 unsigned int NaoCamera::getTimeStamp() const {
