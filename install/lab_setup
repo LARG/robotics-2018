@@ -42,6 +42,12 @@ ln -s "/home/$TA/nao/trunk/lib/flatbuffers" lib/flatbuffers
 #ln -s "/home/$TA/nao/trunk/lib/caffe" lib/caffe
 ln -s "/home/$TA/nao/trunk/lib/fft" lib/fft 
 
+# 6. Sym links for Qmake
+ln -s "/home/$TA/nao/trunk/bin/qmake-qt4" bin/qmake-qt4
+ln -s "/home/$TA/nao/trunk/bin/moc-qt4" bin/moc-qt4
+ln -s "/home/$TA/nao/trunk/bin/uic-qt4" bin/uic-qt4
+
+
 echo "export NAO_HOME=~/nao5/trunk" >> ~/.bashrc
 echo "source $NAO_HOME/install/bashrc_addenda" >> ~/.bashrc
 
