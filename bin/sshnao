@@ -13,7 +13,7 @@ then
 else
 	echo "WIRELESS"
 	#ip=10.0.1.$robot
-  ip=192.168.1.$robot
+  ip=10.202.16.$robot
   #ip=192.168.23.$robot
   #ip=139.140.192.$robot
 fi

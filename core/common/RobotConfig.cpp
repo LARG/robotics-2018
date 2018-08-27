@@ -8,7 +8,7 @@ RobotConfig::RobotConfig() {
   robot_id = 0;
   posX = posY = posZ = orientation = 0;
   team_udp = 10001;
-  team_broadcast_ip = "192.168.1.255";
+  team_broadcast_ip = "10.202.16.255";
   walk_type = getName(RUNSWIFT2014_WALK);
   team = 1;
   audio_enabled = true;

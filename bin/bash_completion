@@ -182,5 +182,5 @@ _setup_robot()
 complete -F _setup_robot setup_robot
 
 export NAO_BUILD_MODULES="all everything nao motion vision memory_test tool sim core pythonswig behaviorsim headless"
-export NAO_ADDRESSES="192.168.1. 11.0.1."
+export NAO_ADDRESSES="10.202.16. 11.0.1."
 export NAO_COPY_MODULES="all everything nao motion vision python memory_test scripts color_table motion_file config_file autoload simple_config wireless time"

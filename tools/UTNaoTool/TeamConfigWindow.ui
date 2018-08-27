@@ -1463,7 +1463,7 @@
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>192.168.1.255</string>
+          <string>10.202.16.255</string>
          </property>
         </widget>
        </item>
@@ -1490,7 +1490,7 @@
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>192.168.1.200</string>
+          <string>10.202.16.200</string>
          </property>
         </widget>
        </item>
