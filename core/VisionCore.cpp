@@ -270,29 +270,23 @@ void VisionCore::initModules(LocalizationMethod::Type locMethod) {
   leds_ = new LEDModule();
   leds_->init(memory_, textlog_.get());
 
-  std::cout << "INIT AUDIO" << std::endl;
   audio_ = new AudioModule();
   audio_->init(memory_, textlog_.get());
   
-  std::cout << "INIT LOCALIZATION" << std::endl;
   localization_ = new LocalizationModule();
   localization_->init(memory_, textlog_.get());
 
-  std::cout << "INIT OPPONENTS" << std::endl;
   opponents_ = new OppModule();
   opponents_->init(memory_, textlog_.get());
 
-  std::cout << "INIT BEHAVIOR" << std::endl;
   behavior_ = new BehaviorModule();
   behavior_->init(memory_, textlog_.get());
 
-  std::cout << "INIT BUTTONS" << std::endl;
   buttons_ = new ButtonModule();
   buttons_->init(memory_, textlog_.get());
 
   /* MUST DO LUA LAST - OTHERWISE ALL THE MEMORY BLOCK POINTERS ARE NOT INITIALISED
      MQ 3/16/2011 */
-  std::cout << "INIT LEDS" << std::endl;
   interpreter_->init(memory_, textlog_.get());
 
   if (communications_ != NULL) {
