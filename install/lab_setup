@@ -1,0 +1,48 @@
+#!/bin/bash
+
+TA="jphanna"
+
+export NAO_HOME=~/nao5/trunk
+
+# 1. Check with user that you are about to remove ~/nao. Is this OK?
+echo "About to set-up course codebase. This command will remove your ~/nao directory."
+
+read -p "OK to proceed? " -r
+
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    exit 1
+fi
+echo "Removing ~/nao"
+
+# 2. Remove ~/nao
+if [ -d ~/nao5 ]
+then
+    rm -rf ~/nao5
+else
+    echo "nao5 does not exist"
+fi
+
+# 3. Create new ~/nao directory
+echo "Creating new ~/nao directory"
+mkdir -p nao5/trunk/
+cd nao5/trunk
+
+# 4. Pull in course code
+echo "Cloning course repository."
+git clone git@github.com:LARG/robotics-2015.git .
+
+# 5. Create sym links to TA Naoqi and lib
+echo "Creating sym links to TA's naoqi and lib"
+ln -s "/home/$TA/nao/trunk/naoqi" naoqi
+ln -s "/home/$TA/nao/trunk/lib/alglib" lib/alglib 
+ln -s "/home/$TA/nao/trunk/lib/yaml-cpp" lib/yaml-cpp 
+ln -s "/home/$TA/nao/trunk/lib/flatbuffers" lib/flatbuffers
+#ln -s "/home/$TA/nao/trunk/lib/caffe" lib/caffe
+ln -s "/home/$TA/nao/trunk/lib/fft" lib/fft 
+
+echo "export NAO_HOME=~/nao5/trunk" >> ~/.bashrc
+echo "source $NAO_HOME/install/bashrc_addenda" >> ~/.bashrc
+
+echo "done"
