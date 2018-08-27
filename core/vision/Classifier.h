@@ -32,6 +32,7 @@ class Classifier {
   inline Color xy2color(int x, int y) {
     return (Color)segImg_[y * iparams_.width + x];
   }
+  void getStepSize(int&,int&) const;
 
  private:
   void classifyImage(const FocusArea& area, unsigned char*);

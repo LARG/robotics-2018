@@ -1,4 +1,7 @@
-#include "VisionModule.h"
+#include <vision/VisionModule.h>
+#include <common/RobotInfo.h>
+#include <vision/ImageProcessor.h>
+#include <vision/VisionBlocks.h>
 #include <memory/FrameInfoBlock.h>
 #include <memory/JointBlock.h>
 #include <memory/RobotVisionBlock.h>
@@ -10,7 +13,7 @@
 #include <memory/WorldObjectBlock.h>
 #include <memory/RobotInfoBlock.h>
 #include <vision/Logging.h>
-
+#include <common/Util.h>
 #include <boost/lexical_cast.hpp>
 
 void VisionModule::specifyMemoryDependency() {
@@ -26,30 +29,29 @@ void VisionModule::specifyMemoryDependency() {
   requiresMemoryBlock("camera_info");
   requiresMemoryBlock("robot_info");
   requiresMemoryBlock("game_state");
-
   providesMemoryBlock("world_objects");
 }
 
 void VisionModule::specifyMemoryBlocks() {
-  getOrAddMemoryBlock(vision_frame_info_,"vision_frame_info");
-  getOrAddMemoryBlock(joint_angles_,"vision_joint_angles");
-  getOrAddMemoryBlock(robot_vision_,"robot_vision");
-  getOrAddMemoryBlock(sensors_,"vision_sensors");
-  getOrAddMemoryBlock(image_,"raw_image");
-  getOrAddMemoryBlock(world_objects_,"world_objects");
-  getOrAddMemoryBlock(robot_state_,"robot_state");
-  getOrAddMemoryBlock(body_model_,"vision_body_model");
-  getOrAddMemoryBlock(camera_info_,"camera_info");
-  getOrAddMemoryBlock(game_state_, "game_state");
-  getOrAddMemoryBlock(robot_info_,"robot_info");
-  *top_params_ = image_->top_params_;
-  *bottom_params_ = image_->bottom_params_;
+  getOrAddMemoryBlock(cache_.frame_info,"vision_frame_info");
+  getOrAddMemoryBlock(cache_.joint,"vision_joint_angles");
+  getOrAddMemoryBlock(cache_.robot_vision,"robot_vision");
+  getOrAddMemoryBlock(cache_.sensor,"vision_sensors");
+  getOrAddMemoryBlock(cache_.image,"raw_image");
+  getOrAddMemoryBlock(cache_.world_object,"world_objects");
+  getOrAddMemoryBlock(cache_.robot_state,"robot_state");
+  getOrAddMemoryBlock(cache_.body_model,"vision_body_model");
+  getOrAddMemoryBlock(cache_.camera,"camera_info");
+  getOrAddMemoryBlock(cache_.game_state,"game_state");
+  getOrAddMemoryBlock(cache_.robot_info,"robot_info");
+  *top_params_ = cache_.image->top_params_;
+  *bottom_params_ = cache_.image->bottom_params_;
 }
 
 bool VisionModule::areFeetOnGround() {
   float total = 0.0f;
   for(int i = fsrLFL; i <= fsrRRR; i++)
-    total += sensors_->values_[i];
+    total += cache_.sensor->values_[i];
 
   return total > .3;
 }
@@ -57,7 +59,7 @@ bool VisionModule::areFeetOnGround() {
 
 void VisionModule::processFrame() {
   // reset world objects
-  world_objects_->reset();
+  cache_.world_object->reset();
   
   if(!areFeetOnGround()) {
     return;
@@ -76,7 +78,7 @@ void VisionModule::updateTransforms() {
 }
 
 bool VisionModule::useSimColorTable() {
-  return (vision_frame_info_->source == MEMORY_SIM);
+  return (cache_.frame_info->source == MEMORY_SIM);
 }
 
 string VisionModule::getDataBase() {
@@ -84,20 +86,18 @@ string VisionModule::getDataBase() {
 }
 
 int VisionModule::getRobotId() {
-  return robot_state_->robot_id_;
+  return cache_.robot_state->robot_id_;
 }
 
 void VisionModule::initSpecificModule() {
   loadColorTables();
-  if(top_processor_) delete top_processor_;
-  top_processor_ = new ImageProcessor(*vblocks_, *top_params_, Camera::TOP);
-  if(bottom_processor_) delete bottom_processor_;
-  bottom_processor_ = new ImageProcessor(*vblocks_, *bottom_params_, Camera::BOTTOM);
-  top_processor_->SetColorTable(topColorTable);
-  bottom_processor_->SetColorTable(bottomColorTable);
+  top_processor_ = std::make_unique<ImageProcessor>(*vblocks_, *top_params_, Camera::TOP);
+  bottom_processor_ = std::make_unique<ImageProcessor>(*vblocks_, *bottom_params_, Camera::BOTTOM);
+  top_processor_->SetColorTable(topColorTable.data());
+  bottom_processor_->SetColorTable(bottomColorTable.data());
   top_processor_->init(textlogger);
   bottom_processor_->init(textlogger);
-  if(robot_state_->WO_SELF == WO_TEAM_COACH) {
+  if(cache_.robot_state->WO_SELF == WO_TEAM_COACH) {
     top_params_->defaultHorizontalStepScale = 0;
     top_params_->defaultVerticalStepScale = 0;
     tlog(30, "Set coach step scales");
@@ -105,32 +105,24 @@ void VisionModule::initSpecificModule() {
 }
 
 VisionModule::VisionModule() {
+  printf("Creating vision system"); fflush(stdout);
 
-  printf("Creating vision system");
-  fflush(stdout);
-
-  bottomColorTable = new unsigned char [LUT_SIZE];
-  topColorTable = new unsigned char [LUT_SIZE];
   bottomColorTableName = "none";
   topColorTableName = "none";
-  memset(bottomColorTable, c_UNDEFINED, LUT_SIZE);
-  memset(topColorTable, c_UNDEFINED, LUT_SIZE);
-  top_params_ = new ImageParams(Camera::TOP), bottom_params_ = new ImageParams(Camera::BOTTOM);
-  top_processor_ = bottom_processor_ = NULL;
+  bottomColorTable.fill(c_UNDEFINED);
+  topColorTable.fill(c_UNDEFINED);
 
-  vblocks_ = new VisionBlocks(world_objects_, body_model_, joint_angles_, image_, robot_vision_, vision_frame_info_, robot_state_, robot_info_, sensors_, game_state_);
+  printf("."); fflush(stdout);
+  top_params_ = std::make_unique<ImageParams>(Camera::TOP);
+  bottom_params_ = std::make_unique<ImageParams>(Camera::BOTTOM);
+  
+  printf("."); fflush(stdout);
+  vblocks_ = std::make_unique<VisionBlocks>(cache_);
 
-
-  puts(" Done!");
-  fflush(stdout);
+  printf(".done!\n");
 }
 
 VisionModule::~VisionModule() {
-  if (topColorTable != bottomColorTable)
-    delete [] topColorTable;
-  delete [] bottomColorTable;
-  if(top_processor_) delete top_processor_;
-  if(bottom_processor_) delete bottom_processor_;
 }
 
 bool VisionModule::loadColorTables() {
@@ -143,18 +135,15 @@ bool VisionModule::loadColorTables() {
   } else {
 
     bool topOk = false, bottomOk = false;
-    if(robot_state_->WO_SELF == WO_TEAM_COACH) {
+    if(cache_.robot_state->WO_SELF == WO_TEAM_COACH) {
       std::string file = "coachtop.col";
       topOk = loadColorTable(Camera::TOP, file.c_str(), false);
     } else {
       // Attempt to load robot-specific color tables if available
-      std::string bottomColorTableFile =
-        boost::lexical_cast<std::string>(getRobotId()) +
-        "bottom.col";
-      std::string topColorTableFile =
-        boost::lexical_cast<std::string>(getRobotId()) +
-        "top.col";
+      std::string bottomColorTableFile = util::ssprintf("%02ibottom.col", getRobotId());
       bottomOk = loadColorTable(Camera::BOTTOM, bottomColorTableFile.c_str(), false);
+      
+      std::string topColorTableFile = util::ssprintf("%02itop.col", getRobotId());
       topOk = loadColorTable(Camera::TOP, topColorTableFile.c_str(), false);
     }
 
@@ -181,16 +170,16 @@ bool VisionModule::loadColorTables() {
 }
 
 bool VisionModule::loadColorTable(Camera::Type camera, std::string fileName, bool fullPath) {
-  unsigned char* colorTable = bottomColorTable;
+  unsigned char* colorTable = bottomColorTable.data();
   if (camera == Camera::TOP) {
-    colorTable=topColorTable;
+    colorTable=topColorTable.data();
   }
   string colorTableName;
   if (!fullPath) {
 #ifdef TOOL
-    colorTableName = getDataBase() + "current/" + fileName;
+    colorTableName = util::ssprintf("%s/current/%s", getDataBase(), fileName);
 #else
-    colorTableName = getDataBase() + fileName;
+    colorTableName = util::ssprintf("%s/%s", getDataBase(), fileName);
 #endif
   } else {
     colorTableName = fileName;

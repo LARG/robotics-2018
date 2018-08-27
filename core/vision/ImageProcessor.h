@@ -8,11 +8,13 @@
 #include <vision/CameraMatrix.h>
 #include <vision/VisionBlocks.h>
 #include <common/RobotInfo.h>
-#include <vision/Classifier.h>
 #include <common/RobotCalibration.h>
 #include <vision/structures/BallCandidate.h>
 #include <math/Pose3D.h>
+#include <vision/structures/VisionParams.h>
 
+class BallDetector;
+class Classifier;
 class BeaconDetector;
 
 /// @ingroup vision
@@ -20,10 +22,12 @@ class ImageProcessor {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW  
     ImageProcessor(VisionBlocks& vblocks, const ImageParams& iparams, Camera::Type camera);
+    ~ImageProcessor();
     void processFrame();
     void init(TextLogger*);
     void SetColorTable(unsigned char*);
-    Classifier* classifier_;
+    std::unique_ptr<BeaconDetector> beacon_detector_;
+    std::unique_ptr<Classifier> color_segmenter_;
     unsigned char* getImg();
     unsigned char* getSegImg();
     unsigned char* getColorTable();
@@ -32,7 +36,7 @@ class ImageProcessor {
     int getImageWidth();
     const ImageParams& getImageParams() const { return iparams_; }
     const CameraMatrix& getCameraMatrix();
-    void setCalibration(RobotCalibration);
+    void setCalibration(const RobotCalibration& calibration);
     void enableCalibration(bool value);
     void updateTransform();
     std::vector<BallCandidate*> getBallCandidates();
@@ -56,10 +60,13 @@ class ImageProcessor {
     float getHeadPan() const;
     float getHeadTilt() const;
     float getHeadChange() const;
-
-    RobotCalibration* calibration_;
+    
+    std::unique_ptr<RobotCalibration> calibration_;
     bool enableCalibration_;
-    BeaconDetector* beacon_detector_;
+
+    //void saveImg(std::string filepath);
+    int topFrameCounter_ = 0;
+    int bottomFrameCounter_ = 0;
 };
 
 #endif

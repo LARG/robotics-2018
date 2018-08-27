@@ -2,67 +2,56 @@
 #define VISION_99KDYIX5
 
 #include <Module.h>
-#include <common/RobotInfo.h>
-#include <vision/ImageProcessor.h>
-#include <vision/VisionBlocks.h>
+#include <common/Camera.h>
+#include <memory/MemoryCache.h>
 
-class FrameInfoBlock;
-class JointBlock;
-class RobotVisionBlock;
-class SensorBlock;
-class ImageBlock;
-class WorldObjectBlock;
-class RobotStateBlock;
-class BodyModelBlock;
-class CameraBlock;
-class RobotInfoBlock;
-class GameStateBlock;
+class VisionBlocks;
+class ImageParams;
+class ImageProcessor;
 
 /// @ingroup vision
 class VisionModule: public Module {
 
-public:
-  VisionModule();
-  ~VisionModule();
+  public:
+    VisionModule();
+    ~VisionModule();
 
-  void specifyMemoryBlocks();
-  void specifyMemoryDependency();
-  void initSpecificModule();
-  void processFrame();
-  void updateTransforms();
+    void specifyMemoryBlocks();
+    void specifyMemoryDependency();
+    void initSpecificModule();
+    void processFrame();
+    void updateTransforms();
 
-  bool loadColorTables();
-  bool loadColorTable(Camera::Type camera, std::string fileName, bool fullpath=false);
+    bool loadColorTables();
+    bool loadColorTable(Camera::Type camera, std::string fileName, bool fullpath=false);
 
-  ImageParams *top_params_, *bottom_params_;
-  ImageProcessor *top_processor_, *bottom_processor_;
+    inline ImageProcessor* top_processor() { return top_processor_.get(); }
+    inline ImageProcessor* bottom_processor() { return bottom_processor_.get(); }
+    inline const MemoryCache& cache() { return cache_; }
 
-  unsigned char* bottomColorTable;
-  unsigned char* topColorTable;
-  string bottomColorTableName;
-  string topColorTableName;
+#ifndef SWIG
+    std::unique_ptr<ImageParams> top_params_, bottom_params_;
 
-private:
-  FrameInfoBlock *vision_frame_info_;
-  JointBlock *joint_angles_;
-  RobotVisionBlock *robot_vision_;
-  SensorBlock *sensors_;
-  ImageBlock *image_;
-  WorldObjectBlock *world_objects_;
-  RobotStateBlock *robot_state_;
-  BodyModelBlock *body_model_;
-  CameraBlock *camera_info_;
-  RobotInfoBlock *robot_info_;
-  GameStateBlock *game_state_;
+    std::array<unsigned char, LUT_SIZE> bottomColorTable;
+    std::array<unsigned char, LUT_SIZE> topColorTable;
+#endif
 
-  VisionBlocks* vblocks_;
+    std::string bottomColorTableName;
+    std::string topColorTableName;
 
-  bool isBottomCamera();
-  bool useSimColorTable();
-  std::string getDataBase();
-  int getRobotId();
-  int getTeamColor();
-  bool areFeetOnGround();
+  private:
+#ifndef SWIG
+    MemoryCache cache_;
+    std::unique_ptr<VisionBlocks> vblocks_;
+    std::unique_ptr<ImageProcessor> top_processor_ , bottom_processor_;
+#endif
+
+    bool isBottomCamera();
+    bool useSimColorTable();
+    std::string getDataBase();
+    int getRobotId();
+    int getTeamColor();
+    bool areFeetOnGround();
 };
 
 #endif /* end of include guard: VISION_99KDYIX5 */

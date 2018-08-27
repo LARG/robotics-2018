@@ -1,20 +1,25 @@
 #include <vision/ImageProcessor.h>
+#include <vision/Classifier.h>
 #include <vision/BeaconDetector.h>
 #include <vision/Logging.h>
 #include <iostream>
 
 ImageProcessor::ImageProcessor(VisionBlocks& vblocks, const ImageParams& iparams, Camera::Type camera) :
-  vblocks_(vblocks), iparams_(iparams), camera_(camera), cmatrix_(iparams_, camera), calibration_(NULL)
+  vblocks_(vblocks), iparams_(iparams), camera_(camera), cmatrix_(iparams_, camera)
 {
   enableCalibration_ = false;
-  classifier_ = new Classifier(vblocks_, vparams_, iparams_, camera_);
-  beacon_detector_ = new BeaconDetector(DETECTOR_PASS_ARGS);
+  color_segmenter_ = std::make_unique<Classifier>(vblocks_, vparams_, iparams_, camera_);
+  beacon_detector_ = std::make_unique<BeaconDetector>(DETECTOR_PASS_ARGS);
+  calibration_ = std::make_unique<RobotCalibration>();
+}
+
+ImageProcessor::~ImageProcessor() {
 }
 
 void ImageProcessor::init(TextLogger* tl){
   textlogger = tl;
   vparams_.init();
-  classifier_->init(tl);
+  color_segmenter_->init(tl);
   beacon_detector_->init(tl);
 }
 
@@ -23,6 +28,15 @@ unsigned char* ImageProcessor::getImg() {
     return vblocks_.image->getImgTop();
   return vblocks_.image->getImgBottom();
 }
+
+//void ImageProcessor::saveImg(std::string filepath) {
+//  cv::Mat mat;
+//  int xstep_ = 1 << iparams_.defaultHorizontalStepScale;
+//  int ystep_ = 1 << iparams_.defaultVerticalStepScale;
+//  cv::resize(color_segmenter_->img_grayscale(), mat, cv::Size(), 1.0 / xstep_, 1.0 / ystep_, cv::INTER_NEAREST); 
+  
+//  cv::imwrite(filepath, mat);
+//}
 
 unsigned char* ImageProcessor::getSegImg(){
   if(camera_ == Camera::TOP)
@@ -93,23 +107,21 @@ double ImageProcessor::getCurrentTime() {
   return vblocks_.frame_info->seconds_since_start;
 }
 
-void ImageProcessor::setCalibration(RobotCalibration calibration){
-  if(calibration_) delete calibration_;
-  calibration_ = new RobotCalibration(calibration);
+void ImageProcessor::setCalibration(const RobotCalibration& calibration){
+  *calibration_ = calibration;
 }
 
 void ImageProcessor::processFrame(){
   if(vblocks_.robot_state->WO_SELF == WO_TEAM_COACH && camera_ == Camera::BOTTOM) return;
   tlog(30, "Process Frame camera %i", camera_);
 
-  updateTransform();
-  
   // Horizon calculation
   tlog(30, "Calculating horizon line");
-  HorizonLine horizon = HorizonLine::generate(iparams_, cmatrix_, 30000);
+  updateTransform();
+  HorizonLine horizon = HorizonLine::generate(iparams_, cmatrix_, 20000);
   vblocks_.robot_vision->horizon = horizon;
-  tlog(30, "Classifying Image", camera_);
-  if(!classifier_->classifyImage(color_table_)) return;
+  tlog(30, "Classifying Image: %i", camera_);
+  if(!color_segmenter_->classifyImage(color_table_)) return;
   detectBall();
   beacon_detector_->findBeacons();
 }
@@ -120,6 +132,7 @@ void ImageProcessor::detectBall() {
 void ImageProcessor::findBall(int& imageX, int& imageY) {
   imageX = imageY = 0;
 }
+
 
 int ImageProcessor::getTeamColor() {
   return vblocks_.robot_state->team_;

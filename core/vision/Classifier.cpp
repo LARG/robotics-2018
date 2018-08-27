@@ -83,3 +83,8 @@ void Classifier::classifyImage(const FocusArea& area, unsigned char* colorTable)
     }
   }
 }
+
+void Classifier::getStepSize(int& h, int& v) const {
+    h = 1 << 2;
+    v = 1 << 1;
+}
