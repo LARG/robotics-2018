@@ -7,7 +7,6 @@
 #include <math/Pose2D.h>
 #include <math/Geometry.h>
 #include <common/WorldObject.h>
-#include <common/States.h>
 #include "SimulatedPlayer.h"
 #include "Simulation.h"
 #include "PhysicsSimulator.h"
@@ -23,14 +22,15 @@ class MemoryFrame;
 class BehaviorSimulation : public Simulation {
 
   public:
-    BehaviorSimulation(int nplayers, bool penaltyKick, bool locMode);
+    BehaviorSimulation(bool lmode);
     ~BehaviorSimulation();
 
     void simulationStep();
     
-    int defaultPlayer() { return activePlayers_[0]; }
-    MemoryCache getGtMemoryCache(int player);
-    MemoryCache getBeliefMemoryCache(int player);
+    virtual int defaultPlayer() const override;
+    std::vector<int> activePlayers() const override;
+    MemoryCache getGtMemoryCache(int player) const override;
+    MemoryCache getBeliefMemoryCache(int player) const override;
     std::vector<std::string> getTextDebug(int id);
     void setPenalty(int index);
     void setStrategy();
@@ -39,7 +39,8 @@ class BehaviorSimulation : public Simulation {
     void changeSimulationState(State state);
     void changeSimulationKickoff();
     void moveRobot(int index, AngRad rotation, Point2D movement);
-    void moveBall(Point2D translation);
+    void moveBall(Point2D position) override;
+    void teleportBall(Point2D position) override;
     void restart();
     int checkLocalizationErrors();
     void runParamTests();
@@ -56,11 +57,7 @@ class BehaviorSimulation : public Simulation {
     int simRedScore;
     bool forceManualPositions;
     bool forceDesiredPositions;
-    WorldObjectBlock* worldObjects;
-    GameStateBlock* gameState;
-    FrameInfoBlock* frameInfo;
-    SimulatedPlayer* sims[WO_ROBOTS_LAST + 1];
-    bool simActive[WO_ROBOTS_LAST + 1];
+    MemoryCache gtcache;
   private:
 
     void restartSimulationInterpreter();
@@ -111,8 +108,9 @@ class BehaviorSimulation : public Simulation {
 
     void setSimScore(bool blue);
 
-    MemoryFrame* memory_;
+    std::unique_ptr<MemoryFrame> memory_;
     PhysicsSimulator physics_;
+    std::array<std::unique_ptr<SimulatedPlayer>, WO_ROBOTS_LAST + 1> sims_;
 };
 
 

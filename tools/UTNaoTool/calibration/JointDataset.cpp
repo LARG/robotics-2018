@@ -27,17 +27,20 @@ void JointMeasurement::serialize(YAML::Emitter& emitter) const {
 }
 
 void JointDataset::deserialize(const YAML::Node& node) {
-  for(auto it = node.begin(); it != node.end(); ++it) {
+  const auto& measurements = node["measurements"];
+  for(auto it = measurements.begin(); it != measurements.end(); ++it) {
     JointMeasurement m;
-    m.deserialize(*it);
+    *it >> m;
     push_back(m);
   }
 }
 
 void JointDataset::serialize(YAML::Emitter& emitter) const {
+  emitter << YAML::Key << "measurements";
+  emitter << YAML::Value;
   emitter << YAML::BeginSeq;
   for(const auto& m : *this)
-    m.serialize(emitter);
+    emitter << m;
   emitter << YAML::EndSeq;
 }
 

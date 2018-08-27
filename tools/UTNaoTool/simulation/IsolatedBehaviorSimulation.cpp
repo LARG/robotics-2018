@@ -53,26 +53,23 @@ void IBSim::randomizePlayers(FieldConfiguration& config) {
 }
 
 void IBSim::loadConfig() {
-  FieldConfiguration gtconfig = { 
-    {player_, OP(-750, 0, 0)},
-    {WO_BALL, OP(0, 0)}
-  };
-  FieldConfiguration bconfig = {
-    {player_, OP(-750, 0, 0)},
-    {WO_BALL, OP(0, 0)}
-  };
-  BeliefConfiguration config;
-  if(config.loadFromFile(UTMainWnd::dataDirectory() + "/ibsim_config.yaml")) {
-    gtconfig = config.gtconfig;
-    bconfig = config.bconfig;
+  auto 
+    &gtconfig = config_.objects.gtconfig,
+    &bconfig = config_.objects.bconfig;
+  if(!loadGame("iso_behavior_sim")) {
+    gtconfig = { 
+      {player_, OP(-750, 0, 0)},
+      {WO_BALL, OP(0, 0)}
+    };
+    bconfig = {
+      {player_, OP(-750, 0, 0)},
+      {WO_BALL, OP(0, 0)}
+    };
   }
   randomizePlayers(gtconfig);
   randomizePlayers(bconfig);
-  config.gtconfig = gtconfig;
-  config.bconfig = bconfig;
-  config.saveToFile(UTMainWnd::dataDirectory() + "/ibsim_config.yaml");
-  gtconfig.place(gtcache_.world_object);
-  bconfig.place(bcache_.world_object);
+  saveGame("iso_behavior_sim");
+  applyConfig(gtcache_, {bcache_});
 }
 
 void IBSim::moveBallRandomly() {
@@ -92,8 +89,8 @@ void IBSim::moveBallRandomly() {
     xquad = ball.loc.x > 0 ? -1 : 1;
     yquad = ball.loc.y > 0 ? -1 : 1;
     Point2D target(
-        rand_.sampleU(min(xquad * FIELD_X/2, 0.f), max(xquad * FIELD_X/2, 0.f)), 
-        rand_.sampleU(min(yquad * FIELD_Y/2, 0.f), max(yquad * FIELD_Y/2, 0.f))
+        rand_.sampleU(min(xquad * FIELD_X/2, 0.0f), max(xquad * FIELD_X/2, 0.0f)), 
+        rand_.sampleU(min(yquad * FIELD_Y/2, 0.0f), max(yquad * FIELD_Y/2, 0.0f))
     );
     physics_.moveBall(target);
 
@@ -109,6 +106,13 @@ void IBSim::simulationStep() {
   physics_.step();
   //moveBallRandomly();
   gtcache_.frame_info->frame_id++;
+  for(int i = WO_TEAM1; i <= WO_TEAM5; i++) {
+    if(i == player_) continue;
+    gtcache_.team_packets->frameReceived[i] = gtcache_.frame_info->frame_id;
+    gtcache_.team_packets->relayData[i].bvrData.state == PENALISED;
+    bcache_.team_packets->frameReceived[i] = gtcache_.frame_info->frame_id;
+    bcache_.team_packets->relayData[i].bvrData.state == PLAYING;
+  }
   //cg_.generateAllCommunications();
   sim_.processFrame(gtcache_.world_object, gtcache_.game_state);
 }
@@ -129,6 +133,8 @@ void IBSim::movePlayer(Point2D position, float orientation, int player) {
   bPlayer.loc = position;
   bPlayer.orientation = orientation;
   if(lmode_) {
+    bcache_.localization_mem->state[0] = position.x;
+    bcache_.localization_mem->state[1] = position.y;
     sim_.core->localization_->initFromMemory();
   }
 }
@@ -143,14 +149,6 @@ void IBSim::teleportBall(Point2D pos) {
 void IBSim::moveBall(Point2D target) {
   TRANSITION(LONG_RANGE_APPROACH);
   physics_.moveBall(target);
-}
-
-MemoryCache IBSim::getGtMemoryCache(int player) {
-  return gtcache_;
-}
-
-MemoryCache IBSim::getBeliefMemoryCache(int player) {
-  return bcache_;
 }
 
 vector<string> IBSim::getTextDebug(int player) {

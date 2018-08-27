@@ -9,8 +9,10 @@
 #include <math/Geometry.h>
 #include <common/RobotInfo.h>
 
-#include "ObservationGenerator.h"
-#include "RobotMovementSimulator.h"
+#include <tool/simulation/ObservationGenerator.h>
+#include <tool/simulation/RobotMovementSimulator.h>
+
+#include <common/Roles.h>
 
 class VisionCore;
 class MemoryFrame;
@@ -22,11 +24,16 @@ class SimulatedPlayer {
 
   SimulatedPlayer(int team, int self, bool lMode = false);
   ~SimulatedPlayer();
-  void initLocalization(); 
+  void initLocalization();
+  void setRole(Role role);
   void setFallen();
   void resetCounters();
-  MemoryCache getMemoryCache();
-  MemoryFrame* getMemory();
+  inline MemoryFrame* getMemory() const {
+    return memory_;
+  }
+  inline MemoryCache getMemoryCache() const {
+    return cache_;
+  }
   void setPenalty(WorldObjectBlock* simMem);
   bool processFrame();
   bool processFrame(WorldObjectBlock* wo, GameStateBlock* gs);
@@ -86,7 +93,6 @@ class SimulatedPlayer {
 
   float crop(float v, float min, float max);
   ImageParams iparams_;
-  Random rand_;
   ObservationGenerator og_;
   RobotMovementSimulator rmsim_;
 };

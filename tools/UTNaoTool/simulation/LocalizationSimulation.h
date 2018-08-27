@@ -31,9 +31,9 @@ struct AgentError {
 };
 
 struct LocSimAgent {
-  enum Type {
-    Default = 0
-  };
+  ENUM_CLASS(Type,
+    Default
+  );
   LocalizationMethod::Type method;
   MemoryCache cache;
   VisionCore* core;
@@ -41,14 +41,15 @@ struct LocSimAgent {
   float rotError;
   int steps;
   Type type;
-  std::string name;
+  inline std::string name() const {
+    return TypeMethods::toName(type);
+  }
   float distRMSE() { return sqrtf(distError / steps); }
   float rotRMSE() { return sqrtf(rotError / steps); }
-  LocSimAgent(Type type = Default) : type(type) {
+  LocSimAgent(Type type = Type::Default) : type(type) {
     switch(type) {
-      case Default:
+      case Type::Default:
         method = LocalizationMethod::Default;
-        name = "Default";
         break;
     }
     distError = rotError = 0;
@@ -65,10 +66,8 @@ class LocalizationSimulation : public Simulation {
     void setPath(const SimulationPath& path);
     void simulationStep();
     
-    MemoryFrame* getGtMemory(int player = 0);
-    MemoryFrame* getBeliefMemory(int player = 0);
-    MemoryCache getGtMemoryCache(int player = 0);
-    MemoryCache getBeliefMemoryCache(int player = 0);
+    MemoryCache getGtMemoryCache(int player = 0) const;
+    MemoryCache getBeliefMemoryCache(int player = 0) const;
     bool complete();
     std::string getSimInfo();
     std::vector<std::string> getTextDebug(int player = 0);
@@ -76,6 +75,7 @@ class LocalizationSimulation : public Simulation {
     void printError();
     void flip();
     void outputBadPaths(float maxDistError, float maxRotError);
+    const SimulationPath* path() const { return &path_; }
   private:
     int seed_;
     int ballmove_;
@@ -104,3 +104,5 @@ class LocalizationSimulation : public Simulation {
     void movePlayer(Point2D position, float orientation, int = 0);
     void teleportPlayer(Point2D position, float orientation, int = 0);
 };
+
+ENUM_CLASS_STREAMS(LocSimAgent::Type);

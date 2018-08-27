@@ -26,12 +26,12 @@ void RobotMovementSimulator::setCaches(WorldObjectBlock* gtObjects, MemoryCache 
 
 Pose2D RobotMovementSimulator::getVelocityRequest() {
   Pose2D reqVel;
-  if(bcache_.walk_request->walk_to_target_) {
-    auto& self = bcache_.world_object->objects_[player_];
+  auto motion = bcache_.walk_request->motion_;
+  auto& robot = bcache_.world_object->objects_[player_];
+  if(bcache_.walk_request->walk_to_target_ && motion == WalkRequestBlock::WALK) {
     ctarget_ = bcache_.behavior->absTargetPt;
     enableTarget_ = true;
   }
-  auto& robot = bcache_.world_object->objects_[player_];
   if(enableTarget_) {
     auto relTarget = ctarget_.globalToRelative(robot.loc, robot.orientation);
     reqVel.x = CROP(relTarget.x, -maxVel_.x, maxVel_.x);
@@ -48,14 +48,15 @@ Pose2D RobotMovementSimulator::getVelocityRequest() {
 void RobotMovementSimulator::step() {
   resetWalkInfo();
   auto& bSelf = gtObjects_->objects_[player_];
-  if(bcache_.walk_request->motion_ != WalkRequestBlock::WALK && bcache_.walk_request->motion_ != WalkRequestBlock::WAIT && !bcache_.walk_request->walk_to_target_){
+  auto motion = bcache_.walk_request->motion_;
+  if(motion != WalkRequestBlock::WALK && motion != WalkRequestBlock::WAIT && motion != WalkRequestBlock::LINE_UP && !bcache_.walk_request->walk_to_target_){
     enableTarget_ = false;
   } else if(enableTarget_ && ctarget_.getDistanceTo(bSelf.loc)) {
     enableTarget_ = false;
   }
   
   auto& gtSelf = gtObjects_->objects_[player_];
-  if(bcache_.walk_request->motion_ == WalkRequestBlock::WALK || enableTarget_) {
+  if(motion == WalkRequestBlock::WALK || enableTarget_) {
     auto reqVel = getVelocityRequest();
     Pose2D dVel(reqVel.t - vel_.t, reqVel.x - vel_.x, reqVel.y - vel_.y);
     dVel = dVel / ACCEL_FRAMES;
@@ -70,9 +71,9 @@ void RobotMovementSimulator::step() {
     movement.t *= pow(((double)rotateTimer_)/(ROTATE_PERIOD/2),ROTATE_EXP);
     bcache_.odometry->displacement = movement;
 
-    movement.x += movement.x * rand_.sampleU(-factor,factor);
-    movement.y += movement.y * rand_.sampleU(-factor,factor);
-    movement.t += movement.t * rand_.sampleU(-factor,factor);
+    movement.x += movement.x * Random::inst().sampleU(-factor,factor);
+    movement.y += movement.y * Random::inst().sampleU(-factor,factor);
+    movement.t += movement.t * Random::inst().sampleU(-factor,factor);
     Point2D gtrans(movement.x, movement.y);
     gtrans = gtrans.rotate(gtSelf.orientation);
     gtSelf.loc += gtrans;

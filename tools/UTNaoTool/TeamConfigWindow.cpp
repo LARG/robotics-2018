@@ -3,27 +3,27 @@
 
 
 #include <QtGui>
-#include "TeamConfigWindow.h"
-#include "UTMainWnd.h"
+#include <tool/TeamConfigWindow.h>
+#include <tool/UTMainWnd.h>
 
-#include "LogSelectWindow.h"
-#include "FilesWindow.h"
+#include <tool/LogSelectWindow.h>
+#include <tool/FilesWindow.h>
 
 #include <iostream>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
 #include <common/WorldObject.h>
-#include <common/Util.h>
 #include <memory/LogWriter.h>
+
+#define WO_ALT1 (WO_TEAM_LAST + 1)
+#define WO_ALT2 (WO_ALT1 + 1)
+
+#define status_callback std::bind(&TeamConfigWindow::statusCallback, this, std::placeholders::_1)
+#define MAP(self) (self > WO_TEAM_LAST && self < WO_TEAM_COACH ? WO_TEAM_LAST : self)
 
 using namespace std;
 
 TeamConfigWindow::TeamConfigWindow(QMainWindow* p) {
   parent = p;
+  qRegisterMetaType<TeamConfigWindow::UploadStatus>("TeamConfigWindow::UploadStatus");
 
   setupUi(this);
   setWindowTitle(tr("Team Config"));
@@ -33,14 +33,15 @@ TeamConfigWindow::TeamConfigWindow(QMainWindow* p) {
   connect (stopNaoQiButton, SIGNAL(clicked()), this, SLOT(stopNaoQi()));
   connect (startNaoQiButton, SIGNAL(clicked()), this, SLOT(startNaoQi()));
   connect (restartInterpreterButton, SIGNAL(clicked()), this, SLOT(restartInterpreter()));
+  connect (compileEverythingButton, SIGNAL(clicked()), this, SLOT(compileEverything()));
   connect (uploadEverythingButton, SIGNAL(clicked()), this, SLOT(uploadEverything()));
   connect (uploadBinaryButton, SIGNAL(clicked()), this, SLOT(uploadBinary()));
   connect (uploadMotionVisionConfigButton, SIGNAL(clicked()), this, SLOT(uploadMotionVisionConfig()));
   connect (uploadRobotConfigButton, SIGNAL(clicked()), this, SLOT(uploadRobotConfig()));
   connect (uploadColorButton, SIGNAL(clicked()), this, SLOT(uploadColor()));
   connect (uploadInterpreterButton, SIGNAL(clicked()), this, SLOT(uploadInterpreter()));
-  connect (uploadTimeButton, SIGNAL(clicked()), this, SLOT(uploadTime()));
   connect (this, SIGNAL(robotStatusUpdated(int,ProcessExecutor::RobotStatus)), this, SLOT(updateRobotStatus(int, ProcessExecutor::RobotStatus)));
+  connect (this, SIGNAL(uploadStatusUpdated(TeamConfigWindow::UploadStatus)), this, SLOT(updateUploadStatus(TeamConfigWindow::UploadStatus)));
   connect (openSSH, SIGNAL(clicked()), this, SLOT(updateSSH()));
   
   connect (this, SIGNAL(logStatusUpdated(int,QString)), this, SLOT(updateLogStatus(int,QString)));
@@ -50,37 +51,43 @@ TeamConfigWindow::TeamConfigWindow(QMainWindow* p) {
   connect (logDeleteButton, SIGNAL(clicked()), this, SLOT(deleteLogs()));
 
   // set to our rc 2013 team # (1)
-  GCNum->setValue(1);
+  team_number->setValue(1);
 
   // check on robot's status
   // start timer for status updates
   QTimer *timer = new QTimer(this);
   connect (timer, SIGNAL(timeout()), this, SLOT(checkStatus()));
-  // check on robots using fping every 15 seconds
-  timer->start(15000);
+  // check on robots using fping every 5 seconds
+  timer->start(5000);
   posX_ = {
-    { WO_TEAM1, x1 },
-    { WO_TEAM2, x2 },
-    { WO_TEAM3, x3 },
-    { WO_TEAM4, x4 },
-    { WO_TEAM5, x5 },
-    { WO_TEAM_COACH, coachX }
+    { WO_TEAM1, x_1 },
+    { WO_TEAM2, x_2 },
+    { WO_TEAM3, x_3 },
+    { WO_TEAM4, x_4 },
+    { WO_TEAM5, x_5 },
+    { WO_TEAM_COACH, x_c },
+    { WO_ALT1, x_a1 },
+    { WO_ALT2, x_a2 }
   };
   posY_ = {
-    { WO_TEAM1, y1 },
-    { WO_TEAM2, y2 },
-    { WO_TEAM3, y3 },
-    { WO_TEAM4, y4 },
-    { WO_TEAM5, y5 },
-    { WO_TEAM_COACH, coachY }
+    { WO_TEAM1, y_1 },
+    { WO_TEAM2, y_2 },
+    { WO_TEAM3, y_3 },
+    { WO_TEAM4, y_4 },
+    { WO_TEAM5, y_5 },
+    { WO_TEAM_COACH, y_c },
+    { WO_ALT1, y_a1 },
+    { WO_ALT2, y_a2 }
   };
   posT_ = {
-    { WO_TEAM1, t1 },
-    { WO_TEAM2, t2 },
-    { WO_TEAM3, t3 },
-    { WO_TEAM4, t4 },
-    { WO_TEAM5, t5 },
-    { WO_TEAM_COACH, coachT }
+    { WO_TEAM1, t_1 },
+    { WO_TEAM2, t_2 },
+    { WO_TEAM3, t_3 },
+    { WO_TEAM4, t_4 },
+    { WO_TEAM5, t_5 },
+    { WO_TEAM_COACH, t_c },
+    { WO_ALT1, t_a1 },
+    { WO_ALT2, t_a2 }
   };
   logStatuses_ = {
     { WO_TEAM1, lstat1 },
@@ -91,30 +98,52 @@ TeamConfigWindow::TeamConfigWindow(QMainWindow* p) {
     { WO_TEAM_COACH, lstatCoach }
   };
   ipboxes_ = {
-    std::make_pair(WO_TEAM1, IP1),
-    std::make_pair(WO_TEAM2, IP2),
-    std::make_pair(WO_TEAM3, IP3),
-    std::make_pair(WO_TEAM4, IP4),
-    std::make_pair(WO_TEAM5, IP5),
-    std::make_pair(WO_TEAM_COACH, IPCoach)
+    { WO_TEAM1, ip_1}, 
+    { WO_TEAM2, ip_2}, 
+    { WO_TEAM3, ip_3}, 
+    { WO_TEAM4, ip_4}, 
+    { WO_TEAM5, ip_5}, 
+    { WO_TEAM_COACH, ip_c}, 
+    { WO_ALT1, ip_a1 },
+    { WO_ALT2, ip_a2 }
   };
+  sonars_ = {
+    { WO_TEAM1, sonar_1}, 
+    { WO_TEAM2, sonar_2}, 
+    { WO_TEAM3, sonar_3}, 
+    { WO_TEAM4, sonar_4}, 
+    { WO_TEAM5, sonar_5}, 
+    { WO_TEAM_COACH, sonar_c}, 
+    { WO_ALT1, sonar_a1 },
+    { WO_ALT2, sonar_a2 }
+  };
+  for(auto& kvp : ipboxes_)
+    connect(kvp.second, SIGNAL(editingFinished()), this, SLOT(updateSSH()));
+  
   checks_ = {
-    std::make_pair(WO_TEAM1, IPBox1),
-    std::make_pair(WO_TEAM2, IPBox2),
-    std::make_pair(WO_TEAM3, IPBox3),
-    std::make_pair(WO_TEAM4, IPBox4),
-    std::make_pair(WO_TEAM5, IPBox5),
-    std::make_pair(WO_TEAM_COACH, IPBoxCoach)
+    { WO_TEAM1, select_1}, 
+    { WO_TEAM2, select_2}, 
+    { WO_TEAM3, select_3}, 
+    { WO_TEAM4, select_4}, 
+    { WO_TEAM5, select_5}, 
+    { WO_TEAM_COACH, select_c}, 
+    { WO_ALT1, select_a1 },
+    { WO_ALT2, select_a2 }
   };
+  for(auto& kvp : checks_)
+    connect(kvp.second, SIGNAL(toggled(bool)), this, SLOT(updateSSH(bool)));
+
   statuses_ = {
-    std::make_pair(WO_TEAM1, IP1_status),
-    std::make_pair(WO_TEAM2, IP2_status),
-    std::make_pair(WO_TEAM3, IP3_status),
-    std::make_pair(WO_TEAM4, IP4_status),
-    std::make_pair(WO_TEAM5, IP5_status),
-    std::make_pair(WO_TEAM_COACH, IPCoach_status)
+    { WO_TEAM1, status_1}, 
+    { WO_TEAM2, status_2}, 
+    { WO_TEAM3, status_3}, 
+    { WO_TEAM4, status_4}, 
+    { WO_TEAM5, status_5}, 
+    { WO_TEAM_COACH, status_c}, 
+    { WO_ALT1, status_a1 },
+    { WO_ALT2, status_a2 }
   };
-  robots_ = { WO_TEAM1, WO_TEAM2, WO_TEAM3, WO_TEAM4, WO_TEAM5, WO_TEAM_COACH };
+  robots_ = { WO_TEAM1, WO_TEAM2, WO_TEAM3, WO_TEAM4, WO_TEAM5, WO_TEAM_COACH, WO_ALT1, WO_ALT2 };
 }
 
 void TeamConfigWindow::reloadLocalConfig() {
@@ -131,20 +160,25 @@ void TeamConfigWindow::reloadLocalConfig() {
         continue;
       }
       box->setText(QString::number(rconfig.robot_id));
-      GCNum->setValue(rconfig.team);
-      //gcIP->setText(QString::fromStdString(rconfig.game_controller_ip));
       auto px = posX_[i], py = posY_[i], pt = posT_[i];
+      auto sonar = sonars_[i];
       px->setValue(rconfig.posX);
       py->setValue(rconfig.posY);
       pt->setValue(rconfig.orientation);
+      sonar->setChecked(rconfig.sonar_enabled);
       if(rconfig.self == WO_TEAM_COACH) {
-        coachZ->setValue(rconfig.posZ);
+        z_coach->setValue(rconfig.posZ);
       }
-      tbIP->setText(QString::fromStdString(rconfig.team_broadcast_ip));
-      tUDP->setValue(rconfig.team_udp);
     }
-    commonIP->setText(QString::fromStdString(tconfig.common_ip));
+    ip_common->setText(QString::fromStdString(tconfig.common_ip));
     audioEnabled->setChecked(tconfig.audio_enabled);
+    svmEnabled->setChecked(tconfig.svm_enabled);
+    optimizeEnabled->setChecked(tconfig.optimize_enabled);
+    ip_broadcast->setText(QString::fromStdString(tconfig.team_broadcast_ip));
+    team_udp->setValue(tconfig.team_udp);
+    team_number->setValue(tconfig.team);
+    ip_game_controller->setText(QString::fromStdString(tconfig.game_controller_ip));
+    updateSSH();
   } else {
     cout << "Team Manager Window: No config to load" << std::endl;
   }
@@ -158,8 +192,14 @@ void TeamConfigWindow::saveLocalConfig() {
   for(auto i : robots_) {
     tconfig.robot_configs[i] = getRobotConfig(i);
   }
-  tconfig.common_ip =commonIP->text().toStdString();
+  tconfig.common_ip = ip_common->text().toStdString();
   tconfig.audio_enabled = audioEnabled->isChecked();
+  tconfig.svm_enabled = svmEnabled->isChecked();
+  tconfig.optimize_enabled = optimizeEnabled->isChecked();
+  tconfig.team_broadcast_ip = ip_broadcast->text().toStdString();
+  tconfig.game_controller_ip = ip_game_controller->text().toStdString();
+  tconfig.team_udp = team_udp->value();
+  tconfig.team = team_number->value();
   tconfig.saveToFile(path);
   cout << "Team Manager Window: Config Written to " << path << "\n";
 }
@@ -171,34 +211,41 @@ RobotConfig TeamConfigWindow::getRobotConfig(int self) {
   config.robot_id = ipbox->text().toInt();
   //config.game_controller_ip = gcIP->text().toStdString();
   auto px = posX_[self], py = posY_[self], pt = posT_[self];
+  auto sonar = sonars_[self];
   config.posX = px->value();
   config.posY = py->value();
   config.orientation = pt->value();
+  config.sonar_enabled = sonar->isChecked();
   if(self == WO_TEAM_COACH) {
-    config.posZ = coachZ->value();
+    config.posZ = z_coach->value();
   }
-  config.team = GCNum->value();
-  config.self = config.role = self;
-  config.team_broadcast_ip = tbIP->text().toStdString();
-  config.team_udp = tUDP->value();
+  config.team = team_number->value();
+  if(self == WO_ALT1 || self == WO_ALT2)
+    config.team = 89; // Set it to something unused so it's not on game controller
+  config.self = MAP(self);
+  config.team_broadcast_ip = ip_broadcast->text().toStdString();
   config.audio_enabled = audioEnabled->isChecked();
+  config.svm_enabled = svmEnabled->isChecked();
+  config.team_udp = team_udp->value();
   return config;
 }
 
 
 QStringList TeamConfigWindow::getUploadList() {
   QStringList list;
-  if (IP1->text()!="" && IPBox1->isChecked()) list.append(IP1->text());
-  if (IP2->text()!="" && IPBox2->isChecked()) list.append(IP2->text());
-  if (IP3->text()!="" && IPBox3->isChecked()) list.append(IP3->text());
-  if (IP4->text()!="" && IPBox4->isChecked()) list.append(IP4->text());
-  if (IP5->text()!="" && IPBox5->isChecked()) list.append(IP5->text());
-  if (IP6->text()!="" && IPBox6->isChecked()) list.append(IP6->text());
-  if (IPCoach->text()!="" && IPBoxCoach->isChecked()) list.append(IPCoach->text());
+  if (ip_1->text()!="" && select_1->isChecked()) list.append(ip_1->text());
+  if (ip_2->text()!="" && select_2->isChecked()) list.append(ip_2->text());
+  if (ip_3->text()!="" && select_3->isChecked()) list.append(ip_3->text());
+  if (ip_4->text()!="" && select_4->isChecked()) list.append(ip_4->text());
+  if (ip_5->text()!="" && select_5->isChecked()) list.append(ip_5->text());
+  if (ip_c->text()!="" && select_c->isChecked()) list.append(ip_c->text());
+  if (ip_a1->text()!="" && select_a1->isChecked()) list.append(ip_a1->text());
+  if (ip_a2->text()!="" && select_a2->isChecked()) list.append(ip_a2->text());
   return list;
 }
 
 void TeamConfigWindow::startNaoQi() {
+  uploadStatusUpdated(UploadStatus::Waiting);
   cout << "Team Manager Window: Starting NaoQi's\n";
 
   auto list = getUploadList();
@@ -207,9 +254,11 @@ void TeamConfigWindow::startNaoQi() {
     QString ip = getFullIP(list[i]);
     executor_.startNaoqi(ip);
   }
+  executor_.notifyCompletion(status_callback);
 }
 
 void TeamConfigWindow::stopNaoQi() {
+  uploadStatusUpdated(UploadStatus::Waiting);
   cout << "Team Manager Window: Stopping NaoQi's\n";
 
   auto list = getUploadList();
@@ -218,6 +267,7 @@ void TeamConfigWindow::stopNaoQi() {
     QString ip = getFullIP(list[i]);
     executor_.stopNaoqi(ip);
   }
+  executor_.notifyCompletion(status_callback);
 }
 
 void TeamConfigWindow::restartInterpreter() {
@@ -226,25 +276,34 @@ void TeamConfigWindow::restartInterpreter() {
   auto list = getUploadList();
   int size=list.size();
   for (int i=0; i<size; i++) {
-    QString ip = getFullIP(list[i]); //toLatin1().data();
-
-    // set it in control window and call files restartInterpreter on it
-    ((UTMainWnd*)parent)->filesWnd_->setCurrentLocation(ip);
-    ((UTMainWnd*)parent)->remoteRestartInterpreter();
-
+    QString ip = getFullIP(list[i]);
+    UTMainWnd::inst()->sendUDPCommand(ip, ToolPacket::RestartInterpreter);
   }
 }
 
+void TeamConfigWindow::statusCallback(bool success) {
+  if(success)
+    uploadStatusUpdated(UploadStatus::Completed);
+  else
+    uploadStatusUpdated(UploadStatus::Failed);
+}
 
+void TeamConfigWindow::compileEverything() {
+  uploadStatusUpdated(UploadStatus::Waiting);
+  executor_.compile();
+  executor_.notifyCompletion(status_callback);
+}
 
 void TeamConfigWindow::uploadEverything() {
+  uploadStatusUpdated(UploadStatus::Waiting);
+  uploadTime();
   uploadBinary();
   uploadInterpreter();
   uploadMotionVisionConfig();
   uploadColor();
   uploadRobotConfig();
   //uploadWireless();
-  //TODO: callback on complete
+  executor_.notifyCompletion(status_callback);
 }
 
 void TeamConfigWindow::uploadBinary() {
@@ -254,12 +313,9 @@ void TeamConfigWindow::uploadBinary() {
   int size=list.size();
   for (int i=0; i<size; i++) {
     QString ip = getFullIP(list[i]); //toLatin1().data();
-    executor_.sendBinary(ip, false);
+    executor_.sendBinary(ip, false, optimizeEnabled->isChecked());
     if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked())
-        executor_.verifyBinaryOld(ip, false);
-      else
-        executor_.verifyBinary(ip, false);
+      executor_.verifyBinary(ip, false, optimizeEnabled->isChecked());
     }
   }
 }
@@ -274,16 +330,8 @@ void TeamConfigWindow::uploadMotionVisionConfig() {
 
     ip = getFullIP(ip);
     executor_.sendConfigFiles(ip, false);
-    executor_.sendMotionFiles(ip, false);
     if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked()) {
-        executor_.verifyConfigFilesOld(ip, false);
-        executor_.verifyMotionFilesOld(ip, false);
-      }
-      else {
-        executor_.verifyConfigFiles(ip, false);
-        executor_.verifyMotionFiles(ip, false);
-      }
+      executor_.verifyConfigFiles(ip, false);
     }
   }
 }
@@ -298,10 +346,7 @@ void TeamConfigWindow::uploadRobotConfig() {
     RobotConfig config = getRobotConfig(robot);
     executor_.sendRobotConfig(ip, config, false);
     if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked())
-        executor_.verifyRobotConfigOld(ip, config, false);
-      else
-        executor_.verifyRobotConfig(ip, config, false);
+      executor_.verifyRobotConfig(ip, config, false);
     }
   }
 }
@@ -315,10 +360,7 @@ void TeamConfigWindow::uploadColor() {
 
     executor_.sendColorTable(ip, false);
     if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked())
-        executor_.verifyColorTableOld(ip, false);
-      else
-        executor_.verifyColorTable(ip, false);
+      executor_.verifyColorTable(ip, false);
     }
   }
 }
@@ -334,47 +376,24 @@ void TeamConfigWindow::uploadWireless() {
 }
 
 void TeamConfigWindow::uploadInterpreter() {
-  //cout << "Team Manager Window: Upload Py/Lua\n";
+  //cout << "Team Manager Window: Upload Py\n";
 
   auto list = getUploadList();
   int size=list.size();
   for (int i=0; i<size; i++) {
     QString ip = getFullIP(list[i]); //toLatin1().data();
 
-    executor_.sendLua(ip, false);
-    if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked())
-        executor_.verifyLuaOld(ip, false);
-      else
-        executor_.verifyLua(ip, false);
-    }
     executor_.sendPython(ip, false);
     if(verifyEnabled->isChecked()) {
-      if(!verifyNew->isChecked())
-        executor_.verifyPythonOld(ip, false);
-      else
-        executor_.verifyPython(ip, false);
+      executor_.verifyPython(ip, false);
     }
   }
 }
 
 void TeamConfigWindow::checkStatus(){
-
-  // only if this window is active
   if (!this->isVisible())
     return;
   updateSSH();
-
-  //for(auto robot : robots_) {
-    //auto box = ipboxes_[robot];
-    //if(box->text() == "") continue;
-    //QString ip = getFullIP(box->text());
-    //clearRobotStatus(robot);
-    //auto callback = [=] (ProcessExecutor::RobotStatus status) {
-      //robotStatusUpdated(robot, status);
-    //};
-    //executor_.checkRobotStatus(ip, callback);
-  //}
 }
 
 void TeamConfigWindow::clearRobotStatus(int robot) {
@@ -389,10 +408,28 @@ void TeamConfigWindow::updateRobotStatus(int robot, ProcessExecutor::RobotStatus
   QString ip = getFullIP(box->text());
   auto label = statuses_[robot];
   switch(status) {
-    case ProcessExecutor::Connecting: label->setText("C..."); break;
+    case ProcessExecutor::Connecting: label->setText("..."); break;
     case ProcessExecutor::Connected: label->setText("CE"); break;
     case ProcessExecutor::Alive: label->setText("A"); break;
-    default: label->setText("xxx"); break;
+    case ProcessExecutor::Dead: label->setText("X"); break;
+    default: label->setText("-"); break;
+  }
+}
+
+void TeamConfigWindow::updateUploadStatus(UploadStatus status) {
+  switch(status) {
+    case UploadStatus::NothingQueued:
+      lblUploadStatus->setPixmap(QPixmap(":/images/empty.png")); break;
+    case UploadStatus::Waiting: {
+      QMovie *movie = new QMovie(":/images/loading.gif");
+      lblUploadStatus->setMovie(movie);
+      movie->start();
+      break;
+    }
+    case UploadStatus::Completed:
+      lblUploadStatus->setPixmap(QPixmap(":/images/checkmark.png")); break;
+    case UploadStatus::Failed:
+      lblUploadStatus->setPixmap(QPixmap(":/images/error.png")); break;
   }
 }
 
@@ -407,7 +444,7 @@ void TeamConfigWindow::uploadTime() {
 }
 
 QString TeamConfigWindow::getFullIP(const QString &suffix) {
-  QString common = commonIP->text();
+  QString common = ip_common->text();
   if (!common.endsWith("."))
     common += ".";
   return common + suffix;
@@ -416,7 +453,10 @@ QString TeamConfigWindow::getFullIP(const QString &suffix) {
 void TeamConfigWindow::updateSSH() {
   for(auto robot : robots_) {
     auto box = ipboxes_[robot];
-    if(box->text() == "") continue;
+    if(box->text() == "") {
+      clearRobotStatus(robot);
+      continue;
+    }
     QString ip = getFullIP(box->text());
     auto callback = [=] (ProcessExecutor::RobotStatus status) {
       robotStatusUpdated(robot, status);

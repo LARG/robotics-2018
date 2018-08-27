@@ -24,11 +24,14 @@
 #define OUR_TEAM 1
 #define THEIR_TEAM -1
 
+using std::vector;
+using std::string;
 
-BehaviorSimulation::BehaviorSimulation(int n, bool penaltyKick, bool lMode) : lmode_(lMode) {
+
+BehaviorSimulation::BehaviorSimulation(bool lmode) : lmode_(lmode) {
+  Random::engine() == std::mt19937(0);
   for (int i = WO_PLAYERS_FIRST; i <= WO_ROBOTS_LAST; i++){
-    sims[i] = NULL;
-    simActive[i] = false;
+    sims_[i] = nullptr;
     fallenTime[i] = 0;
   }
 
@@ -50,64 +53,46 @@ BehaviorSimulation::BehaviorSimulation(int n, bool penaltyKick, bool lMode) : lm
   // start at 655 to include the 5 init, 45 ready and 5 set seconds before kickoff
   halfTimer = 655;
 
-  simPenaltyKick = penaltyKick;
-  nplayers = n;
+  simPenaltyKick = false;
   timeInc = 1.0/30.0;
 
   // init our world object mem
-  memory_ = new MemoryFrame(false, MemoryOwner::VISION, 0, 1);
-  memory_->getOrAddBlockByName(worldObjects, "world_objects");
-  worldObjects->init(TEAM_BLUE);
-  worldObjects->reset();
-  memory_->getOrAddBlockByName(gameState, "game_state");
-  gameState->isPenaltyKick = simPenaltyKick;
-  memory_->getOrAddBlockByName(frameInfo, "vision_frame_info");
-  frameInfo->frame_id = 0;
-  frameInfo->seconds_since_start = 0;
+  memory_ = std::make_unique<MemoryFrame>(false, MemoryOwner::VISION, 0, 1);
+  gtcache.fill(memory_.get(), {"world_objects", "game_state", "vision_frame_info"});
+  gtcache.world_object->init(TEAM_BLUE);
+  gtcache.world_object->reset();
+  gtcache.game_state->isPenaltyKick = simPenaltyKick;
+  gtcache.frame_info->frame_id = 0;
+  gtcache.frame_info->seconds_since_start = 0;
 
-  // if we haven't initialized any before, init them
-  for (int i = WO_PLAYERS_FIRST; i <= WO_ROBOTS_LAST; i++){
-    if (nplayers == 10 and i <= WO_OPPONENT_LAST)
-      simActive[i] = true;
-    else if (nplayers == 6) {
-      if(i == WO_TEAM1 || i == WO_TEAM2 || i == WO_TEAM5 || i == WO_OPPONENT1 || i == WO_OPPONENT2 || i == WO_OPPONENT5) 
-        simActive[i] = true;
-      else
-        simActive[i] = false;
-    } else if (nplayers == 1) {
-      if (i == WO_TEAM_LAST)
-        simActive[i] = true;
-      else
-        simActive[i] = false;
-    } else if (nplayers == 2){
-      if (i == WO_TEAM5 || (simPenaltyKick && i == WO_OPPONENT_FIRST) || (!simPenaltyKick && i == WO_OPPONENT_LAST)) {
-        simActive[i] = true;
-        if(currentSim == 0) currentSim = i; // Set current sim to the robot on our team
+  loadGame("behavior");
+  auto& gtconfig = config_.objects.gtconfig;
+
+  std::vector<MemoryCache> playerCaches;
+  for(int i = WO_PLAYERS_FIRST; i <= WO_ROBOTS_LAST; i++) {
+    if(gtconfig.contains(i)) {
+      if(i <= WO_TEAM5) {
+        currentSim = i;
       }
-      else
-        simActive[i] = false;
-    }
-    if (sims[i] == NULL && simActive[i]) {
-      activePlayers_.push_back(i);
-      int teamsign;
-      int self;
-      getTeamSignAndSelf(i,teamsign,self);
-      int team = TEAM_BLUE;
-      if (teamsign < 0)
-        team = TEAM_RED;
-      sims[i] = new SimulatedPlayer(team, self, lmode_);
+      int teamsign, self;
+      getTeamSignAndSelf(i, teamsign, self);
+      int team = teamsign >= 0 ? TEAM_BLUE : TEAM_RED;
+      sims_[i] = std::make_unique<SimulatedPlayer>(team, self, lmode_);
+      auto itrole = config_.roles.find(i);
+      if(itrole != config_.roles.end())
+        sims_[i]->setRole(itrole->second);
+      playerCaches.push_back(sims_[i]->getMemoryCache());
     }
   }
 
-  if(SKIP_TO_PLAYING) {
-    gameState->setState(SET);
-    simTimer = 1.0;
-  } else {
-    gameState->setState(INITIAL);
-    simTimer = 5.0;
+  switch(config_.game_state) {
+    case PLAYING:
+      simTimer = 5 * 60.0f; break;
+    default:
+      simTimer = 5.0f; break;
   }
 
-  worldObjects->objects_[WO_BALL].loc = Point2D(0,0);
+  gtcache.world_object->objects_[WO_BALL].loc = Point2D(0,0);
 
   for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
     int teamsign;
@@ -125,73 +110,68 @@ BehaviorSimulation::BehaviorSimulation(int n, bool penaltyKick, bool lMode) : lm
     // special locations for penalty kick
     if (simPenaltyKick) {
       if (i == WO_TEAM_LAST){
-        worldObjects->objects_[i].loc.x = PENALTY_CROSS_X - 1000;
-        worldObjects->objects_[i].loc.y = 0;
-        worldObjects->objects_[i].orientation = 0;
-        worldObjects->objects_[WO_BALL].loc = Point2D(PENALTY_CROSS_X,0);
+        gtcache.world_object->objects_[i].loc.x = PENALTY_CROSS_X - 1000;
+        gtcache.world_object->objects_[i].loc.y = 0;
+        gtcache.world_object->objects_[i].orientation = 0;
+        gtcache.world_object->objects_[WO_BALL].loc = Point2D(PENALTY_CROSS_X,0);
       } else {
-        worldObjects->objects_[i].loc.x = FIELD_X/2.0 - 50;
-        worldObjects->objects_[i].loc.y = 0;
-        worldObjects->objects_[i].orientation = M_PI;
+        gtcache.world_object->objects_[i].loc.x = FIELD_X/2.0 - 50;
+        gtcache.world_object->objects_[i].loc.y = 0;
+        gtcache.world_object->objects_[i].orientation = M_PI;
       }
     }
 
     // set way off field if not active
-    if (sims[i] == NULL || !simActive[i]){
-      worldObjects->objects_[i].loc.x = 10000;
-      worldObjects->objects_[i].loc.y = 10000;
+    if (sims_[i] == nullptr) {
+      gtcache.world_object->objects_[i].loc.x = 10000;
+      gtcache.world_object->objects_[i].loc.y = 10000;
     }
 
   }
-
+  applyConfig(gtcache, playerCaches);
+  for (int i = WO_PLAYERS_FIRST; i <= WO_ROBOTS_LAST; i++){
+    if(sims_[i] != nullptr)
+      sims_[i]->initLocalization();
+  }
 }
 
 
 
 BehaviorSimulation::~BehaviorSimulation(){
   // core will delete memory for us
-  delete worldObjects;
-  delete gameState;
-  delete memory_;
-  for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
-    if (sims[i] != NULL)
-      delete sims[i];
-    sims[i] = NULL;
-  }
-  worldObjects = NULL;
-  gameState = NULL;
-  memory_ = NULL;
+  gtcache.world_object = NULL;
+  gtcache.game_state = NULL;
 }
 
 void BehaviorSimulation::doPenaltyKickReset(){
-  worldObjects->objects_[WO_BALL].loc = Point2D(PENALTY_CROSS_X,0);
-  worldObjects->objects_[WO_BALL].absVel = Point2D(0,0);
-  worldObjects->objects_[WO_TEAM_LAST].loc = Point2D(PENALTY_CROSS_X-1000,0);
-  worldObjects->objects_[WO_TEAM_LAST].orientation = 0;
-  worldObjects->objects_[WO_OPPONENT_FIRST].loc = Point2D(FIELD_X/2.0-50,0);
-  worldObjects->objects_[WO_OPPONENT_FIRST].orientation = M_PI;
+  gtcache.world_object->objects_[WO_BALL].loc = Point2D(PENALTY_CROSS_X,0);
+  gtcache.world_object->objects_[WO_BALL].absVel = Point2D(0,0);
+  gtcache.world_object->objects_[WO_TEAM_LAST].loc = Point2D(PENALTY_CROSS_X-1000,0);
+  gtcache.world_object->objects_[WO_TEAM_LAST].orientation = 0;
+  gtcache.world_object->objects_[WO_OPPONENT_FIRST].loc = Point2D(FIELD_X/2.0-50,0);
+  gtcache.world_object->objects_[WO_OPPONENT_FIRST].orientation = M_PI;
   changeSimulationState(READY);
   simTimer = 5.0;
 
-  if (sims[WO_TEAM_LAST] != NULL){
-    sims[WO_TEAM_LAST]->resetCounters();
-    sims[WO_TEAM_LAST]->cache_.game_state->setState(READY);
+  if (sims_[WO_TEAM_LAST] != nullptr){
+    sims_[WO_TEAM_LAST]->resetCounters();
+    sims_[WO_TEAM_LAST]->cache_.game_state->setState(READY);
   }
-  if (sims[WO_OPPONENT_FIRST] != NULL){
-    sims[WO_OPPONENT_FIRST]->resetCounters();
-    sims[WO_OPPONENT_FIRST]->cache_.game_state->setState(READY);
+  if (sims_[WO_OPPONENT_FIRST] != nullptr){
+    sims_[WO_OPPONENT_FIRST]->resetCounters();
+    sims_[WO_OPPONENT_FIRST]->cache_.game_state->setState(READY);
   }
 }
 
 void BehaviorSimulation::stepTimer(Point2D &ballLoc,Point2D &ballVel) {
   simTimer -= timeInc;
   halfTimer -= timeInc;
-  gameState->secsRemaining = (int)halfTimer;
-  frameInfo->seconds_since_start += timeInc;
-  frameInfo->frame_id++;
+  gtcache.game_state->secsRemaining = (int)halfTimer;
+  gtcache.frame_info->seconds_since_start += timeInc;
+  gtcache.frame_info->frame_id++;
 
 #ifdef TOOL
-  if (simTimer < 10 && simPenaltyKick && sims[WO_TEAM_LAST]->cache_.game_state->state() == PLAYING){
+  if (simTimer < 10 && simPenaltyKick && sims_[WO_TEAM_LAST]->cache_.game_state->state() == PLAYING){
     simInfo += std::to_string(simTimer) + " seconds left in PK, ";
   }
 #endif
@@ -200,27 +180,27 @@ void BehaviorSimulation::stepTimer(Point2D &ballLoc,Point2D &ballVel) {
     // different for penalty mode
     if (simPenaltyKick){
       // go through ready,set,pen
-      if (gameState->state() == INITIAL){
+      if (gtcache.game_state->state() == INITIAL){
         changeSimulationState(READY);
         simTimer = 5.0;
-      } else if (gameState->state() == READY){
+      } else if (gtcache.game_state->state() == READY){
         ballLoc = Point2D(PENALTY_CROSS_X,0);
         // go to set
         changeSimulationState(SET);
         simTimer = 5.0;
-      } else if (gameState->state() == SET){
+      } else if (gtcache.game_state->state() == SET){
         ballLoc = Point2D(PENALTY_CROSS_X,0);
         // go to playing
         changeSimulationState(PLAYING);
         simTimer = 60.0;
         halfTimer = 60.0;
-      } else if (gameState->state() == PENALISED){
+      } else if (gtcache.game_state->state() == PENALISED){
         ballLoc = Point2D(PENALTY_CROSS_X,0);
         // go to playing
         changeSimulationState(PLAYING);
         simTimer = 60.0;
         halfTimer = 60.0;
-      } else if (gameState->state() == PLAYING){
+      } else if (gtcache.game_state->state() == PLAYING){
         // TIME IS UP!
 #ifdef TOOL
         simInfo += "PK TIME UP, NO GOAL SCORED!, ";
@@ -229,26 +209,26 @@ void BehaviorSimulation::stepTimer(Point2D &ballLoc,Point2D &ballVel) {
       }
       ballClearedFromCircle = true;
     } else {
-      if (gameState->state() == INITIAL){
+      if (gtcache.game_state->state() == INITIAL){
         // go to ready
         ballLoc = Point2D(0,0);
         ballVel = Point2D(0,0);
         changeSimulationState(READY);
         simTimer = 45.0;
-      } else if (gameState->state() == READY){
+      } else if (gtcache.game_state->state() == READY){
         ballLoc = Point2D(0,0);
         ballVel = Point2D(0,0);
 
         // go to set
         changeSimulationState(SET);
         simTimer = 5.0;
-      } else if (gameState->state() == SET){
+      } else if (gtcache.game_state->state() == SET){
         changeSimulationState(PLAYING);
         if (halfTimer > 600) halfTimer = 600;
         simTimer = halfTimer;
       }
       // back to ready
-      else if (gameState->state() == PLAYING){
+      else if (gtcache.game_state->state() == PLAYING){
         cout << "Half: " << numHalves << " Blue: " << simBlueScore << ", Red: " << simRedScore << endl;
         numHalves++;
         changeSimulationKickoff();
@@ -268,7 +248,7 @@ void BehaviorSimulation::stepCheckGoal(Point2D &ballLoc, Point2D &ballVel) {
   if (fabs(ballLoc.x) > FIELD_X/2.0 && fabs(ballLoc.y) < GOAL_Y/2.0){
     if (ballLoc.x > 0){
       // if from circle and our kickoff, not valid
-      if (gameState->ourKickOff && !ballClearedFromCircle){
+      if (gtcache.game_state->ourKickOff && !ballClearedFromCircle){
 #ifdef TOOL
         simInfo += "KICKOFF SHOT BLUE, ";
 #endif
@@ -277,13 +257,13 @@ void BehaviorSimulation::stepCheckGoal(Point2D &ballLoc, Point2D &ballVel) {
         simInfo += "GOAL BLUE, ";
 #endif
         setSimScore(true);
-        //cout << sims[3]->frameInfo->frame_id << " Goal blue. Score Blue: " << simBlueScore << " Red: " << simRedScore << endl;
+        //cout << sims_[3]->gtcache.frame_info->frame_id << " Goal blue. Score Blue: " << simBlueScore << " Red: " << simRedScore << endl;
       }
-      gameState->ourKickOff = false;
+      gtcache.game_state->ourKickOff = false;
     }
     else {
       // if from circle and our kickoff, not valid
-      if (!gameState->ourKickOff && !ballClearedFromCircle){
+      if (!gtcache.game_state->ourKickOff && !ballClearedFromCircle){
 #ifdef TOOL
         simInfo += "KICKOFF SHOT RED, ";
 #endif
@@ -292,9 +272,9 @@ void BehaviorSimulation::stepCheckGoal(Point2D &ballLoc, Point2D &ballVel) {
         simInfo += "GOAL RED, ";
 #endif
         setSimScore(false);
-        //cout << sims[3]->frameInfo->frame_id << " Goal red. Score Blue: " << simBlueScore << " Red: " << simRedScore << endl;
+        //cout << sims_[3]->gtcache.frame_info->frame_id << " Goal red. Score Blue: " << simBlueScore << " Red: " << simRedScore << endl;
       }
-      gameState->ourKickOff = true;
+      gtcache.game_state->ourKickOff = true;
     }
     ballLoc = Point2D(0,0);
     ballVel = Point2D(0,0);
@@ -303,14 +283,18 @@ void BehaviorSimulation::stepCheckGoal(Point2D &ballLoc, Point2D &ballVel) {
     changeSimulationState(READY);
     if (simPenaltyKick){
       doPenaltyKickReset();
-      ballLoc = worldObjects->objects_[WO_BALL].loc;
-      ballVel = worldObjects->objects_[WO_BALL].absVel;
+      ballLoc = gtcache.world_object->objects_[WO_BALL].loc;
+      ballVel = gtcache.world_object->objects_[WO_BALL].absVel;
     }
   }
 }
 
 void BehaviorSimulation::stepCheckBounds(Point2D &ballLoc, Point2D &ballVel) {
   // check for out of bounds
+  if(fabs(ballLoc.x) >= 9000 && fabs(ballLoc.y) >= 9000) {
+    // The ball is being intentionally hidden
+    return;
+  }
   if (fabs(ballLoc.y) > FIELD_Y/2.0){
     if (PRINT) cout << "ball out at " << ballLoc << endl;
     ballVel = Point2D(0,0);
@@ -331,11 +315,19 @@ void BehaviorSimulation::stepCheckBounds(Point2D &ballLoc, Point2D &ballVel) {
 #ifdef TOOL
       simInfo += "OUT OF BOUNDS on RED, ";
 #endif
-      if (ballLoc.x > lastKickX) {
-        ballLoc.x += 1000;
-      } else {
-        ballLoc.x = lastKickX + 1000;
-      }
+      // if (ballLoc.x > lastKickX) {
+      //   ballLoc.x += 1000;
+      // } else {
+      //   ballLoc.x = lastKickX + 1000;
+      // }
+      ballLoc.x = -PENALTY_X;
+      if (ballLoc.y > 0)
+        ballLoc.y = GOAL_Y / 2;
+      else
+        ballLoc.y = -GOAL_Y / 2;
+      gtcache.game_state->isFreeKick = true;
+      gtcache.game_state->isFreeKickTypeGoal = true;
+      gtcache.game_state->ourKickOff = true;    
     }
     // max and min values
     if (ballLoc.x < -2000) ballLoc.x = -2000;
@@ -351,24 +343,40 @@ void BehaviorSimulation::stepCheckBounds(Point2D &ballLoc, Point2D &ballVel) {
       ballLoc.y = -FIELD_Y/2.0 + 400;
     if (lastKick == TEAM_BLUE){
 #ifdef TOOL
-      simInfo += "OUT OF BOUNDS on BLUE, ";
+      simInfo += "OUT ENDLINE on BLUE, ";
 #endif
-      if (ballLoc.x > 0){
-        ballLoc.x = 0;
-        if (PRINT) cout << "Ball out endline on blue" << endl;
-      } else {
-        ballLoc.x = -2000;
-      }
+      // if (ballLoc.x > 0){
+      //   ballLoc.x = 0;
+      //   if (PRINT) cout << "Ball out endline on blue" << endl;
+      // } else {
+      //   ballLoc.x = -2000;
+      // }
+      ballLoc.x = FIELD_X / 2.0 - PENALTY_X;
+      if (ballLoc.y > 0)
+        ballLoc.y = GOAL_Y / 2;
+      else
+        ballLoc.y = -GOAL_Y / 2;
+      gtcache.game_state->isFreeKick = true;
+      gtcache.game_state->isFreeKickTypeGoal = true;
+      gtcache.game_state->ourKickOff = false;
     } else {
 #ifdef TOOL
-      simInfo += "OUT OF BOUNDS on RED, ";
+      simInfo += "OUT ENDLINE on RED, ";
 #endif
-      if (ballLoc.x > 0){
-        ballLoc.x = 2000;
-      } else {
-        ballLoc.x = 0;
-        if (PRINT) cout << "Ball out endline on red" << endl;
-      }
+      ballLoc.x = -FIELD_X / 2.0 + PENALTY_X;
+      if (ballLoc.y > 0)
+        ballLoc.y = GOAL_Y / 2;
+      else
+        ballLoc.y = -GOAL_Y / 2;
+      gtcache.game_state->isFreeKick = true;
+      gtcache.game_state->isFreeKickTypeGoal = true;
+      gtcache.game_state->ourKickOff = false;
+      // if (ballLoc.x > 0){
+      //   ballLoc.x = 2000;
+      // } else {
+      //   ballLoc.x = 0;
+      //   if (PRINT) cout << "Ball out endline on red" << endl;
+      // }
     }
   }
 }
@@ -377,9 +385,9 @@ void BehaviorSimulation::stepCheckBounds(Point2D &ballLoc, Point2D &ballVel) {
 void BehaviorSimulation::stepCheckBallCollisions(Point2D &ballLoc, Point2D &ballVel) {
   // see if ball hit anyone
   for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
-    if (!simActive[i]) continue;
+    if(sims_[i] == nullptr) continue;
     float ballDist = 0;
-    ballDist = ballLoc.getDistanceTo(worldObjects->objects_[i].loc);
+    ballDist = ballLoc.getDistanceTo(gtcache.world_object->objects_[i].loc);
 
     if (ballDist < 120){
       // slow down ball
@@ -388,23 +396,23 @@ void BehaviorSimulation::stepCheckBallCollisions(Point2D &ballLoc, Point2D &ball
         simInfo += "BALL HIT BLUE, ";
 #endif
         lastKick = TEAM_BLUE;
-        lastKickX = worldObjects->objects_[i].loc.x;
+        lastKickX = gtcache.world_object->objects_[i].loc.x;
       } else {
 #ifdef TOOL
         simInfo += "BALL HIT RED, ";
 #endif
         lastKick = TEAM_RED;
-        lastKickX = -worldObjects->objects_[i].loc.x;
+        lastKickX = -gtcache.world_object->objects_[i].loc.x;
       }
       //cout << "ball hit " << lastKick << " at " << lastKickX << endl;
     }
 
     // special check for keeper
     Point2D teamBallLoc = ballLoc;
-    if (fabs(sims[i]->cache_.sensor->values_[angleY]) > (M_PI/2.0 - 0.08)){
-      Point2D robotLoc = worldObjects->objects_[i].loc;
+    if (fabs(sims_[i]->cache_.sensor->values_[angleY]) > (M_PI/2.0 - 0.08)){
+      Point2D robotLoc = gtcache.world_object->objects_[i].loc;
       bool yMatch = false;
-      if (sims[i]->cache_.sensor->values_[angleY] > 0){
+      if (sims_[i]->cache_.sensor->values_[angleY] > 0){
         yMatch = (teamBallLoc.y < robotLoc.y && teamBallLoc.y > robotLoc.y-480);
       } else {
         yMatch = (teamBallLoc.y > robotLoc.y && teamBallLoc.y < robotLoc.y+480);
@@ -415,16 +423,16 @@ void BehaviorSimulation::stepCheckBallCollisions(Point2D &ballLoc, Point2D &ball
           simInfo += "BLUE KEEPER SAVE!, ";
 #endif
           lastKick = TEAM_BLUE;
-          lastKickX = worldObjects->objects_[i].loc.x;
+          lastKickX = gtcache.world_object->objects_[i].loc.x;
         } else {
 #ifdef TOOL
           simInfo += "RED KEEPER SAVE!, ";
 #endif
           lastKick = TEAM_RED;
-          lastKickX = worldObjects->objects_[i].loc.x;
+          lastKickX = gtcache.world_object->objects_[i].loc.x;
         }
         //cout << "ball saved by " << lastKick << " at " << lastKickX << endl;
-        if (rand_.sampleB() && !simPenaltyKick){
+        if (Random::inst().sampleB() && !simPenaltyKick){
           // keeper sweep
           if (ballLoc.x < 0){
             ballVel.x = 1000;
@@ -444,41 +452,41 @@ void BehaviorSimulation::stepCheckBallCollisions(Point2D &ballLoc, Point2D &ball
 
 void BehaviorSimulation::stepPlayerFallen(int i) {
   // check how long each robot has been down for
-  if (fabs(sims[i]->cache_.sensor->values_[angleX]) > 0.8 || fabs(sims[i]->cache_.sensor->values_[angleY]) > 0.8)
+  if (fabs(sims_[i]->cache_.sensor->values_[angleX]) > 0.8 || fabs(sims_[i]->cache_.sensor->values_[angleY]) > 0.8)
     fallenTime[i] += timeInc;
   else
     fallenTime[i] = 0;
 
   // penalty if they have not started getting up after 5 seconds
-  if (fallenTime[i] > 5.0 && sims[i]->cache_.odometry->getting_up_side_ == Getup::NONE){
+  if (fallenTime[i] > 5.0 && sims_[i]->cache_.odometry->getting_up_side_ == Getup::NONE){
 #ifdef TOOL
     if (i < WO_OPPONENT_FIRST)
-      simInfo += "INACTIVE ROBOT BLUE "+std::to_string(sims[i]->self_)+", ";
+      simInfo += "INACTIVE ROBOT BLUE "+std::to_string(sims_[i]->self_)+", ";
     else
-      simInfo += "INACTIVE ROBOT RED "+std::to_string(sims[i]->self_)+", ";
+      simInfo += "INACTIVE ROBOT RED "+std::to_string(sims_[i]->self_)+", ";
 #endif
 
-    sims[i]->setPenalty(worldObjects);
+    sims_[i]->setPenalty(gtcache.world_object);
   }
 }
 
 void BehaviorSimulation::stepPlayerBounds(int i) {
   // penalty if left field
-  if (fabs(worldObjects->objects_[i].loc.x) > (GRASS_X/2.0 + 500.0) || fabs(worldObjects->objects_[i].loc.y) > (GRASS_Y/2.0 + 500.0)){
+  if (fabs(gtcache.world_object->objects_[i].loc.x) > (GRASS_X/2.0 + 500.0) || fabs(gtcache.world_object->objects_[i].loc.y) > (GRASS_Y/2.0 + 500.0)){
 #ifdef TOOL
     if (i < WO_OPPONENT_FIRST)
-      simInfo += "LEAVING FIELD BLUE "+std::to_string(sims[i]->self_)+", ";
+      simInfo += "LEAVING FIELD BLUE "+std::to_string(sims_[i]->self_)+", ";
     else
-      simInfo += "LEAVING FIELD RED "+std::to_string(sims[i]->self_)+", ";
+      simInfo += "LEAVING FIELD RED "+std::to_string(sims_[i]->self_)+", ";
 #endif
-    sims[i]->setPenalty(worldObjects);
+    sims_[i]->setPenalty(gtcache.world_object);
   }
 }
 
 void BehaviorSimulation::stepPlayerKick(int i) {
-  lastKick = sims[i]->team_;
-  lastKickX = worldObjects->objects_[i].loc.x;
-  if (worldObjects->objects_[WO_BALL].loc.getMagnitude() > CIRCLE_RADIUS){
+  lastKick = sims_[i]->team_;
+  lastKickX = gtcache.world_object->objects_[i].loc.x;
+  if (gtcache.world_object->objects_[WO_BALL].loc.getMagnitude() > CIRCLE_RADIUS){
     ballClearedFromCircle = true;
   }
 #ifdef TOOL
@@ -493,7 +501,7 @@ void BehaviorSimulation::stepPlayerKick(int i) {
   // if its a penalty kick, this could be illegal
   if (simPenaltyKick) {
     if (lastKick == TEAM_BLUE){
-      Point2D ballLoc = worldObjects->objects_[WO_BALL].loc;
+      Point2D ballLoc = gtcache.world_object->objects_[WO_BALL].loc;
       if (ballLoc.x > (FIELD_X/2.0 - PENALTY_X) && fabs(ballLoc.y < PENALTY_Y/2.0)){
 #ifdef TOOL
         simInfo += "BLUE TOUCHED BALL INSIDE PEN BOX, NO GOAL, ";
@@ -501,7 +509,7 @@ void BehaviorSimulation::stepPlayerKick(int i) {
         doPenaltyKickReset();
       }
     } else {
-      Point2D ballLoc = sims[i]->cache_.world_object->objects_[WO_BALL].loc;
+      Point2D ballLoc = sims_[i]->cache_.world_object->objects_[WO_BALL].loc;
       if (ballLoc.x > (-FIELD_X/2.0 + PENALTY_X) || fabs(ballLoc.y > PENALTY_Y/2.0)){
 #ifdef TOOL
         simInfo += "RED TOUCHED BALL OUTSIDE PEN BOX, GOAL, ";
@@ -517,31 +525,31 @@ void BehaviorSimulation::stepPlayerBumpBall(int /*i*/, Point2D &ballLoc, Point2D
   // check if we bumped ball (dribble)
   if (ballLoc.getDistanceTo(robot->loc) < 60){
     // add up to 30 degree error
-    float headingError = rand_.sampleU(-.5,.5) * 60 * DEG_T_RAD;
-    float velError = rand_.sampleU(-.5,.5) * 500;
+    float headingError = Random::inst().sampleU(-.5,.5) * 60 * DEG_T_RAD;
+    float velError = Random::inst().sampleU(-.5,.5) * 500;
 
     Point2D absVel(250+velError, robot->orientation+headingError, POLAR);
     Point2D disp(100, robot->orientation, POLAR);
 
-    worldObjects->objects_[WO_BALL].loc += disp;
-    worldObjects->objects_[WO_BALL].absVel = absVel;
+    gtcache.world_object->objects_[WO_BALL].loc += disp;
+    gtcache.world_object->objects_[WO_BALL].absVel = absVel;
     ballVel = absVel;
-    ballLoc = worldObjects->objects_[WO_BALL].loc;
+    ballLoc = gtcache.world_object->objects_[WO_BALL].loc;
   }
 }
 
 void BehaviorSimulation::stepPlayerPenaltyBox(int i, WorldObject *robot) {
   // check if we went into own penalty box
-  if (sims[i]->self_ != 1 && i <= WO_TEAM_LAST && robot->loc.x < (-FIELD_X/2.0 + PENALTY_X) && fabs(robot->loc.y) < PENALTY_Y/2.0){
-    sims[i]->setPenalty(worldObjects);
+  if (sims_[i]->self_ != 1 && i <= WO_TEAM_LAST && robot->loc.x < (-FIELD_X/2.0 + PENALTY_X) && fabs(robot->loc.y) < PENALTY_Y/2.0){
+    sims_[i]->setPenalty(gtcache.world_object);
 #ifdef TOOL
-    simInfo += "ILLEGAL DEFENDER BLUE " + std::to_string(sims[i]->self_) + ", ";
+    simInfo += "ILLEGAL DEFENDER BLUE " + std::to_string(sims_[i]->self_) + ", ";
 #endif
   }
-  if (sims[i]->self_ != 1 && i >= WO_OPPONENT_FIRST && robot->loc.x > (FIELD_X/2.0 - PENALTY_X) && fabs(robot->loc.y) < PENALTY_Y/2.0){
-    sims[i]->setPenalty(worldObjects);
+  if (sims_[i]->self_ != 1 && i >= WO_OPPONENT_FIRST && robot->loc.x > (FIELD_X/2.0 - PENALTY_X) && fabs(robot->loc.y) < PENALTY_Y/2.0){
+    sims_[i]->setPenalty(gtcache.world_object);
 #ifdef TOOL
-    simInfo += "ILLEGAL DEFENDER RED " + std::to_string(sims[i]->self_) + ", ";
+    simInfo += "ILLEGAL DEFENDER RED " + std::to_string(sims_[i]->self_) + ", ";
 #endif
   }
 
@@ -553,16 +561,16 @@ void BehaviorSimulation::stepPlayerCollisions(int i, WorldObject *robot) {
   // check if we hit other robots
   for (int j = 1; j <= WO_OPPONENT_LAST; j++){
     if (i == j) continue;
-    if (!simActive[j]) continue;
+    if(sims_[i] == nullptr) continue;
     // check if we ran into another robot
-    float mateDist = robot->loc.getDistanceTo(worldObjects->objects_[j].loc);
-    if (mateDist < 180 && sims[j]->cache_.game_state->state() != PENALISED && sims[i]->cache_.game_state->state() != PENALISED){
-      sims[i]->setPenalty(worldObjects);
+    float mateDist = robot->loc.getDistanceTo(gtcache.world_object->objects_[j].loc);
+    if (mateDist < 180 && sims_[j]->cache_.game_state->state() != PENALISED && sims_[i]->cache_.game_state->state() != PENALISED){
+      sims_[i]->setPenalty(gtcache.world_object);
 #ifdef TOOL
-      if (sims[i]->team_ == TEAM_BLUE){
-        simInfo += "PUSHING BLUE " + std::to_string(sims[i]->self_) + ", ";
+      if (sims_[i]->team_ == TEAM_BLUE){
+        simInfo += "PUSHING BLUE " + std::to_string(sims_[i]->self_) + ", ";
       } else {
-        simInfo += "PUSHING RED " + std::to_string(sims[i]->self_) + ", ";
+        simInfo += "PUSHING RED " + std::to_string(sims_[i]->self_) + ", ";
       }
 #endif
     }
@@ -570,6 +578,34 @@ void BehaviorSimulation::stepPlayerCollisions(int i, WorldObject *robot) {
 }
 
 void BehaviorSimulation::stepPlayerComm(int i) {
+  if (sims_[i]->cache_.frame_info->frame_id % 6 != 0)
+    return;
+  // get team packet we would have sent
+  // and update other teammates
+  auto sent = &(sims_[i]->cache_.team_packets->relayData[sims_[i]->self_]);
+  // send team pkts to other robots
+  for (int j = 1; j <= WO_OPPONENT_LAST; j++){
+    // basically we "send" our team packets across this way
+    if(sims_[j] != nullptr && (sims_[i]->team_ == sims_[j]->team_)) {
+      int robotNumber = sims_[i]->self_;
+      int idx = sims_[j]->team_ == TEAM_RED ? j - WO_TEAM_LAST : j;
+      sims_[j]->cache_.team_packets->relayData[robotNumber] = *sent;
+      sims_[j]->cache_.team_packets->frameReceived[robotNumber] = sims_[j]->cache_.frame_info->frame_id;
+      sims_[j]->cache_.team_packets->ballUpdated[robotNumber] = sims_[j]->cache_.frame_info->frame_id;
+      sims_[j]->cache_.team_packets->oppUpdated[robotNumber] = true;
+
+      if (lmode_ && idx != robotNumber) {
+        // Populate world objects for team mate position
+        sims_[j]->cache_.world_object->objects_[robotNumber].loc.x = sent->locData.robotX;
+        sims_[j]->cache_.world_object->objects_[robotNumber].loc.y = sent->locData.robotY;
+        sims_[j]->cache_.world_object->objects_[robotNumber].orientation = sent->locData.orientation();
+
+        sims_[j]->cache_.world_object->objects_[robotNumber].sd.x = sent->locData.robotSDX;
+        sims_[j]->cache_.world_object->objects_[robotNumber].sd.y = sent->locData.robotSDY;
+        sims_[j]->cache_.world_object->objects_[robotNumber].sdOrientation = sent->locData.sdOrient;
+      }
+    }
+  } // for
 }
 
 
@@ -577,45 +613,45 @@ void BehaviorSimulation::simulationStep(){
   std::string oldSimInfo = simInfo;
   simInfo = "";
 
-  physics_.setObjects(worldObjects);
+  physics_.setObjects(gtcache.world_object);
   physics_.step();
-  Point2D ballVel = worldObjects->objects_[WO_BALL].absVel;
-  Point2D ballLoc = worldObjects->objects_[WO_BALL].loc;
+  Point2D ballVel = gtcache.world_object->objects_[WO_BALL].absVel;
+  Point2D ballLoc = gtcache.world_object->objects_[WO_BALL].loc;
   
   stepTimer(ballLoc,ballVel);
 
   stepCheckGoal(ballLoc,ballVel);
   stepCheckBounds(ballLoc,ballVel);
-  stepCheckBallCollisions(ballLoc,ballVel);
+  //stepCheckBallCollisions(ballLoc,ballVel); // let the physics simulator do this
 
   // save new loc and vel back to wo
-  worldObjects->objects_[WO_BALL].absVel = ballVel;
-  worldObjects->objects_[WO_BALL].loc = ballLoc;
+  gtcache.world_object->objects_[WO_BALL].absVel = ballVel;
+  gtcache.world_object->objects_[WO_BALL].loc = ballLoc;
 
 
   // step the simulation ahead
   for (int i = WO_PLAYERS_FIRST; i <= WO_ROBOTS_LAST; i++){
-    if (sims[i] == NULL || !simActive[i])
+    if(sims_[i] == nullptr)
       continue;
     stepPlayerFallen(i);
     stepPlayerBounds(i);
-    bool kicked = sims[i]->processFrame(worldObjects,gameState);
+    bool kicked = sims_[i]->processFrame(gtcache.world_object,gtcache.game_state);
     if (kicked)
       stepPlayerKick(i);
 
     // get updates of where we are and where ball is, and update other bots with it
     // get new ball location
-    ballLoc = worldObjects->objects_[WO_BALL].loc;
-    ballVel = worldObjects->objects_[WO_BALL].absVel;
+    ballLoc = gtcache.world_object->objects_[WO_BALL].loc;
+    ballVel = gtcache.world_object->objects_[WO_BALL].absVel;
     // get new robot location
-    WorldObject* robot = &(worldObjects->objects_[i]);
+    WorldObject* robot = &(gtcache.world_object->objects_[i]);
     if(i == WO_TEAM_COACH) {
-      auto& srobot = sims[i]->cache_.world_object->objects_[i];
+      auto& srobot = sims_[i]->cache_.world_object->objects_[i];
       robot->loc = srobot.loc;
       robot->height = srobot.height;
       robot->orientation = srobot.orientation;
     } else {
-      stepPlayerBumpBall(i,ballLoc,ballVel,robot);
+      //stepPlayerBumpBall(i,ballLoc,ballVel,robot); // let the physics simulator do this
       stepPlayerPenaltyBox(i,robot);
       stepPlayerCollisions(i,robot);
       stepPlayerComm(i);
@@ -638,35 +674,33 @@ void BehaviorSimulation::getTeamSignAndSelf(int i, int &teamsign, int &self) {
 }
 
 void BehaviorSimulation::setObjectFromPose(int i, int teamsign, const Pose2D *pose) {
-  worldObjects->objects_[i].loc.x = teamsign * pose->translation.x;
-  worldObjects->objects_[i].loc.y = teamsign * pose->translation.y;
+  gtcache.world_object->objects_[i].loc.x = teamsign * pose->translation.x;
+  gtcache.world_object->objects_[i].loc.y = teamsign * pose->translation.y;
   if (teamsign > 0) {
-    worldObjects->objects_[i].orientation = pose->rotation;
+    gtcache.world_object->objects_[i].orientation = pose->rotation;
   } else {
-    worldObjects->objects_[i].orientation = normalizeAngle(M_PI + pose->rotation);
+    gtcache.world_object->objects_[i].orientation = normalizeAngle(M_PI + pose->rotation);
   }
 }
 
 std::vector<std::string> BehaviorSimulation::getTextDebug(int index){
-  if (index < 1 || index > 8 || !simActive[index]){
-    std::vector<std::string> emptytext;
-    return emptytext;
-  }
-  return sims[index]->getTextDebug();
+  if(index < 1 || index >= sims_.size())
+    return vector<string>();
+  return sims_[index]->getTextDebug();
 }
 
 void BehaviorSimulation::changeSimulationState(State state){
-  gameState->setState(state);
+  gtcache.game_state->setState(state);
   ballClearedFromCircle = false;
 
   if (state == SET && !simPenaltyKick){
-    worldObjects->objects_[WO_BALL].loc = Point2D(0,0);
-    worldObjects->objects_[WO_BALL].absVel = Point2D(0,0);
+    gtcache.world_object->objects_[WO_BALL].loc = Point2D(0,0);
+    gtcache.world_object->objects_[WO_BALL].absVel = Point2D(0,0);
     // check positions
     //int blueCircleCount = 0;
     //int redCircleCount = 0;
     for (int i = WO_OPPONENT_LAST; i > 0; i--){
-      if (!simActive[i]) continue;
+      if(sims_[i] == nullptr) continue;
       bool manual = false;
       float xLineKick = -50;
 
@@ -674,48 +708,48 @@ void BehaviorSimulation::changeSimulationState(State state){
         float xLine = xLineKick;
 
         // past x barrier
-        if (worldObjects->objects_[i].loc.x > xLine){
+        if (gtcache.world_object->objects_[i].loc.x > xLine){
           manual = true;
         }
         // robot inside circle if not our kickoff
-        if (worldObjects->objects_[i].loc.getMagnitude() < CIRCLE_RADIUS){
-          if (!gameState->ourKickOff)
+        if (gtcache.world_object->objects_[i].loc.getMagnitude() < CIRCLE_RADIUS){
+          if (!gtcache.game_state->ourKickOff)
             manual = true;
         }
         // keeper not in box
-        if (i == 1 && (worldObjects->objects_[i].loc.x > (-FIELD_X/2.0 + PENALTY_X) || fabs(worldObjects->objects_[i].loc.y) > (PENALTY_Y/2.0))){
+        if (i == 1 && (gtcache.world_object->objects_[i].loc.x > (-FIELD_X/2.0 + PENALTY_X) || fabs(gtcache.world_object->objects_[i].loc.y) > (PENALTY_Y/2.0))){
           manual = true;
         }
         // other player in box
-        if (i != 1 && (worldObjects->objects_[i].loc.x < (-FIELD_X/2.0 + PENALTY_X) && fabs(worldObjects->objects_[i].loc.y) < (PENALTY_Y/2.0))){
+        if (i != 1 && (gtcache.world_object->objects_[i].loc.x < (-FIELD_X/2.0 + PENALTY_X) && fabs(gtcache.world_object->objects_[i].loc.y) < (PENALTY_Y/2.0))){
           manual = true;
         }
         // off field
-        if (fabs(worldObjects->objects_[i].loc.x) > (FIELD_X/2.0) || fabs(worldObjects->objects_[i].loc.y) > (FIELD_Y/2.0)){
+        if (fabs(gtcache.world_object->objects_[i].loc.x) > (FIELD_X/2.0) || fabs(gtcache.world_object->objects_[i].loc.y) > (FIELD_Y/2.0)){
           manual = true;
         }
       } else { // team red
         float xLine = -xLineKick;
 
         // past x barrier
-        if (worldObjects->objects_[i].loc.x < xLine){
+        if (gtcache.world_object->objects_[i].loc.x < xLine){
           manual = true;
         }
         // robot inside circle and not our kickoff
-        if (worldObjects->objects_[i].loc.getMagnitude() < CIRCLE_RADIUS){
-          if (gameState->ourKickOff)
+        if (gtcache.world_object->objects_[i].loc.getMagnitude() < CIRCLE_RADIUS){
+          if (gtcache.game_state->ourKickOff)
             manual = true;
         }
         // keeper not in box
-        if (i == WO_OPPONENT_FIRST && (worldObjects->objects_[i].loc.x < (FIELD_X/2.0 - PENALTY_X) || fabs(worldObjects->objects_[i].loc.y) > (PENALTY_Y/2.0))){
+        if (i == WO_OPPONENT_FIRST && (gtcache.world_object->objects_[i].loc.x < (FIELD_X/2.0 - PENALTY_X) || fabs(gtcache.world_object->objects_[i].loc.y) > (PENALTY_Y/2.0))){
           manual = true;
         }
         // other player in box
-        if (i != WO_OPPONENT_FIRST && (worldObjects->objects_[i].loc.x > (FIELD_X/2.0 - PENALTY_X) && fabs(worldObjects->objects_[i].loc.y) < (PENALTY_Y/2.0))){
+        if (i != WO_OPPONENT_FIRST && (gtcache.world_object->objects_[i].loc.x > (FIELD_X/2.0 - PENALTY_X) && fabs(gtcache.world_object->objects_[i].loc.y) < (PENALTY_Y/2.0))){
           manual = true;
         }
         // off field
-        if (fabs(worldObjects->objects_[i].loc.x) > (FIELD_X/2.0) || fabs(worldObjects->objects_[i].loc.y) > (FIELD_Y/2.0)){
+        if (fabs(gtcache.world_object->objects_[i].loc.x) > (FIELD_X/2.0) || fabs(gtcache.world_object->objects_[i].loc.y) > (FIELD_Y/2.0)){
           manual = true;
         }
       } // team
@@ -732,8 +766,8 @@ void BehaviorSimulation::changeSimulationState(State state){
         getTeamSignAndSelf(i,teamsign,self);
         
         const Pose2D *pose;
-        if (((i <= WO_TEAM_LAST) &&  gameState->ourKickOff) ||
-            ((i >  WO_TEAM_LAST) && !gameState->ourKickOff)) {
+        if (((i <= WO_TEAM_LAST) &&  gtcache.game_state->ourKickOff) ||
+            ((i >  WO_TEAM_LAST) && !gtcache.game_state->ourKickOff)) {
           if (forceDesiredPositions)
             pose = RobotPositions::ourKickoffPosesDesired + self;
           else
@@ -747,28 +781,28 @@ void BehaviorSimulation::changeSimulationState(State state){
         setObjectFromPose(i,teamsign,pose);
 /*
         if (i == WO_TEAM_FIRST || i == WO_OPPONENT_FIRST)
-          worldObjects->objects_[i].loc = Point2D(-FIELD_X/2.0, 0);
-        if ((i < 5 && gameState->ourKickOff) || (i > 4 && !gameState->ourKickOff)){
+          gtcache.world_object->objects_[i].loc = Point2D(-FIELD_X/2.0, 0);
+        if ((i < 5 && gtcache.game_state->ourKickOff) || (i > 4 && !gtcache.game_state->ourKickOff)){
           if (i == 2 || i == 6)
-            worldObjects->objects_[i].loc = Point2D(-PENALTY_CROSS_X, GOAL_Y/2.0);
+            gtcache.world_object->objects_[i].loc = Point2D(-PENALTY_CROSS_X, GOAL_Y/2.0);
           if (i == 3 || i == 7)
-            worldObjects->objects_[i].loc = Point2D(-FIELD_X/2.0+PENALTY_X+200, -PENALTY_Y/2.0);
+            gtcache.world_object->objects_[i].loc = Point2D(-FIELD_X/2.0+PENALTY_X+200, -PENALTY_Y/2.0);
           if (i == 4 || i == 8)
-            worldObjects->objects_[i].loc = Point2D(-CIRCLE_RADIUS-100, 0);
+            gtcache.world_object->objects_[i].loc = Point2D(-CIRCLE_RADIUS-100, 0);
         } else {
           // their kickoff
           float xPos = -FIELD_X/2.0+PENALTY_X+200;
           if (i == 2 || i == 6)
-            worldObjects->objects_[i].loc = Point2D(xPos, (FIELD_Y+PENALTY_Y)/4.0);
+            gtcache.world_object->objects_[i].loc = Point2D(xPos, (FIELD_Y+PENALTY_Y)/4.0);
           if (i == 3 || i == 7)
-            worldObjects->objects_[i].loc = Point2D(xPos, (FIELD_Y+PENALTY_Y)/-4.0);
+            gtcache.world_object->objects_[i].loc = Point2D(xPos, (FIELD_Y+PENALTY_Y)/-4.0);
           if (i == 4 || i == 8)
-            worldObjects->objects_[i].loc = Point2D(xPos, GOAL_Y/2.0);
+            gtcache.world_object->objects_[i].loc = Point2D(xPos, GOAL_Y/2.0);
         }
 
         if (i > 4){
-          worldObjects->objects_[i].loc = -worldObjects->objects_[i].loc;
-          worldObjects->objects_[i].orientation = M_PI;
+          gtcache.world_object->objects_[i].loc = -gtcache.world_object->objects_[i].loc;
+          gtcache.world_object->objects_[i].orientation = M_PI;
         }
 */
       } // manual
@@ -776,9 +810,9 @@ void BehaviorSimulation::changeSimulationState(State state){
   }
 
   simTimer = 45.0;
-  if (gameState->state() == SET){
+  if (gtcache.game_state->state() == SET){
     simTimer = 5.0;
-  } else if (gameState->state() == PLAYING){
+  } else if (gtcache.game_state->state() == PLAYING){
     if (simPenaltyKick){
       simTimer = 60.0;
       halfTimer = 60.0;
@@ -787,10 +821,10 @@ void BehaviorSimulation::changeSimulationState(State state){
     }
   }
 
-  if (gameState->state() == INITIAL){
+  if (gtcache.game_state->state() == INITIAL){
     for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
-      if (sims[i] != NULL && simActive[i])
-        sims[i]->resetCounters();
+      if(sims_[i] != nullptr)
+        sims_[i]->resetCounters();
     }
   }
   forceManualPositions = false;
@@ -800,45 +834,49 @@ void BehaviorSimulation::changeSimulationState(State state){
 
 void BehaviorSimulation::moveRobot(int index, AngRad rotation, Point2D translation){
   if (index < 1 || index > WO_OPPONENT_LAST) return;
-  WorldObject* robot = &(worldObjects->objects_[index]);
+  WorldObject* robot = &(gtcache.world_object->objects_[index]);
   robot->loc += translation;
   robot->orientation += rotation;
 }
 
-void BehaviorSimulation::moveBall(Point2D movement){
+void BehaviorSimulation::moveBall(Point2D pos){
+  WorldObject* ball = &(gtcache.world_object->objects_[WO_BALL]);
+  ball->loc = pos;
+}
 
-  WorldObject* ball = &(worldObjects->objects_[WO_BALL]);
-  ball->loc += movement;
+void BehaviorSimulation::teleportBall(Point2D pos){
+  WorldObject* ball = &(gtcache.world_object->objects_[WO_BALL]);
+  ball->loc = pos;
 }
 
 void BehaviorSimulation::changeSimulationKickoff(){
-  gameState->ourKickOff = !gameState->ourKickOff;
+  gtcache.game_state->ourKickOff = !gtcache.game_state->ourKickOff;
 }
 
 void BehaviorSimulation::restartSimulationInterpreter(){
   for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
-    if (sims[i] == NULL || !simActive[i]) continue;
-    sims[i]->core->interpreter_->restart();
+    if(sims_[i] == nullptr) continue;
+    sims_[i]->core->interpreter_->restart();
   }
 }
 
 void BehaviorSimulation::setSimScore(bool blue){
   if (blue) simBlueScore++;
   else simRedScore++;
-  gameState->ourScore = simBlueScore;
-  gameState->opponentScore = simRedScore;
+  gtcache.game_state->ourScore = simBlueScore;
+  gtcache.game_state->opponentScore = simRedScore;
 }
 
 
 void BehaviorSimulation::setPenalty(int index){
   if (index < 1 || index > WO_OPPONENT_LAST) return;
-  sims[index]->setPenalty(worldObjects);
+  sims_[index]->setPenalty(gtcache.world_object);
 }
 
 void BehaviorSimulation::flipRobot(int index){
   if (index < 1 || index > WO_OPPONENT_LAST) return;
-  worldObjects->objects_[index].loc = -worldObjects->objects_[index].loc;
-  worldObjects->objects_[index].orientation = normalizeAngle(worldObjects->objects_[index].orientation + M_PI);
+  gtcache.world_object->objects_[index].loc = -gtcache.world_object->objects_[index].loc;
+  gtcache.world_object->objects_[index].orientation = normalizeAngle(gtcache.world_object->objects_[index].orientation + M_PI);
 }
 
 std::string BehaviorSimulation::getSimInfo(){
@@ -846,17 +884,16 @@ std::string BehaviorSimulation::getSimInfo(){
 }
 
 void BehaviorSimulation::setFallen(int index){
-  if (index < 1 || index > WO_OPPONENT_LAST) return;
-  if (sims[index] == NULL || !simActive[index]) return;
+  if(index < 1 || index >= sims_.size()) return;
+  if(sims_[index] == nullptr) return;
 
-
-  sims[index]->setFallen();
+  sims_[index]->setFallen();
 }
 
 void BehaviorSimulation::kickBall(){
-  WorldObject* ball = &(worldObjects->objects_[WO_BALL]);
+  WorldObject* ball = &(gtcache.world_object->objects_[WO_BALL]);
   // random target within goal
-  float targetY = rand_.sampleU(-.5,.5) * 1400;
+  float targetY = Random::inst().sampleU(-.5,.5) * 1400;
   float targetX = -3000;
   if (ball->loc.x > 0){
     targetX = 3000;
@@ -869,19 +906,19 @@ void BehaviorSimulation::kickBall(){
 int BehaviorSimulation::checkLocalizationErrors(){
   PRINT = true;
 
-  for (int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
-    if (!simActive[i] || sims[i] == NULL) continue;
-    sims[i]->PRINT = true;
+  for(int i = WO_PLAYERS_FIRST; i <= WO_PLAYERS_LAST; i++){
+    if(sims_[i] == nullptr) continue;
+    sims_[i]->PRINT = true;
 
     // not while the robot is getting up
-    if (sims[i]->cache_.odometry->getting_up_side_ != Getup::NONE) continue;
+    if (sims_[i]->cache_.odometry->getting_up_side_ != Getup::NONE) continue;
     // not if penalized
-    if (sims[i]->cache_.game_state->state() == PENALISED) continue;
+    if (sims_[i]->cache_.game_state->state() == PENALISED) continue;
     // not in set if keeper
-    if (sims[i]->cache_.game_state->state() == SET && sims[i]->self_ == 1) continue;
+    if (sims_[i]->cache_.game_state->state() == SET && sims_[i]->self_ == 1) continue;
 
-    WorldObject* trueRobot = &(worldObjects->objects_[i]);
-    WorldObject* belRobot = &(sims[i]->cache_.world_object->objects_[sims[i]->self_]);
+    WorldObject* trueRobot = &(gtcache.world_object->objects_[i]);
+    WorldObject* belRobot = &(sims_[i]->cache_.world_object->objects_[sims_[i]->self_]);
 
     float distance, orient;
     if (i < WO_OPPONENT_FIRST){
@@ -917,18 +954,16 @@ void BehaviorSimulation::runParamTests(){
     // set all players with this diff
     for (int i = WO_OPPONENT_FIRST; i <= WO_OPPONENT_LAST; i++){
       cout << "i is " << i << endl;
-      if (sims[i] == NULL || !simActive[i]) continue;
+      if(sims_[i] == nullptr) continue;
       cout << " and setting " << i << endl;
-      sims[i]->PRINT = false;
+      sims_[i]->PRINT = false;
       // modify parameters
-      sims[i]->cache_.behavior_params->mainStrategy.maxArcAngle += diff;
-      // restart lua
-      //sims[i]->restart();
+      sims_[i]->cache_.behavior_params->mainStrategy.maxArcAngle += diff;
+      //sims_[i]->restart();
     }
 
     // run param test
     runParamTest();
-
   }
 }
 
@@ -968,13 +1003,13 @@ void BehaviorSimulation::runKickTests(){
     // set all red players with this behavior
     for (int i = WO_OPPONENT_FIRST; i <= WO_OPPONENT_LAST; i++){
       cout << "i is " << i << endl;
-      if (sims[i] == NULL || !simActive[i]) continue;
+      if(sims_[i] == nullptr) continue;
       cout << " and setting " << i << endl;
-      sims[i]->PRINT = false;
+      sims_[i]->PRINT = false;
 
       // set equal to blue kick strategy
-      sims[i]->cache_.behavior_params->mainStrategy = sims[1]->cache_.behavior_params->mainStrategy;
-      sims[i]->cache_.behavior_params->clusterStrategy = sims[1]->cache_.behavior_params->clusterStrategy;
+      sims_[i]->cache_.behavior_params->mainStrategy = sims_[1]->cache_.behavior_params->mainStrategy;
+      sims_[i]->cache_.behavior_params->clusterStrategy = sims_[1]->cache_.behavior_params->clusterStrategy;
 
 
       switch(test){
@@ -984,7 +1019,7 @@ void BehaviorSimulation::runKickTests(){
       case 0:
         {
           cout << endl << "Test " << test << ": Use side kick cluster strategy" << endl << endl;
-          sims[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::SIDEKICK;
+          sims_[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::SIDEKICK;
           break;
         }
 
@@ -992,7 +1027,7 @@ void BehaviorSimulation::runKickTests(){
       case 1:
         {
           cout << endl << "Test " << test << ": Use dribble cluster strategy" << endl << endl;
-          sims[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::DRIBBLE;
+          sims_[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::DRIBBLE;
           break;
         }
 
@@ -1000,7 +1035,7 @@ void BehaviorSimulation::runKickTests(){
       case 2:
         {
           cout << endl << "Test " << test << ": Use no cluster strategy" << endl << endl;
-          sims[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::NONE;
+          sims_[i]->cache_.behavior_params->clusterStrategy.behavior = Cluster::NONE;
           break;
         }
 
@@ -1010,11 +1045,11 @@ void BehaviorSimulation::runKickTests(){
       case 3:
         {
           cout << endl << "Test " << test << ": Use all angle kicks (med, long, goal, pass)" << endl << endl;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass4Kick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass3Kick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass2Kick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass4Kick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass3Kick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdPass2Kick] = true;
           break;
         }
 
@@ -1023,8 +1058,8 @@ void BehaviorSimulation::runKickTests(){
         {
           cout << endl << "Test " << test << ": Use goal gap kicks" << endl << endl;
 
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
           break;
         }
 
@@ -1032,8 +1067,8 @@ void BehaviorSimulation::runKickTests(){
       case 5:
         {
           cout << endl << "Test " << test << ": Use all angle kicks except passes (fwd, med, goal)" << endl << endl;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongLargeGapKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdLongSmallGapKick] = true;
           break;
         }
 
@@ -1042,7 +1077,7 @@ void BehaviorSimulation::runKickTests(){
         {
           cout << endl << "Test " << test << ": Use short fwd kick" << endl << endl;
 
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdShortStraightKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdShortStraightKick] = true;
           break;
         }
 
@@ -1051,15 +1086,15 @@ void BehaviorSimulation::runKickTests(){
         {
           cout << endl << "Test " << test << ": Use only dribble strategy" << endl << endl;
 
-          sims[i]->cache_.behavior_params->mainStrategy = cfgDribbleStrategy;
+          sims_[i]->cache_.behavior_params->mainStrategy = cfgDribbleStrategy;
           break;
         }
         // 8 enable side kicks normally
       case 8:
         {
           cout << endl << "Test " << test << ": Use fast side kicks in normal strategy" << endl << endl;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickLeftwardSide] = true;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickRightwardSide] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickLeftwardSide] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickRightwardSide] = true;
           break;
         }
         // 7 change kick distances
@@ -1067,7 +1102,7 @@ void BehaviorSimulation::runKickTests(){
         {
           cout << endl << "Test " << test << ": Use add kick between med and long" << endl << endl;
 
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdShortStraightKick] = true;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[FwdShortStraightKick] = true;
 
           break;
         }
@@ -1076,8 +1111,8 @@ void BehaviorSimulation::runKickTests(){
         {
           cout << endl << "Test " << test << ": No quick angle kicks" << endl << endl;
 
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickLeftward] = false;
-          sims[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickRightward] = false;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickLeftward] = false;
+          sims_[i]->cache_.behavior_params->mainStrategy.usableKicks[WalkKickRightward] = false;
 
 
           break;
@@ -1111,7 +1146,7 @@ void BehaviorSimulation::runKickTests(){
       case 12:
         {
           cout << "Player " << i << " setting opponent Width to 50" << endl;
-          sims[i]->cache_.behavior_params->mainStrategy.opponentWidth = 50;
+          sims_[i]->cache_.behavior_params->mainStrategy.opponentWidth = 50;
           break;
         }
           
@@ -1142,36 +1177,55 @@ void BehaviorSimulation::runParamTest(){
   simTimer = 45;
   halfTimer = 655;
   changeSimulationState(INITIAL);
-  gameState->setState(INITIAL);
+  gtcache.game_state->setState(INITIAL);
   simTimer = 5.0;
   while (numHalves < 80)
     simulationStep();
 }
 
 void BehaviorSimulation::restart() {
-  for (int i = WO_TEAM_FIRST; i <= WO_OPPONENT_LAST; i++) {
-    if ((sims[i] != NULL) && simActive[i]) {
-      sims[i]->core->interpreter_->restart();
-    }
-  }
+  for(auto& s : sims_)
+    if(s != nullptr)
+      s->core->interpreter_->restart();
 }
 
-MemoryCache BehaviorSimulation::getGtMemoryCache(int player) {
+MemoryCache BehaviorSimulation::getGtMemoryCache(int player) const {
   if(player == 0) {
-    return MemoryCache(memory_);
+    return MemoryCache(memory_.get());
   }
-  if(!simActive[player]) {
+  if(sims_[player] == nullptr) {
     std::cerr << "Invalid player memory cache requested: " << player << "\n";
     return MemoryCache();
   }
-  return sims[player]->getMemoryCache();
+  return sims_[player]->getMemoryCache();
 }
 
-MemoryCache BehaviorSimulation::getBeliefMemoryCache(int player) {
-  if(player == 0 && currentSim > 0) return sims[currentSim]->getMemoryCache();
+MemoryCache BehaviorSimulation::getBeliefMemoryCache(int player) const {
+  if(player == 0 && currentSim > 0) return sims_[currentSim]->getMemoryCache();
   else return getGtMemoryCache(player);
 }
 
 bool BehaviorSimulation::complete() {
-  return gameState->secsRemaining <= 0;
+  return gtcache.game_state->secsRemaining <= 0;
+}
+
+int BehaviorSimulation::defaultPlayer() const {
+  int player = 0;
+  for(int i = 0; i < sims_.size(); i++) {
+    if(sims_[i] != nullptr) {
+      player = i; break;
+    }
+  }
+  return 0;
+}
+
+std::vector<int> BehaviorSimulation::activePlayers() const {
+  std::vector<int> active;
+  for(int i = 0; i < sims_.size(); i++) {
+    if(sims_[i] != nullptr) {
+      active.push_back(i);
+    }
+  }
+  return active;
+
 }

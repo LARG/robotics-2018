@@ -110,14 +110,14 @@ void MotionGLWidget::draw() {
   // we'll always want a body model
 
   // various versions of the stick figure based on different data
-  //if (displayOptions[SHOWBODYMODEL]) drawBodyModel(body_model_, Colors::LightOrange);
-  //if (displayOptions[SHOWJOINTVALUESMODEL]) drawBodyModelFromJointValues();
-  //if (displayOptions[SHOWJOINTCOMMANDSMODEL]) drawBodyModelFromJointCommands();
+  //if (displayOptions[SHOW_BODYMODEL]) drawBodyModel(body_model_, Colors::LightOrange);
+  //if (displayOptions[SHOW_JOINTVALUESMODEL]) drawBodyModelFromJointValues();
+  //if (displayOptions[SHOW_JOINTCOMMANDSMODEL]) drawBodyModelFromJointCommands();
   if (useKeyframes_) drawBodyModelFromKeyframe(lastKeyframe_);
   else drawBodyModelFromJointValues();
 
   // step placement
-  if (displayOptions[SHOWSTEPS]) drawSteps();
+  if (displayOptions[SHOW_STEPS]) drawSteps();
 
   // ZMP trajectories
   if (walk_engine_ != NULL){
@@ -128,47 +128,47 @@ void MotionGLWidget::draw() {
       timeInc = 1.0/50.0;
 
     // show ref trajectory
-    if (displayOptions[SHOWZMPREF]) drawZmpTrajectory(Colors::Green, walk_engine_->zmp_ref_);
+    if (displayOptions[SHOW_ZMPREF]) drawZmpTrajectory(Colors::Green, walk_engine_->zmp_ref_);
     // show current
-    if (displayOptions[SHOWCURRENTZMP]) drawZmp(Colors::Orange, walk_engine_->current_state_.zmp_, 0);
+    if (displayOptions[SHOW_CURRENTZMP]) drawZmp(Colors::Orange, walk_engine_->current_state_.zmp_, 0);
     // show desired next
-    if (displayOptions[SHOWDESIREDZMP]) drawZmp(Colors::Pink, walk_engine_->desired_next_state_.zmp_, timeInc);
+    if (displayOptions[SHOW_DESIREDZMP]) drawZmp(Colors::Pink, walk_engine_->desired_next_state_.zmp_, timeInc);
     // show sensed
-    if (displayOptions[SHOWSENSEDZMP]) drawZmp(Colors::Yellow, walk_engine_->sensor_zmp_, 0);
+    if (displayOptions[SHOW_SENSEDZMP]) drawZmp(Colors::Yellow, walk_engine_->sensor_zmp_, 0);
 
     // show state com
-    if (displayOptions[SHOWCURRENTPEN]) drawPen(Colors::Violet, walk_engine_->current_state_.pen_pos_, 0);
+    if (displayOptions[SHOW_CURRENTPEN]) drawPen(Colors::Violet, walk_engine_->current_state_.pen_pos_, 0);
     // show desired next com
-    if (displayOptions[SHOWDESIREDPEN]) drawPen(Colors::Gray, walk_engine_->desired_next_state_.pen_pos_, timeInc);
+    if (displayOptions[SHOW_DESIREDPEN]) drawPen(Colors::Gray, walk_engine_->desired_next_state_.pen_pos_, timeInc);
   }
 
   // swing foot
-  if (displayOptions[SHOWSWINGFOOT])drawSwingFoot();
+  if (displayOptions[SHOW_SWINGFOOT])drawSwingFoot();
 
   // abs feet
-  if (displayOptions[SHOWABSFEETTARGETS]) drawAbsFeetTargets();
+  if (displayOptions[SHOW_ABSFEETTARGETS]) drawAbsFeetTargets();
 
   // target point
-  if (displayOptions[SHOWTARGETPT]) drawTargetPoint();
+  if (displayOptions[SHOW_TARGETPT]) drawTargetPoint();
 
   // various text overlays
-  if (displayOptions[SHOWSENSORSTEXT]) textSensors();
-  if (displayOptions[SHOWWALKTEXT]) textWalk();
-  if (displayOptions[SHOWFRAMETEXT]) textFrame();
-  if (displayOptions[SHOWWALKREQUESTTEXT]) textWalkRequest();
-  if (displayOptions[SHOWSTEPSTEXT]) textSteps();
-  if (displayOptions[SHOWZMPPENTEXT]) textZmpCom();
-  if (displayOptions[SHOWFEETTEXT]) textFeet();
-  if (displayOptions[SHOWODOMETRYTEXT]) textOdometry();
+  if (displayOptions[SHOW_SENSORSTEXT]) textSensors();
+  if (displayOptions[SHOW_WALKTEXT]) textWalk();
+  if (displayOptions[SHOW_FRAMETEXT]) textFrame();
+  if (displayOptions[SHOW_WALKREQUESTTEXT]) textWalkRequest();
+  if (displayOptions[SHOW_STEPSTEXT]) textSteps();
+  if (displayOptions[SHOW_ZMPPENTEXT]) textZmpCom();
+  if (displayOptions[SHOW_FEETTEXT]) textFeet();
+  if (displayOptions[SHOW_ODOMETRYTEXT]) textOdometry();
 
   // kick foot targets
-  if (displayOptions[SHOWKICKFOOTTARGET]) drawKickFootTarget();
-  if (displayOptions[SHOWKICKSPLINE]) drawKickSpline();
+  if (displayOptions[SHOW_KICKFOOTTARGET]) drawKickFootTarget();
+  if (displayOptions[SHOW_KICKSPLINE]) drawKickSpline();
 
   // kick text overlays
-  if (displayOptions[SHOWKICKREQUESTTEXT]) textKickRequest();
-  if (displayOptions[SHOWKICKTARGETTEXT]) textKickFeetTargets();
-  if (displayOptions[SHOWKICKINFO]) textKickInfo();
+  if (displayOptions[SHOW_KICKREQUESTTEXT]) textKickRequest();
+  if (displayOptions[SHOW_KICKTARGETTEXT]) textKickFeetTargets();
+  if (displayOptions[SHOW_KICKINFO]) textKickInfo();
 
 
 }
@@ -1111,119 +1111,119 @@ void MotionGLWidget::setMode(int mode){
 
   if (currentMode == BODYMODELMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWBODYMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
+    displayOptions[SHOW_BODYMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
     emit modeChanged("Body Model Figure");
   } else if (currentMode == JOINTVALUESMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
     emit modeChanged("Joint Values Figure");
   } else if (currentMode == JOINTCOMMANDSMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
     emit modeChanged("Joint Commands Figure");
   } else if (currentMode == GETUPSIMMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
     emit modeChanged("Getup Sim");
   } else if (currentMode == WALKSIMMODE) {
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
-    displayOptions[SHOWSTEPS] = true;
-    displayOptions[SHOWSTEPSTEXT] = true;
-    displayOptions[SHOWZMPREF] = true;
-    displayOptions[SHOWCURRENTZMP] = true;
-    displayOptions[SHOWDESIREDZMP] = true;
-    displayOptions[SHOWSENSEDZMP] = true;
-    displayOptions[SHOWCURRENTPEN] = true;
-    displayOptions[SHOWDESIREDPEN] = true;
-    displayOptions[SHOWZMPPENTEXT] = true;
-    displayOptions[SHOWSWINGFOOT] = true;
-    displayOptions[SHOWFEETTEXT] = true;
-    displayOptions[SHOWODOMETRYTEXT] = true;
-    displayOptions[SHOWTARGETPT] = true;
-    //   displayOptions[SHOWABSFEETTARGETS] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
+    displayOptions[SHOW_STEPS] = true;
+    displayOptions[SHOW_STEPSTEXT] = true;
+    displayOptions[SHOW_ZMPREF] = true;
+    displayOptions[SHOW_CURRENTZMP] = true;
+    displayOptions[SHOW_DESIREDZMP] = true;
+    displayOptions[SHOW_SENSEDZMP] = true;
+    displayOptions[SHOW_CURRENTPEN] = true;
+    displayOptions[SHOW_DESIREDPEN] = true;
+    displayOptions[SHOW_ZMPPENTEXT] = true;
+    displayOptions[SHOW_SWINGFOOT] = true;
+    displayOptions[SHOW_FEETTEXT] = true;
+    displayOptions[SHOW_ODOMETRYTEXT] = true;
+    displayOptions[SHOW_TARGETPT] = true;
+    //   displayOptions[SHOW_ABSFEETTARGETS] = true;
     emit modeChanged("Walk Simulation");
   } else if (currentMode == WALKMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWSENSORSTEXT] = true;
-    displayOptions[SHOWWALKTEXT] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWWALKREQUESTTEXT] = true;
-    displayOptions[SHOWSTEPS] = true;
-    displayOptions[SHOWSTEPSTEXT] = true;
-    displayOptions[SHOWZMPREF] = true;
-    displayOptions[SHOWCURRENTZMP] = true;
-    displayOptions[SHOWDESIREDZMP] = true;
-    displayOptions[SHOWSENSEDZMP] = true;
-    displayOptions[SHOWCURRENTPEN] = true;
-    displayOptions[SHOWDESIREDPEN] = true;
-    displayOptions[SHOWZMPPENTEXT] = true;
-    displayOptions[SHOWSWINGFOOT] = true;
-    displayOptions[SHOWFEETTEXT] = true;
-    displayOptions[SHOWODOMETRYTEXT] = true;
-    displayOptions[SHOWTARGETPT] = true;
-    //    displayOptions[SHOWABSFEETTARGETS] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_SENSORSTEXT] = true;
+    displayOptions[SHOW_WALKTEXT] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_WALKREQUESTTEXT] = true;
+    displayOptions[SHOW_STEPS] = true;
+    displayOptions[SHOW_STEPSTEXT] = true;
+    displayOptions[SHOW_ZMPREF] = true;
+    displayOptions[SHOW_CURRENTZMP] = true;
+    displayOptions[SHOW_DESIREDZMP] = true;
+    displayOptions[SHOW_SENSEDZMP] = true;
+    displayOptions[SHOW_CURRENTPEN] = true;
+    displayOptions[SHOW_DESIREDPEN] = true;
+    displayOptions[SHOW_ZMPPENTEXT] = true;
+    displayOptions[SHOW_SWINGFOOT] = true;
+    displayOptions[SHOW_FEETTEXT] = true;
+    displayOptions[SHOW_ODOMETRYTEXT] = true;
+    displayOptions[SHOW_TARGETPT] = true;
+    //    displayOptions[SHOW_ABSFEETTARGETS] = true;
     emit modeChanged("Walk Mode");
   } else if (currentMode == KICKMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWKICKREQUESTTEXT] = true;
-    displayOptions[SHOWKICKFOOTTARGET] = true;
-    displayOptions[SHOWKICKTARGETTEXT] = true;
-    displayOptions[SHOWKICKINFO] = true;
-    displayOptions[SHOWKICKSPLINE] = true;
-    //    displayOptions[SHOWABSFEETTARGETS] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_KICKREQUESTTEXT] = true;
+    displayOptions[SHOW_KICKFOOTTARGET] = true;
+    displayOptions[SHOW_KICKTARGETTEXT] = true;
+    displayOptions[SHOW_KICKINFO] = true;
+    displayOptions[SHOW_KICKSPLINE] = true;
+    //    displayOptions[SHOW_ABSFEETTARGETS] = true;
     emit modeChanged("Kick Mode");
   } else if (currentMode == KICKSIMMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWFRAMETEXT] = true;
-    displayOptions[SHOWKICKREQUESTTEXT] = true;
-    displayOptions[SHOWKICKFOOTTARGET] = true;
-    displayOptions[SHOWKICKTARGETTEXT] = true;
-    displayOptions[SHOWKICKINFO] = true;
-    displayOptions[SHOWKICKSPLINE] = true;
-    //    displayOptions[SHOWABSFEETTARGETS] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_FRAMETEXT] = true;
+    displayOptions[SHOW_KICKREQUESTTEXT] = true;
+    displayOptions[SHOW_KICKFOOTTARGET] = true;
+    displayOptions[SHOW_KICKTARGETTEXT] = true;
+    displayOptions[SHOW_KICKINFO] = true;
+    displayOptions[SHOW_KICKSPLINE] = true;
+    //    displayOptions[SHOW_ABSFEETTARGETS] = true;
     emit modeChanged("Kick Simulation");
   } else if (currentMode == KEYFRAMEMODE){
     setAllDisplayOptions(false);
-    displayOptions[SHOWJOINTVALUESMODEL] = true;
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = true;
-    displayOptions[SHOWSTEPS] = true;
-    displayOptions[SHOWZMPREF] = true;
-    displayOptions[SHOWCURRENTZMP] = true;
-    displayOptions[SHOWDESIREDZMP] = true;
-    displayOptions[SHOWSENSEDZMP] = true;
-    displayOptions[SHOWCURRENTPEN] = true;
-    displayOptions[SHOWDESIREDPEN] = true;
-    displayOptions[SHOWSWINGFOOT] = true;
-    displayOptions[SHOWTARGETPT] = true;
+    displayOptions[SHOW_JOINTVALUESMODEL] = true;
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = true;
+    displayOptions[SHOW_STEPS] = true;
+    displayOptions[SHOW_ZMPREF] = true;
+    displayOptions[SHOW_CURRENTZMP] = true;
+    displayOptions[SHOW_DESIREDZMP] = true;
+    displayOptions[SHOW_SENSEDZMP] = true;
+    displayOptions[SHOW_CURRENTPEN] = true;
+    displayOptions[SHOW_DESIREDPEN] = true;
+    displayOptions[SHOW_SWINGFOOT] = true;
+    displayOptions[SHOW_TARGETPT] = true;
 
   } else {
     setAllDisplayOptions(false);
@@ -1270,24 +1270,24 @@ void MotionGLWidget::keyPressEvent(QKeyEvent *event) {
     // turn things on/off
   case Qt::Key_S:
     if ((currentMode != WALKSIMMODE) && (currentMode != KICKSIMMODE)) {
-      displayOptions[SHOWSTEPS] = !displayOptions[SHOWSTEPS];
+      displayOptions[SHOW_STEPS] = !displayOptions[SHOW_STEPS];
       update();
     }
     break;
   case Qt::Key_B:
-    displayOptions[SHOWBODYMODEL] = !displayOptions[SHOWBODYMODEL];
+    displayOptions[SHOW_BODYMODEL] = !displayOptions[SHOW_BODYMODEL];
     update();
     break;
   case Qt::Key_V:
-    displayOptions[SHOWJOINTVALUESMODEL] = !displayOptions[SHOWJOINTVALUESMODEL];
+    displayOptions[SHOW_JOINTVALUESMODEL] = !displayOptions[SHOW_JOINTVALUESMODEL];
     update();
     break;
   case Qt::Key_C:
-    displayOptions[SHOWJOINTCOMMANDSMODEL] = !displayOptions[SHOWJOINTCOMMANDSMODEL];
+    displayOptions[SHOW_JOINTCOMMANDSMODEL] = !displayOptions[SHOW_JOINTCOMMANDSMODEL];
     update();
     break;
   case Qt::Key_Z:
-    displayOptions[SHOWZMPREF] = !displayOptions[SHOWZMPREF];
+    displayOptions[SHOW_ZMPREF] = !displayOptions[SHOW_ZMPREF];
     update();
     break;
 

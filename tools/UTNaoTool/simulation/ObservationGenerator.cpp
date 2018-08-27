@@ -23,6 +23,7 @@ ObservationGenerator::ObservationGenerator() : iparams_(Camera::TOP) {
   opponent_mem_ = NULL;
   frame_info_ = NULL;
   joint_ = NULL;
+  lconfig_.load(util::cfgpath(util::Modules) + "/localization.yaml");
 }
 
 ObservationGenerator::~ObservationGenerator() {
@@ -71,7 +72,7 @@ void ObservationGenerator::generateBallObservations() {
     float maxDist = 5500.f;
     // Sigmoid shape
     float missedObsRate = min(1.f / (1.f + exp(-(distance/maxDist-.5f)*10.f)), 1.f);
-    float randPct = rand_.sampleU();
+    float randPct = Random::inst().sampleU();
     bool visible = true;
     if(distance > maxDist) visible = false;
     // check for other robots obstructing us
@@ -97,7 +98,7 @@ void ObservationGenerator::generateBallObservations() {
       float diff = joint_->values_[HeadPan] - bearing;
       obsBall.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
       obsBall.imageCenterY = iparams_.height/2.0;
-      float randNoise = rand_.sampleU() - .5;
+      float randNoise = Random::inst().sampleU() - .5;
       obsBall.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.05*distance;
       obsBall.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;
     }
@@ -108,8 +109,9 @@ void ObservationGenerator::generateLineObservations() {
   getSelf(gtSelf,obsSelf,player_);
   int seenLines = 0;
 
-  for (int i = WO_OPP_GOAL_LINE; i <= WO_BOTTOM_SIDE_LINE; i++){
+  for (int i = LINE_OFFSET; i < LINE_OFFSET + NUM_LINES; i++) {
     if (seenLines >= 4) break;
+    if(!lconfig_.use_field_edges && WorldObject::isEdgeObject(i)) continue;
     WorldObject& truthWO = gt_object_->objects_[i];
    
     Line2D visionLine(gtSelf.loc, gtSelf.orientation);
@@ -124,7 +126,7 @@ void ObservationGenerator::generateLineObservations() {
       continue;
 
     float missedObsRate = 1.0/3.0;
-    float randPct = rand_.sampleU();
+    float randPct = Random::inst().sampleU();
     // see lines up to 2.5 m
     if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 2500){
       // seen
@@ -135,9 +137,9 @@ void ObservationGenerator::generateLineObservations() {
       LineSegment vline = truthWO.lineLoc.getVisiblePortion(gtSelf.loc, gtSelf.orientation + pan, FOVx);
       vline = vline.globalToRelative(gtSelf.loc, gtSelf.orientation);
 
-      float xnoise = rand_.sampleU(.95,1.05);
-      float ynoise = rand_.sampleU(.95,1.05);
-      float tnoise = rand_.sampleU(-10 * DEG_T_RAD, 10 * DEG_T_RAD);
+      float xnoise = Random::inst().sampleU(.95,1.05);
+      float ynoise = Random::inst().sampleU(.95,1.05);
+      float tnoise = Random::inst().sampleU(-10 * DEG_T_RAD, 10 * DEG_T_RAD);
       vline.start.x *= xnoise; vline.end.x *= xnoise;
       vline.start.y *= ynoise; vline.end.y *= ynoise;
       vline.computeCenter();
@@ -174,7 +176,7 @@ void ObservationGenerator::generateOpponentObservations() {
     // in FOV
     if (fabs(joint_->values_[HeadPan] - bearing) < FOVx/2.0){
       float missedObsRate = 1.0/5.0;
-      float randPct = rand_.sampleU();
+      float randPct = Random::inst().sampleU();
       // only see opponents between 0.5 and 2.5 meters
       if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance > 500 && distance < 2500){
         // seen
@@ -185,7 +187,7 @@ void ObservationGenerator::generateOpponentObservations() {
         obsWO.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
         obsWO.imageCenterY = iparams_.height/2.0;
         // add distance and bearing noise
-        float randNoise = rand_.sampleU()-0.5;
+        float randNoise = Random::inst().sampleU()-0.5;
         obsWO.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.25*distance;// up to 25% distance error
         obsWO.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 7.0*DEG_T_RAD;// up to 7 deg bearing error
 
@@ -201,7 +203,7 @@ void ObservationGenerator::generateCenterCircleObservations() {
   float distance = gtSelf.loc.getDistanceTo(gtCircle.loc);
   if (isVisible(WO_CENTER_CIRCLE)) {
     float missedObsRate = 1.0/5.0;
-    float randPct = rand_.sampleU();
+    float randPct = Random::inst().sampleU();
     // see circle up to 3 m
     if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 3000){
       // seen
@@ -210,7 +212,7 @@ void ObservationGenerator::generateCenterCircleObservations() {
       obsCircle.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
       obsCircle.imageCenterY = iparams_.height/2.0;
       // add distance and bearing noise
-      float randNoise = rand_.sampleU()-0.5;
+      float randNoise = Random::inst().sampleU()-0.5;
       obsCircle.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.15*distance;// up to 15% distance error
       obsCircle.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;// up to 5 deg bearing error
       obsCircle.visionConfidence = 1.0;
@@ -235,7 +237,7 @@ void ObservationGenerator::generateBeaconObservations() {
     if (isVisible(t)) {
       // Rate of expected misses
       float missedObsRate = 1.0/5.0;
-      float randPct = rand_.sampleU();
+      float randPct = Random::inst().sampleU();
       // Only allow beacons to be seen up to 3 meters away
       if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 3000){
         obsBeacon.seen = true;
@@ -243,7 +245,7 @@ void ObservationGenerator::generateBeaconObservations() {
         obsBeacon.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
         obsBeacon.imageCenterY = iparams_.height/2.0;
         // Add distance and bearing noise
-        float randNoise = rand_.sampleU()-0.5;
+        float randNoise = Random::inst().sampleU()-0.5;
         obsBeacon.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.2*distance;// up to 15% distance error
         obsBeacon.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 10.0*DEG_T_RAD;// up to 5 deg bearing error
         obsBeacon.visionConfidence = 1.0;
@@ -264,7 +266,7 @@ void ObservationGenerator::generateGoalObservations() {
       float missedObsRate = 1.0/10.0;
       if (distance > 3000) 
         missedObsRate = 1.0/3.0;
-      float randPct = rand_.sampleU();
+      float randPct = Random::inst().sampleU();
       if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 7000){
         // seen
         obsPost.seen = true;
@@ -274,7 +276,7 @@ void ObservationGenerator::generateGoalObservations() {
         obsPost.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
         obsPost.imageCenterY = iparams_.height/2.0;
         // add distance and bearing noise
-        float randNoise = rand_.sampleU()-0.5;
+        float randNoise = Random::inst().sampleU()-0.5;
         obsPost.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.25*distance;// up to 25% distance error
         obsPost.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;// up to 5 deg bearing error
         obsPost.visionConfidence = 1.0;
@@ -337,6 +339,7 @@ void ObservationGenerator::generateGoalObservations() {
 
 void ObservationGenerator::generateAllObservations() {
   obs_object_->reset();
+  initializeBelief();
   generateBallObservations();
   generateLineObservations();
   generateOpponentObservations();
@@ -348,9 +351,10 @@ void ObservationGenerator::generateAllObservations() {
 }
 
 void ObservationGenerator::generateGroundTruthObservations(){
+  initializeBelief();
   obs_object_->reset();
 
-  for (int i = 0; i <= WO_OPPONENT_LAST; i++){
+  for (int i = 1; i <= WO_OPPONENT_LAST; i++){
     OpponentModel
       &cmodel = opponent_mem_->locModels[i - WO_OPPONENT_FIRST],
       &pmodel = opponent_mem_->locModels[i - 1];
@@ -404,14 +408,6 @@ void ObservationGenerator::generateGroundTruthObservations(){
 
   // update ball relative velocity from absolute
   // have to make a copy first because rotate rotates the actual point
-  oball->relVel = gtball.absVel;
-  oball->relVel.rotate(-gtrobot.orientation);
-
-  oball->relPos = gtball.loc;
-  oball->relPos = oball->relPos.globalToRelative(gtrobot.loc, gtrobot.orientation);
-
-  oball->relOrientation = gtrobot.loc.getBearingTo(gtball.loc, gtrobot.orientation);
-  oball->sd.x = oball->sd.y = 0;
 
   for (int i = 0; i < NUM_WORLD_OBJS; i++){
     if (i == WO_ROBOT_CLUSTER)
@@ -419,13 +415,26 @@ void ObservationGenerator::generateGroundTruthObservations(){
     WorldObject* wo = &(obs_object_->objects_[i]);
     WorldObject* gto = &gt_object_->objects_[i];
     // calculate distance and bearing to each object
-    wo->distance = gtrobot.loc.getDistanceTo(obs_object_->objects_[i].loc);
-    wo->bearing = gtrobot.loc.getBearingTo(obs_object_->objects_[i].loc,
-                                          gtrobot.orientation);
+    auto distance = gtrobot.loc.getDistanceTo(gt_object_->objects_[i].loc);
+    auto bearing = gtrobot.loc.getBearingTo(gt_object_->objects_[i].loc, gtrobot.orientation);
 
     // decide if seen depending on pan
-    if (fabs(joint_->values_[HeadPan] - wo->bearing) < FOVx/2.0){
+    if (fabs(joint_->values_[HeadPan] - bearing) < FOVx/2.0 && distance < 5'000){
       if(wo->isUnknown()) continue;
+      if(i == WO_BALL) {
+        wo->relVel = gtball.absVel;
+        wo->relVel.rotate(-gtrobot.orientation);
+
+        wo->relPos = gtball.loc;
+        wo->relPos = wo->relPos.globalToRelative(gtrobot.loc, gtrobot.orientation);
+
+        wo->relOrientation = gtrobot.loc.getBearingTo(gtball.loc, gtrobot.orientation);
+        wo->sd.x = wo->sd.y = 0;
+      }
+      wo->loc.x = gto->loc.x;
+      wo->loc.y = gto->loc.y;
+      wo->distance = distance;
+      wo->bearing = bearing;
       gto->seen = wo->seen = true;
       gto->frameLastSeen = wo->frameLastSeen = frame_info_->frame_id;
       float diff = joint_->values_[HeadPan] - wo->bearing;
@@ -447,19 +456,63 @@ void ObservationGenerator::generatePenaltyCrossObservations() {
     float distance = gtSelf.loc.getDistanceTo(gtCross.loc);
     if (isVisible(cross)) {
       float missedObsRate = 4.0/5.0;
-      float randPct = rand_.sampleU();
+      float randPct = Random::inst().sampleU();
       if (randPct > missedObsRate && distance < 2000){
         obsCross.seen = true;
         float diff = joint_->values_[HeadPan] - bearing;
         obsCross.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
         obsCross.imageCenterY = iparams_.height/2.0;
-        float randNoise = rand_.sampleU()-0.5;
+        float randNoise = Random::inst().sampleU()-0.5;
         obsCross.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.15*distance;// up to 15% distance error
         obsCross.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;// up to 5 deg bearing error
         obsCross.visionConfidence = 1.0;
       }
     }
   }
+}
+
+void ObservationGenerator::initializeBelief() {
+  if(initialized_) return;
+  //TODO: obs_objects_ should really just be one cache, 
+  //use a different generator for different ones or something
+  //because these updates don't make sense with multiple observation caches.
+  for(auto obs : obs_objects_) {
+    for(int i = 0; i < NUM_WORLD_OBJS; i++) {
+      auto& from = obs->objects_[i];
+      auto& to = obs_object_->objects_[i];
+      to.seen = from.seen;
+      to.frameLastSeen = from.frameLastSeen;
+      to.imageCenterX = from.imageCenterX;
+      to.imageCenterY = from.imageCenterY;
+      to.visionDistance = from.visionDistance;
+      to.visionBearing = from.visionBearing;
+      to.visionPt1 = from.visionPt1;
+      to.visionPt2 = from.visionPt2;
+      to.visionLine = from.visionLine;
+      to.distance = from.distance;
+      to.bearing = from.bearing;
+      to.loc = from.loc;
+      to.orientation = from.orientation;
+      to.relPos = from.relPos;
+      to.relVel = from.relVel;
+      to.absVel = from.absVel;
+      to.sdOrientation = from.sdOrientation;
+    }
+    // These updates assume that loc is given correctly and nothing else really is,
+    // which conforms to the FieldConfiguration class only setting position (loc)
+    // and orientation
+    auto& self = obs->objects_[player_];
+    for(int i = 0; i < NUM_WORLD_OBJS; i++) {
+      auto& obj = obs_object_->objects_[i];
+      obj.distance = (self.loc - obj.loc).getMagnitude();
+      obj.bearing = self.loc.getBearingTo(obj.loc, self.orientation);
+      obj.relPos = obj.loc.globalToRelative(self.loc, self.orientation);
+      obj.visionDistance = obj.distance;
+      obj.visionBearing = obj.bearing;
+      obj.frameLastSeen = -10000; // make this a long time ago so that we think it's lost
+    }
+  }
+  initialized_ = true;
 }
 
 void ObservationGenerator::fillObservationObjects() {

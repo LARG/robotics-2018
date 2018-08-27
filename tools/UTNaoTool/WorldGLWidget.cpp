@@ -241,26 +241,26 @@ void WorldGLWidget::draw(Simulation* simulation) {
     drawer_.setGtCache(simulation->getGtMemoryCache());
     drawer_.setBeliefCache(simulation->getBeliefMemoryCache());
     drawer_.draw(display_);
-    if (display_[GLDrawer::SHOWSIMINFO]) drawer_.displaySimInfo(simulation->getSimInfo());
-    if (display_[GLDrawer::SHOWTRUESIMLOCATION]) {
+    if (display_[GLDrawer::SHOW_SIM_INFO]) drawer_.displaySimInfo(simulation->getSimInfo());
+    if (display_[GLDrawer::SHOW_TRUE_SIM_LOCATION]) {
       auto caches = simulation->getPlayerGtMemoryCaches();
       drawer_.drawTrueSimLocations(caches);
     }
-    if (display_[GLDrawer::SHOWSIMROBOTS]) {
+    if (display_[GLDrawer::SHOW_SIM_ROBOTS]) {
       auto caches = simulation->getPlayerGtMemoryCaches();
       drawer_.drawSimRobots(caches);
     }
     auto gtcaches = simulation->getPlayerGtMemoryCaches();
     auto bcaches = simulation->getPlayerBeliefMemoryCaches();
-    if (display_[GLDrawer::SHOWVISIONRANGE]) drawer_.drawVisionRanges(bcaches);
+    if (display_[GLDrawer::SHOW_VISION_RANGE]) drawer_.drawVisionRanges(bcaches);
 
-    if (display_[GLDrawer::SHOWALTERNATEROBOTS]) drawer_.drawAlternateRobots(bcaches);
+    if (display_[GLDrawer::SHOW_ALTERNATE_ROBOTS]) drawer_.drawAlternateRobots(bcaches);
   } else if (cache_.memory) {
     drawer_.setGtCache(cache_);
     drawer_.setBeliefCache(cache_);
     drawer_.draw(display_);
-    if (display_[GLDrawer::SHOWALTERNATEROBOTS]) drawer_.drawAlternateRobots(cache_);
-    if (display_[GLDrawer::SHOWVISIONRANGE]) drawer_.drawVisionRanges(cache_);
+    if (display_[GLDrawer::SHOW_ALTERNATE_ROBOTS]) drawer_.drawAlternateRobots(cache_);
+    if (display_[GLDrawer::SHOW_VISION_RANGE]) drawer_.drawVisionRanges(cache_);
   }
   if(dragInfo_.dragging)
     basicGL_.drawArrow(dragInfo_.start, dragInfo_.end);

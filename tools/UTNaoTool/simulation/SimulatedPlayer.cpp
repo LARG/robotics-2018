@@ -121,18 +121,6 @@ void SimulatedPlayer::setMemory(MemoryFrame* memory){
   core->interpreter_->start();
 }
 
-MemoryFrame* SimulatedPlayer::getMemory(){
-  return memory_;
-}
-
-MemoryCache SimulatedPlayer::getMemoryCache() {
-  cache_.world_object = cache_.world_object;
-  cache_.joint = cache_.joint;
-  cache_.robot_state = cache_.robot_state;
-  cache_.sensor = cache_.sensor;
-  return cache_;
-}
-
 void SimulatedPlayer::updateMemoryBlocks(){
 
   absWalkVel = Pose2D(0,0,0);
@@ -200,7 +188,7 @@ void SimulatedPlayer::updateBasicInputs(WorldObjectBlock* simulationMem, GameSta
   else cache_.game_state->ourKickOff = !simulationState->ourKickOff;
   cache_.game_state->isPenaltyKick = simulationState->isPenaltyKick;
 
-  if (team_ == TEAM_BLUE){
+  if (team_ == TEAM_BLUE) {
     cache_.game_state->ourScore = simulationState->ourScore;
     cache_.game_state->opponentScore = simulationState->opponentScore;
   } else {
@@ -260,9 +248,9 @@ void SimulatedPlayer::updateBasicInputs(WorldObjectBlock* simulationMem, GameSta
 
 
     // with some small prob... get up the wrong direction
-    if (rand_.sampleB(0.05)){
+    if (Random::inst().sampleB(0.05)){
       // pick a dir to add 90 deg
-      int choice = rand_.sampleU(1,3);
+      int choice = Random::inst().sampleU(1,3);
       if (PRINT) cout << index_ << " getting up in random direction " << endl;
       if (choice == 1)
         truthRobot->orientation -= M_PI/2.0;
@@ -282,15 +270,15 @@ void SimulatedPlayer::updateBasicInputs(WorldObjectBlock* simulationMem, GameSta
     // if tilted, still mainly same direction
 
     // some angle noise upon getup
-    float oerror = rand_.sampleU(-.5,.5);
+    float oerror = Random::inst().sampleU(-.5,.5);
     truthRobot->orientation += odometryErrorFactor*0.1*M_PI*oerror;
 
     truthRobot->orientation = normalizeAngle(truthRobot->orientation);
 
     // also move the robot up to 50 cm in each dir upon getting up
-    float randDistX = rand_.sampleU(-.5,.5) * 1000;
+    float randDistX = Random::inst().sampleU(-.5,.5) * 1000;
     truthRobot->loc.x += randDistX;
-    float randDistY = rand_.sampleU(-.5,.5) * 1000;
+    float randDistY = Random::inst().sampleU(-.5,.5) * 1000;
     truthRobot->loc.y += randDistY;
     
 
@@ -383,7 +371,7 @@ bool SimulatedPlayer::updateOutputs(WorldObjectBlock* simulationMem){
   cache_.odometry->didKick = false;
   cache_.odometry->standing = true;
 
-  if (ALLOW_FALLING && !DEBUGGING_POSITIONING && rand_.sampleB(1.0/3600.))
+  if (ALLOW_FALLING && !DEBUGGING_POSITIONING && Random::inst().sampleB(1.0/3600.))
     setFallen();
 
   // start timer
@@ -406,14 +394,18 @@ bool SimulatedPlayer::updateOutputs(WorldObjectBlock* simulationMem){
     cache_.kick_request->kick_running_ = false;
   }
 
-  //printf("kick type: %s, walk kick: %i, kick seconds: %2.2f\n", kickTypeNames[cache_.kick_request->kick_type_].c_str(), kickHitSeconds);
+  //printf("kick type: %s, perform kick? %i, kick seconds: %2.2f\n", kickTypeNames[cache_.kick_request->kick_type_].c_str(), cache_.walk_request->perform_kick_, kickHitSeconds);
   // kick gets executed kickHitTime seconds in
   if ((cache_.kick_request->kick_type_ != Kick::NO_KICK || cache_.walk_request->perform_kick_) && cache_.kick_request->kick_type_ != Kick::ABORT && kickHitSeconds <= 0.2 && kickHitSeconds > 0){
 
     kickHitSeconds = 0;
     
     // this stuff only happens if ball is at robot!
-    if (ball->relPos.x < 210 && fabs(ball->relPos.y) < 90 && ball->relPos.x > 0){
+    float ballThreshX = 210, ballThreshY = 90;
+    if(cache_.walk_request->perform_kick_) {
+      ballThreshX = 500, ballThreshY = 300;
+    }
+    if (ball->relPos.x < ballThreshX && fabs(ball->relPos.x) < ballThreshY && ball->relPos.x > 0) {
 
       // assume ball velocity at heading
       float vel = cache_.kick_request->desired_distance_;
@@ -428,17 +420,29 @@ bool SimulatedPlayer::updateOutputs(WorldObjectBlock* simulationMem){
       cache_.odometry->didKick = true;
       cache_.odometry->kickHeading = heading;
       cache_.odometry->kickVelocity = vel / 1.2;
+      cache_.walk_request->walk_control_status_ = WALK_CONTROL_DONE;
+      // Fail with some probability (and print failure)
+      // otherwise update normally
+      if (Random::inst().sampleB(0.05)) {
+        std::cout << "[SimulatedPlayer::updateOutputs]: Kick failed!!!";
+        std::cout << std::endl;
+        heading = 0;
+        vel = 0;
+      } else {
+        std::cout << "[SimulatedPlayer::updateOutputs]: Kick success";
+        std::cout << std::endl;
+        // add up to 10 degree error
+        heading += kickErrorFactor*Random::inst().sampleU(-.5,.5)*20.0*DEG_T_RAD;
+        // add up to 40 % vel error
+        vel += Random::inst().sampleU(-.5,.5)*kickErrorFactor*0.8*vel;
 
-      // add up to 10 degree error
-      heading += kickErrorFactor*rand_.sampleU(-.5,.5)*20.0*DEG_T_RAD;
-      // add up to 40 % vel error
-      vel += rand_.sampleU(-.5,.5)*kickErrorFactor*0.8*vel;
+        // never longer than 8000
+        if (vel > 8000) vel = 8000;
 
-      // never longer than 8000
-      if (vel > 8000) vel = 8000;
+        // never shorter than 10
+        if (vel < 10) vel = 10;
 
-      // never shorter than 10
-      if (vel < 10) vel = 10;
+      }
 
       cache_.kick_request->kick_type_ = Kick::NO_KICK;
 
@@ -619,14 +623,14 @@ void SimulatedPlayer::setFallen(){
   // random fall direction
   float randPct = ((float)rand())/((float)RAND_MAX);
   // give a little extra tilt and roll
-  if (rand_.sampleB()){
+  if (Random::inst().sampleB()){
     cache_.sensor->values_[angleY] = 0.05;
     cache_.sensor->values_[angleX] = 0.05;
   } else {
     cache_.sensor->values_[angleY] = -0.05;
     cache_.sensor->values_[angleX] = -0.05;
   }
-  int choice = rand_.sampleU(1,10);
+  int choice = Random::inst().sampleU(1,10);
   if (choice <= 4) // tilt fwd
     cache_.sensor->values_[angleY] = M_PI/2.0;
   else if (choice <= 8) // tilt back
@@ -635,4 +639,8 @@ void SimulatedPlayer::setFallen(){
     cache_.sensor->values_[angleX] = -M_PI/2.0;
   else // tilt right
     cache_.sensor->values_[angleX] = M_PI/2.0;
+}
+
+void SimulatedPlayer::setRole(Role role) {
+  cache_.robot_state->role_ = role;
 }

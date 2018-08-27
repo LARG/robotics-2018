@@ -35,10 +35,10 @@ void VisionWindow::topOpenTable() {
 void VisionWindow::newTable(Camera::Type camera) {
   unsigned char* colorTable;
   if (camera == Camera::TOP) {
-    colorTable = core_->vision_->topColorTable;
+    colorTable = core_->vision_->topColorTable.data();
     core_->vision_->topColorTableName = "none";
   } else {
-    colorTable = core_->vision_->bottomColorTable;
+    colorTable = core_->vision_->bottomColorTable.data();
     core_->vision_->bottomColorTableName = "none";
   }
   memset(colorTable,c_UNDEFINED,LUT_SIZE);
@@ -65,10 +65,10 @@ void VisionWindow::writeTable(Camera::Type camera, std::string fileName) {
   unsigned char *colorTable;
   std::string displayMessage;
   if (camera == Camera::TOP) {
-    colorTable = core_->vision_->topColorTable;
+    colorTable = core_->vision_->topColorTable.data();
     displayMessage += "Top Table";
   } else {
-    colorTable = core_->vision_->bottomColorTable;
+    colorTable = core_->vision_->bottomColorTable.data();
     displayMessage += "Bottom Table";
   }
 

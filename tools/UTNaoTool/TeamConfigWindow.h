@@ -11,32 +11,43 @@ class QWidget;
 class QFile;
 
 class TeamConfigWindow : public QMainWindow, public Ui_TeamConfigWindow {
- Q_OBJECT
+  Q_OBJECT
 
   public:
-  TeamConfigWindow(QMainWindow* par);
-  QString getFullIP(const QString &suffix);
-  RobotConfig getRobotConfig(int self);
-  
-  FILE* localConfig;
-  
-  QStringList getUploadList();
-  QMainWindow* parent;
+    enum class UploadStatus {
+      NothingQueued,
+      Waiting,
+      Completed,
+      Failed
+    };
+
+    TeamConfigWindow(QMainWindow* par);
+    QString getFullIP(const QString &suffix);
+    RobotConfig getRobotConfig(int self);
+
+    FILE* localConfig;
+
+    QStringList getUploadList();
+    QMainWindow* parent;
 
   signals:
     void robotStatusUpdated(int robot, ProcessExecutor::RobotStatus status);
     void logStatusUpdated(int robot, QString status);
+    void uploadStatusUpdated(TeamConfigWindow::UploadStatus status);
 
   public slots:
     void updateRobotStatus(int robot, ProcessExecutor::RobotStatus status);
     void updateLogStatus(int robot, QString status);
+    void updateUploadStatus(TeamConfigWindow::UploadStatus status);
     void clearRobotStatus(int robot);
+    inline void updateSSH(bool) { updateSSH(); }
     void updateSSH();
     void reloadLocalConfig();
     void saveLocalConfig();
     void startNaoQi();  
     void stopNaoQi();
-    void restartInterpreter();  
+    void restartInterpreter(); 
+    void compileEverything();
     void uploadEverything();
     void uploadBinary();
     void uploadRobotConfig();
@@ -52,7 +63,8 @@ class TeamConfigWindow : public QMainWindow, public Ui_TeamConfigWindow {
     void copyLogs();
     void deleteLogs();
   private:
-    std::map<int, QCheckBox*> checks_;
+    void statusCallback(bool success);
+    std::map<int, QCheckBox*> checks_, sonars_;
     std::map<int, QLabel*> statuses_;
     std::map<int, QLineEdit*> ipboxes_;
     std::map<int, QSpinBox*> posX_, posY_, posT_;

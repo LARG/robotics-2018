@@ -18,7 +18,6 @@ class CommunicationGenerator {
 
     MemoryCache gtcache_, bcache_;
     std::vector<MemoryCache> bcaches_;
-    Random rand_;
     int teamBroadcastFrame_, teamSilenceFrame_, coachframe_;
     bool teamMode_;
 };

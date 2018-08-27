@@ -259,7 +259,7 @@ void ExtrinsicCalibrationWidget::load(){
 
 void ExtrinsicCalibrationWidget::stopCalibration() {
   calibrator_.stop();
-  loadCalibration(*calibrator_.getCalibration(), false);
+  loadCalibration(calibrator_.getCalibration(), false);
 }
 
 void ExtrinsicCalibrationWidget::handleUpdatedCalibrations() {
@@ -272,7 +272,7 @@ void ExtrinsicCalibrationWidget::takeSamples() {
 
 void ExtrinsicCalibrationWidget::optimizeCalibration() {
   auto callback = [&] {
-    loadCalibration(*calibrator_.getCalibration(), false);
+    loadCalibration(calibrator_.getCalibration(), false);
   };
   calibrator_.start(iterations->value(), callback);
 }

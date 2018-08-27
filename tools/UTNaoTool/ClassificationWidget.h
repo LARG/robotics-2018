@@ -11,15 +11,14 @@
 #include <common/annotations/VisionAnnotation.h>
 #include "ui_ClassificationWidget.h"
 
-
 class ClassificationWidget : public QWidget, public Ui_UTClassificationWidget {
     Q_OBJECT
     private:
-        QString strCol[NUM_Colors];
+        QString strCol[Color::NUM_Colors];
         Camera::Type currentCamera_;
         ImageProcessor *topProcessor_, *bottomProcessor_;
         LogViewer* log_;
-        vector<VisionAnnotation*> annotations_;
+        std::vector<VisionAnnotation*> annotations_;
         int maxFrames_;
 
         int getColorFlags();

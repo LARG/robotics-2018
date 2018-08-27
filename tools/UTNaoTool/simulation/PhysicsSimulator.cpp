@@ -3,9 +3,9 @@
 
 #define TIME_INC (1.0f/30.0f)
 #define DECAY_RATE 0.966
-#define FOOT_X_FRONT 10
-#define FOOT_X_BACK -10
-#define FOOT_Y_OUT 30
+#define FOOT_X_FRONT 30
+#define FOOT_X_BACK -50
+#define FOOT_Y_OUT 60
 
 #define getObject(obj, idx) auto& obj = world_object_->objects_[idx]
 

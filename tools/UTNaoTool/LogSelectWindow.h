@@ -12,8 +12,10 @@
 #include <QLabel>
 
 #include <functional>
+#include <set>
 
 #include <tool/ConfigWindow.h>
+#include <tool/MemorySelectConfig.h>
 
 class LogSelectWindow : public ConfigWindow {
   Q_OBJECT
@@ -21,20 +23,22 @@ class LogSelectWindow : public ConfigWindow {
   private:
     static LogSelectWindow* instance_;
     bool log_enabled_;
-    static void listenUDP(void*);
+    void listenUDP();
     void listenForLoggingStatus();
     UDPWrapper* naoUDP;
     void logModeOn();
 
   public:
     LogSelectWindow(QMainWindow* pa,std::vector<std::string> &block_names);
+    void init();
     static LogSelectWindow* inst();
+
+  private:
 
     QMainWindow* parent;
 
     QLabel** moduleLabels;
     QCheckBox** moduleChecks;
-    int NUM_MODULES;
 
     QWidget* centralWidget;
     QPushButton* logButton;
@@ -47,10 +51,14 @@ class LogSelectWindow : public ConfigWindow {
     QLabel** groupLabels;
     QCheckBox** groupChecks;
 
-    std::vector<std::string> block_names_;
+    MemorySelectConfig config_;
 
+    int nmodules_;
+    std::set<std::string> block_names_;
+    bool initialized_ = false;
 
    public slots:
+     void controlsChanged();
      void logModeOff(bool force = true);
      void sendLogSettings();
      void sendLogSettings(QString ip);
@@ -65,11 +73,13 @@ class LogSelectWindow : public ConfigWindow {
 
      void updateSelectedIP(QString address);
 
-     void loadConfig(const ToolConfig& config);
-     void saveConfig(ToolConfig& config);
+     void loadConfig();
+     void loadConfig(const ToolConfig& config) override;
+     void saveConfig(ToolConfig& config) override;
 
      void startMultiLogging(std::vector<QString> ips);
      void stopMultiLogging(std::vector<QString> ips, std::function<void(QString)> callback);
+
 };
 
 #endif

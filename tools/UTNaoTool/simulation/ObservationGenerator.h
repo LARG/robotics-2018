@@ -4,8 +4,8 @@
 #include <memory/MemoryCache.h>
 #include <math/Geometry.h>
 #include <common/Random.h>
-#include <common/RobotInfo.h>
 #include <common/ImageParams.h>
+#include <localization/LocalizationConfig.h>
 
 
 class ObservationGenerator {
@@ -30,14 +30,16 @@ class ObservationGenerator {
     void generatePenaltyCrossObservations();
     void generateBeaconObservations();
     void fillObservationObjects();
+    void initializeBelief();
     ImageParams iparams_;
-    Random rand_;
     WorldObjectBlock *gt_object_, *obs_object_;
     OpponentBlock* opponent_mem_;
     FrameInfoBlock* frame_info_;
     JointBlock* joint_;
     int player_, team_;
+    bool initialized_ = false;
     std::vector<WorldObjectBlock*> obs_objects_;
+    LocalizationConfig lconfig_;
 };
 
 #endif

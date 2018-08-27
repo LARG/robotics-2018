@@ -21,11 +21,9 @@ class FilesWindow : public ConfigWindow, public Ui_UTFilesWindow {
 
   public:
     FilesWindow(QMainWindow* pa);
-    QDir* luaDir;
     QString basePath;
     QString logPath;
     QString dataPath;
-    QFileSystemWatcher* luaWatch;
     QCheckBox* files;
     QMainWindow* parent;
     int numFiles;
@@ -67,9 +65,6 @@ class FilesWindow : public ConfigWindow, public Ui_UTFilesWindow {
     void resetTopCamera();
     void resetBottomCamera();
 
-    void sendLua(bool verbose = true);
-    void verifyLua(bool verbose = true);
-
     void sendPython(bool verbose = true);
     void verifyPython(bool verbose = true);
 
@@ -78,9 +73,6 @@ class FilesWindow : public ConfigWindow, public Ui_UTFilesWindow {
 
     void sendAll(bool verbose = true);
     void verifyAll(bool verbose = true);
-
-    void sendEverything(bool verbose = true);
-    void verifyEverything(bool verbose = true);
 
     void sendVision(bool verbose = true);
     void verifyVision(bool verbose = true);
@@ -91,23 +83,14 @@ class FilesWindow : public ConfigWindow, public Ui_UTFilesWindow {
     void sendInterface(bool verbose = true);
     void verifyInterface(bool verbose = true);
 
-    void sendMotionFiles(bool verbose = true);
-    void verifyMotionFiles(bool verbose = true);
-
     void sendConfigFiles(bool verbose = true);
     void verifyConfigFiles(bool verbose = true);
 
     void sendColorTable(bool verbose = true);
     void verifyColorTable(bool verbose = true);
     
-    void sendWireless(bool verbose = true);
-    //void verifyWireless(bool verbose = true);
-
-    void sendAutoloadFile(bool verbose = true);
-    void verifyAutoloadFile(bool verbose = true);
-
-    void sendSimpleConfig(bool verbose = true);
-    void verifySimpleConfig(bool verbose = true);
+    void sendRobotConfig(bool verbose = true);
+    void verifyRobotConfig(bool verbose = true);
 
     void restartNaoQi();
 
@@ -125,7 +108,7 @@ class FilesWindow : public ConfigWindow, public Ui_UTFilesWindow {
     void enableButtons(bool b);
     void locationChanged(int index);
     void setCurrentLocation(QString ip);
-
+    void setCurrentLocation(std::string ip);
 };
 
 #endif

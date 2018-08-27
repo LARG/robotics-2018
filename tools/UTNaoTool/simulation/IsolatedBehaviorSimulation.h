@@ -13,8 +13,8 @@ class IsolatedBehaviorSimulation : public Simulation {
   public:
     IsolatedBehaviorSimulation(bool locMode = true, int player = 5); 
     virtual void simulationStep();
-    MemoryCache getGtMemoryCache(int player = 0);
-    MemoryCache getBeliefMemoryCache(int player = 0);
+    inline MemoryCache getGtMemoryCache(int player = 0) const { return gtcache_; }
+    inline MemoryCache getBeliefMemoryCache(int player = 0) const { return bcache_; }
     bool lmode() { return lmode_; }
     std::vector<std::string> getTextDebug(int player = 0);
     void moveBall(Point2D pos);

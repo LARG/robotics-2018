@@ -13,19 +13,18 @@ typedef ObjectConfiguration OP;
   auto& obj = gtcache_.world_object->objects_[idx];
 
 GoalieSimulation::GoalieSimulation() : IBSim(true, KEEPER) {
-  FieldConfiguration config;
-  if(!config.loadFromFile(UTMainWnd::dataDirectory() + "/gsim_config.yaml")) {
+  auto& config = config_.objects.gtconfig;
+  if(!loadGame("goalie_sim")) {
     config = {
       {player_, OP(_X, _Y, _ORIENT)},
       {WO_BALL, OP(BALL_X, _Y)}
     };
   }
-  config.saveToFile(UTMainWnd::dataDirectory() + "/gsim_config.yaml");
+  saveGame("goalie_sim");
   bcache_.robot_state->role_ = KEEPER;
-  gtcache_.game_state->setState(PLAYING);
-  bcache_.game_state->setState(PLAYING);
-  config.place(bcache_.world_object);
-  config.place(gtcache_.world_object);
+  gtcache_.game_state->setState(config_.game_state);
+  bcache_.game_state->setState(config_.game_state);
+  applyConfig(gtcache_, {bcache_});
   physics_.setObjects(gtcache_.world_object);
   align_ = true;
   sframe_ = 0;

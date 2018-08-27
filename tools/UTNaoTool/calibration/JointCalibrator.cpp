@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace Eigen;
+using Corners = JointCalibrator::Corners;
 
 std::vector<int> rjointMap = {
   HeadYaw,
@@ -58,32 +59,27 @@ JCSettings::JCSettings() {
   oT = 0;
 }
 
-JointCalibrator::JointCalibrator() : cache_(NULL), vblocks_(NULL), params_(NULL), processor_(NULL), cal_(NULL), thread_(NULL), memory_(NULL) {
-  memory_ = new MemoryFrame(false, MemoryOwner::TOOL_MEM, 0, 1);
+JointCalibrator::JointCalibrator() {
+  memory_ = std::make_unique<MemoryFrame>(false, MemoryOwner::TOOL_MEM, 0, 1);
   //printf("creating cache\n");
-  cache_ = new MemoryCache();
+  cache_ = std::make_unique<MemoryCache>();
   //printf("creating blocks\n");
-  vblocks_ = new VisionBlocks(*cache_);
+  vblocks_ = std::make_unique<VisionBlocks>(*cache_);
   //printf("creating params\n");
-  params_ = new ImageParams(Camera::BOTTOM);
+  params_ = std::make_unique<ImageParams>(Camera::BOTTOM);
   //printf("creating processor\n");
-  processor_ = new ImageProcessor(*vblocks_, *params_, Camera::BOTTOM);
+  processor_ = std::make_unique<ImageProcessor>(*vblocks_, *params_, Camera::BOTTOM);
   processor_->enableCalibration(true);
   datafile_ = string(getenv("NAO_HOME")) + "/data/jcalibration.yaml";
   reset();
 }
 
 JointCalibrator::~JointCalibrator() {
-  delete cache_;
-  delete vblocks_;
-  delete params_;
-  delete processor_;
-  delete cal_;
+  stop();
 }
 
 void JointCalibrator::reset() {
-  if(cal_) delete cal_;
-  cal_ = new RobotCalibration();
+  cal_ = std::make_unique<RobotCalibration>();
   processor_->setCalibration(*cal_);
   stop();
 }
@@ -92,17 +88,17 @@ void JointCalibrator::stop() {
   calibrating_ = false;
   if(thread_) {
     thread_->join();
-    delete thread_;
+    thread_.reset();
   }
 }
 
 void JointCalibrator::start(int iterations, function<void()> callback) {
   if(thread_) {
     thread_->join();
-    delete thread_;
+    thread_.reset();
   }
   calibrating_ = true;
-  thread_ = new thread(&JointCalibrator::calibrate, (JointCalibrator*)this, iterations, callback);
+  thread_ = std::make_unique<std::thread>(&JointCalibrator::calibrate, (JointCalibrator*)this, iterations, callback);
 }
 
 void JointCalibrator::pause() {
@@ -110,16 +106,14 @@ void JointCalibrator::pause() {
   //TODO: fill in
 }
 
-void JointCalibrator::setCalibration(RobotCalibration* cal) {
-  if(cal_) delete cal_;
-  cal_ = new RobotCalibration(*cal);
+void JointCalibrator::setCalibration(const RobotCalibration& cal) {
+  cal_ = std::make_unique<RobotCalibration>(cal);
   processor_->setCalibration(*cal_);
   processor_->updateTransform();
 }
 
 void JointCalibrator::setMemory(MemoryFrame* memory) {
-  //if(memory_) delete memory_;
-  //memory_ = new MemoryFrame(*memory);
+  //memory_ = std::make_unique<MemoryFrame>(*memory);
   //memory_ = memory;
   cache_->fill(memory);
   processor_->updateTransform();
@@ -154,7 +148,7 @@ JointCalibrator::Measurement JointCalibrator::takeSample(MemoryFrame* frame) {
 }
 
 void JointCalibrator::calibrate(int iterations, function<void()> callback) {
-  cache_->fill(memory_);
+  cache_->fill(*memory_);
   Dataset dataset;
   dataset.loadFromFile(datafile_);
   vector<float> iparams = convertParams(*cal_);
@@ -187,7 +181,7 @@ vector<float> JointCalibrator::convertParams(const RobotCalibration& cal) const 
     offsets.push_back(cal.poseZ / weights[jointMap().size() + 2]);
     offsets.push_back(cal.poseTheta / weights[jointMap().size() + 3]);
   }
-  printf("done: %lu\n", offsets.size());
+  printf("done: %lu\n",offsets.size());
   return offsets;
 }
 
@@ -247,13 +241,13 @@ float JointCalibrator::evaluate(const Measurement& m, const vector<float>& offse
   return error;
 }
 
-vector<Vector2f> JointCalibrator::findChessboardCorners(unsigned char* image) const {
+Corners JointCalibrator::findChessboardCorners(unsigned char* image) const {
   const ImageParams& iparams = processor_->getImageParams();
   cv::Mat cvimage = color::rawToMat(image, iparams);
   return findChessboardCorners(cvimage);
 }
 
-vector<Vector2f> JointCalibrator::findChessboardCorners(cv::Mat& image) const {
+Corners JointCalibrator::findChessboardCorners(cv::Mat& image) const {
   //printf("find corners\n");
   cv::Mat grayImage, sharpened;
 
@@ -274,7 +268,7 @@ vector<Vector2f> JointCalibrator::findChessboardCorners(cv::Mat& image) const {
     //cv::cornerSubPix(grayImage, imagePoints, cv::Size(11,11), cv::Size(-1, -1),
         //cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
   //}
-  auto corners = vector<Vector2f>();
+  auto corners = Corners();
   //printf("%i corners found:\n", imagePoints.size());
   processor_->updateTransform();
   for(auto p : imagePoints) {
@@ -288,7 +282,7 @@ vector<Vector2f> JointCalibrator::findChessboardCorners(cv::Mat& image) const {
   return corners;
 }
 
-vector<Vector2f> JointCalibrator::projectChessboardCorners(bool left) const {
+Corners JointCalibrator::projectChessboardCorners(bool left) const {
   vector<Vector3f> fcorners;
   Vector2f topLeft(
     settings_.boardOffset + (settings_.boardSize.height / 2.0f - .5) * settings_.squareSize,
@@ -304,7 +298,7 @@ vector<Vector2f> JointCalibrator::projectChessboardCorners(bool left) const {
       ));
     }
   }
-  vector<Vector2f> corners;
+  Corners corners;
   //printf("converting %i world coordinates\n", fcorners.size());
   for(auto fc : fcorners) {
     Pose3D foot = cache_->body_model->abs_parts_[left ? BodyPart::left_bottom_foot : BodyPart::right_bottom_foot];
@@ -324,7 +318,7 @@ vector<Vector2f> JointCalibrator::projectChessboardCorners(bool left) const {
   return corners;
 }
 
-float JointCalibrator::computeProjectionError(const vector<Vector2f>& icorners, const vector<Vector2f>& pcorners) const {
+float JointCalibrator::computeProjectionError(const Corners& icorners, const Corners& pcorners) const {
   assert(icorners.size() == pcorners.size());
   float sqSum = 0.0f;
   const ImageParams& iparams = processor_->getImageParams();
@@ -353,3 +347,8 @@ const vector<int>& JointCalibrator::jointMap() const {
   if(left()) return ljointMap;
   else return rjointMap;
 }
+
+bool JointCalibrator::validateProjection(const Corners& icorners, const Corners& pcorners) const {
+  return icorners.size() == pcorners.size() && icorners.size() > 0;
+}
+

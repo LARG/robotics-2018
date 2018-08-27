@@ -1,5 +1,6 @@
-#include "AnalysisWidget.h"
+#include <tool/AnalysisWidget.h>
 #include <localization/LocalizationModule.h>
+#include <vision/ImageProcessor.h>
 
 AnalysisWidget::AnalysisWidget(QWidget* parent) : QWidget(parent), log_(NULL), core_(NULL) {
   setupUi(this);
@@ -13,7 +14,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent) : QWidget(parent), log_(NULL), c
   colorStrings[c_YELLOW]="Goal Posts";
   colorStrings[c_ROBOT_WHITE] = "Robot White";
 
-  for (int i=1; i<NUM_Colors; i++) {
+  for (int i=1; i<Color::NUM_Colors; i++) {
     colorBox->addItem(colorStrings[i]);
   }
 
@@ -50,9 +51,10 @@ void AnalysisWidget::displayGoalInfo(bool show){
 
 void AnalysisWidget::analyze(){
   analyzer_.setAnnotations(annotations_);
-  ImageProcessor* processor = (currentCamera_ == Camera::TOP ? topProcessor_ : bottomProcessor_);
+  ImageProcessor* processor = (camera_ == Camera::TOP ? topProcessor_ : bottomProcessor_);
   unsigned char* colorTable = processor->getColorTable();
   analyzer_.setColorTable(colorTable);
+  analyzer_.readImageData();
   fpcText->setText(QString::number(analyzer_.falsePositiveCount(selectedColor_)));
   fprText->setText(QString::number(analyzer_.falsePositiveRate(selectedColor_)));
   fncText->setText(QString::number(analyzer_.falseNegativeCount(selectedColor_)));
@@ -75,9 +77,7 @@ void AnalysisWidget::analyze(){
 }
 
 void AnalysisWidget::handleNewLogLoaded(LogViewer* log){
-  std::vector<ImageParams> iparams = (currentCamera_ == Camera::TOP ? log->getTopParams() : log->getBottomParams());
-  std::vector<ImageBuffer> images = (currentCamera_ == Camera::TOP ? log->getRawTopImages() : log->getRawBottomImages());
-  analyzer_.setImages(images, iparams);
+  analyzer_.setLog(log);
   log_ = log;
 }
 
@@ -91,12 +91,8 @@ void AnalysisWidget::setImageProcessors(ImageProcessor* top, ImageProcessor* bot
 }
 
 void AnalysisWidget::setCurrentCamera(Camera::Type camera){
-  currentCamera_ = camera;
-  if(log_) {
-    std::vector<ImageParams> iparams = (currentCamera_ == Camera::TOP ? log_->getTopParams() : log_->getBottomParams());
-    std::vector<ImageBuffer> images = (currentCamera_ == Camera::TOP ? log_->getRawTopImages() : log_->getRawBottomImages());
-    analyzer_.setImages(images, iparams);
-  }
+  analyzer_.setCamera(camera);
+  camera_ = camera;
 }
 
 void AnalysisWidget::colorBoxIndexChanged(const QString& text) {
@@ -121,7 +117,7 @@ void AnalysisWidget::colorBoxIndexChanged(const QString& text) {
 
 void AnalysisWidget::prune() {
   analyzer_.setAnnotations(annotations_);
-  ImageProcessor* processor = (currentCamera_ == Camera::TOP ? topProcessor_ : bottomProcessor_);
+  ImageProcessor* processor = (camera_ == Camera::TOP ? topProcessor_ : bottomProcessor_);
   unsigned char* colorTable = processor->getColorTable();
   analyzer_.setColorTable(colorTable);
   float amount = (float)prunePercentBox->value() / 100;

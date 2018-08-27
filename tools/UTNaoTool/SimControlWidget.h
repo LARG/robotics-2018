@@ -19,6 +19,7 @@ class SimControlWidget : public QWidget, public Ui_SimControlWidget {
   public slots:
     void flip();
     void penalize();
+    void hideBall();
     void fieldHovered(Point2D pos);
     void fieldClicked(Point2D pos, Qt::MouseButton button);
     void fieldDragged(Point2D start, Point2D end, Qt::MouseButton button);

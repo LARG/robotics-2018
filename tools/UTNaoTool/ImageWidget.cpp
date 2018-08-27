@@ -1,5 +1,8 @@
-#include "ImageWidget.h"
+#include <tool/ImageWidget.h>
 #include <cstdlib>
+#include <math/Common.h>
+
+using namespace static_math;
 
 ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent) {
   setMouseTracking(true);
@@ -8,6 +11,7 @@ ImageWidget::ImageWidget(QWidget *parent) : QWidget(parent) {
   isSelectionEnabled_ = false;
   selectionType_ = SelectionType::Rectangle;
   selectionColor_ = Qt::cyan;
+  hoverColor_ = Qt::yellow;
 }
 
 void ImageWidget::setImageSize(int width, int height, QImage::Format format){
@@ -19,12 +23,34 @@ void ImageWidget::setImageSize(int width, int height, QImage::Format format){
   }
 }
 
-void ImageWidget::setImageSource(QImage* image, int width, int height) {
+void ImageWidget::setImageSource(const cv::Mat& image, int format) {
+  switch(format) {
+    case CV_8UC1:
+      setImageSize(image.cols, image.rows);
+      for(int j = 0; j < image.rows; j++)
+        for(int i = 0; i < image.cols; i++) {
+          unsigned char value = image.at<unsigned char>(j, i);
+          setPixel(i, j, qRgb(value, value, value));
+        }
+      break;
+    case CV_8UC3:
+      setImageSize(image.cols, image.rows);
+      for(int j = 0; j < image.rows; j++)
+        for(int i = 0; i < image.cols; i++) {
+          cv::Vec3b value = image.at<cv::Vec3b>(j, i);
+          setPixel(i, j, qRgb(value[0], value[1], value[2]));
+        }
+      break;
+  }
+  update();
+}
+
+void ImageWidget::setImageSource(const QImage* image) {
   if(image == nullptr) {
-    setImageSize(1280, 960);
+    setImageSize(1280,960);
     img_->fill(Qt::black);
   } else {
-    setImageSize(width, height);
+    setImageSize(image->width(), image->height());
     *img_ = *image;
   }
   update();
@@ -52,12 +78,15 @@ SelectionMode ImageWidget::getMode(){
   int mods = QApplication::keyboardModifiers();
   if(mods == Qt::NoModifier)
     return None;
-  else if (mods == (Qt::ControlModifier | Qt::AltModifier))
+  else if(mods == (Qt::ControlModifier | Qt::AltModifier)) {
     return Zoom;
-  else if (isSelectionEnabled_ && mods == Qt::AltModifier )
+  }
+  else if(isSelectionEnabled_ && mods == Qt::AltModifier) {
     return Subtract;
-  else if (isSelectionEnabled_ && mods == Qt::ControlModifier )
+  }
+  else if(isSelectionEnabled_) {
     return Add;
+  }
   return None;
 }
 
@@ -77,7 +106,7 @@ void ImageWidget::mousePressEvent(QMouseEvent *event) {
     if (event->button() != Qt::LeftButton && event->button() != Qt::RightButton) return;
     clearSelection();
     QPoint point = mapPoint(QPoint(event->x(),event->y()));
-    emit clicked(point.x(), point.y(), (int) event->button());
+    emit clicked(point.x(), point.y(), event->button());
   }
   else if (getMode() == Zoom){
     if(event->button() == Qt::RightButton){
@@ -103,10 +132,24 @@ void ImageWidget::mousePressEvent(QMouseEvent *event) {
   repaint();
 }
 
+std::vector<Point> convert(std::vector<QPoint> qpoints) {
+  std::vector<Point> points;
+  for(auto p : qpoints)
+    points.push_back(Point(p.x(), p.y()));
+  return points;
+}
+
 void ImageWidget::mouseMoveEvent(QMouseEvent *event) {
   QPoint point = mapPoint(QPoint(event->x(),event->y()));
-  emit mouseXY(point.x(),point.y());
-  if(QApplication::mouseButtons() == Qt::LeftButton && (getMode() == Zoom || getMode() == Add) && getType() == SelectionType::Rectangle) {
+  emit moved(point.x(),point.y());
+  if(getMode() == None) {
+    if(QApplication::mouseButtons() == Qt::LeftButton) {
+      emit dragged(point.x(), point.y(), event->button());
+    }
+    else
+      emit hovered(point.x(), point.y());
+  }
+  else if(QApplication::mouseButtons() == Qt::LeftButton && (getMode() == Zoom || getMode() == Add) && (getType() == SelectionType::Rectangle || getType() == SelectionType::Square)) {
     isDragging_ = true;
     beginSelection();
     updateSelection(event->x(), event->y());
@@ -166,28 +209,30 @@ void ImageWidget::endSelection(){
     zoomIn(startX_, startY_, currentX_, currentY_);
     repaint();
   }
-  if(getMode() == Add && getType() == SelectionType::Rectangle){
-    QPoint topleft(startX_, startY_), bottomright(currentX_, currentY_);
-    topleft = mapPoint(topleft);
-    bottomright = mapPoint(bottomright);
-    UTRectangle* rect = new UTRectangle(Point(topleft.x(), topleft.y()), Point(bottomright.x(), bottomright.y()));
-    emit selected(rect);
-  }
-  if(getMode() == Add && (getType() == SelectionType::Polygon || getType() == SelectionType::Manual)){
-    std::vector<Point> vertices;
-    for(uint16_t i = 0; i < selectionVertices_.size(); i++)
-      vertices.push_back(Point(selectionVertices_[i].x(), selectionVertices_[i].y()));
-    
-    UTPolygon* poly = new UTPolygon(vertices);
-    emit selected(poly);
-  }
-  if(getMode() == Add && getType() == SelectionType::Ellipse){
-    std::vector<Point> vertices;
-    for(uint16_t i = 0; i < selectionVertices_.size(); i++)
-      vertices.push_back(Point(selectionVertices_[i].x(), selectionVertices_[i].y()));
-    UTEllipse* ellipse = new UTEllipse(vertices);
-    ellipse->fixpoints();
-    emit selected(ellipse);
+  //TODO: Fix these memory leaks
+  if(getMode() == Add) {
+    switch(getType()) {
+      case SelectionType::Rectangle: {
+        QPoint sp(startX_, startY_), cp(currentX_, currentY_);
+        sp = mapPoint(sp);
+        cp = mapPoint(cp);
+        Rectangle* rect = new Rectangle(Point(sp.x(), sp.y()), Point(cp.x(), cp.y()));
+        emit selected(rect);
+      } break;
+      case SelectionType::Polygon: {
+        Polygon* poly = new Polygon(convert(selectionVertices_));
+        emit selected(poly);
+      } break;
+      case SelectionType::Manual: {
+        Polygon* poly = new Manual(convert(selectionVertices_));
+        emit selected(poly);
+      } break;
+      case SelectionType::Ellipse: {
+        Ellipse* ellipse = new Ellipse(convert(selectionVertices_));
+        ellipse->fixpoints();
+        emit selected(ellipse);
+      } break;
+    }
   }
 }
 
@@ -222,15 +267,12 @@ void ImageWidget::drawSelectionRectangle(bool map){
     topleft = mapPoint(topleft);
     bottomright = mapPoint(bottomright);
   }
-  UTRectangle rect(Point(topleft.x(), topleft.y()), Point(bottomright.x(), bottomright.y()));
+  Rectangle rect(Point(topleft.x(), topleft.y()), Point(bottomright.x(), bottomright.y()));
   drawRectangle(&rect, map);
 }
 
 void ImageWidget::drawSelectionEllipse(){
-  std::vector<Point> vertices;
-  for(uint16_t i = 0; i < selectionVertices_.size(); i++)
-    vertices.push_back(Point(selectionVertices_[i].x(), selectionVertices_[i].y()));
-  UTEllipse ellipse(vertices);
+  Ellipse ellipse(convert(selectionVertices_));
   if(isSelecting_) {
     QPoint qp(currentX_, currentY_);
     qp = mapPoint(qp);
@@ -242,10 +284,7 @@ void ImageWidget::drawSelectionEllipse(){
 }
 
 void ImageWidget::drawSelectionPolygon(){
-  std::vector<Point> vertices;
-  for(uint16_t i = 0; i < selectionVertices_.size(); i++)
-    vertices.push_back(Point(selectionVertices_[i].x(), selectionVertices_[i].y()));
-  UTPolygon poly(vertices);
+  Polygon poly(convert(selectionVertices_));
   if(isSelecting_) {
     QPoint qp(currentX_, currentY_);
     qp = mapPoint(qp);
@@ -259,13 +298,14 @@ void ImageWidget::drawStoredSelections() {
   for(unsigned int i=0; i<selections_.size(); i++) {
     switch(selections_[i]->getSelectionType()){
       case SelectionType::Rectangle:
-        drawRectangle((UTRectangle*)selections_[i], true);
+        drawRectangle(static_cast<Rectangle*>(selections_[i]), true);
         break;
       case SelectionType::Ellipse:
-        drawEllipse((UTEllipse*)selections_[i]);
+        drawEllipse(static_cast<Ellipse*>(selections_[i]));
         break;
+      case SelectionType::Manual:
       case SelectionType::Polygon:
-        drawPolygon((UTPolygon*)selections_[i]);
+        drawPolygon(static_cast<Polygon*>(selections_[i]));
         break;
       default:
         break;
@@ -273,61 +313,60 @@ void ImageWidget::drawStoredSelections() {
   }
 }
 
-void ImageWidget::drawRectangle(UTRectangle* rectangle, bool map){
+void ImageWidget::drawRectangle(Rectangle* rectangle, bool map){
   QPainter painter;
   painter.begin(this);
   painter.setRenderHint(QPainter::Antialiasing);
-  painter.setPen(selectionColor_);
+  painter.setPen(rectangle->hovered() ? hoverColor_ : selectionColor_);
   painter.setOpacity(.7);
-  QRect rect;
   QPoint topleft = QPoint(rectangle->getTopLeft().x, rectangle->getTopLeft().y);
   QPoint bottomright = QPoint(rectangle->getBottomRight().x, rectangle->getBottomRight().y);
+  QRect rect(topleft, bottomright);
   if(map)
     rect = QRect(unMapPoint(topleft), unMapPoint(bottomright));
   else
     rect = QRect(topleft, bottomright);
   painter.drawRect(rect);
-  painter.setBrush(selectionColor_);
+  painter.setBrush(rectangle->hovered() ? hoverColor_ : selectionColor_);
   painter.setOpacity(.2);
   painter.drawRect(rect);
   painter.end();
 }
 
-void ImageWidget::drawEllipse(UTEllipse* ellipse){
+void ImageWidget::drawEllipse(Ellipse* ellipse){
   QPainter painter;
   painter.begin(this);
   painter.setRenderHint(QPainter::Antialiasing);
-  painter.setPen(selectionColor_);
+  painter.setPen(ellipse->hovered() ? hoverColor_ : selectionColor_);
   QPoint topleft(ellipse->x(), ellipse->y());
   QPoint bottomright(ellipse->x() + ellipse->width(), ellipse->y() + ellipse->height());
   QRect rect(unMapPoint(topleft), unMapPoint(bottomright));
   painter.drawEllipse(rect);
-  painter.setBrush(selectionColor_);
+  painter.setBrush(ellipse->hovered() ? hoverColor_ : selectionColor_);
   painter.setOpacity(.2);
   painter.drawEllipse(rect);
   painter.end();
 }
 
-void ImageWidget::drawPolygon(UTPolygon* poly) {
+void ImageWidget::drawPolygon(Polygon* poly) {
   QPainter painter;
   painter.begin(this);
   painter.setRenderHint(QPainter::Antialiasing);
-  painter.setPen(selectionColor_);
+  painter.setPen(poly->hovered() ? hoverColor_ : selectionColor_);
   std::vector<Point> vertices = poly->getVertices();
   int vcount = vertices.size();
-  QPoint* points = new QPoint[vcount];
+  std::vector<QPoint> points(vcount);
   for(int j=0; j<vcount; j++){
     Point p = vertices[j];
     QPoint qp = QPoint(p.x,p.y);
     points[j] = unMapPoint(qp);
   }
   painter.setOpacity(.7);
-  painter.drawPolygon(points, vcount);
-  painter.setBrush(selectionColor_);
+  painter.drawPolygon(points.data(), vcount);
+  painter.setBrush(poly->hovered() ? hoverColor_ : selectionColor_);
   painter.setOpacity(.2);
-  painter.drawPolygon(points,vcount);
+  painter.drawPolygon(points.data(), vcount);
   painter.end();
-  delete [] points;
 }
 
 /** Zooming **/

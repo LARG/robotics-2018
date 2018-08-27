@@ -6,14 +6,15 @@
 #include <tool/simulation/CoachSimulation.h>
 #include <tool/simulation/GoalieSimulation.h>
 #include <communications/CommunicationModule.cpp>
+#include <common/Util.h>
 
-#define CONFIG_PATH(mode) (UTMainWnd::dataDirectory() + "/simulators/" + getName((WorldMode)(mode)) + ".yaml")
+#define CONFIG_PATH(mode) util::format("%s/%s.yaml", util::cfgpath(util::SimViewConfigs), getName(static_cast<WorldMode>(mode))) 
 using namespace std;
 
 WorldWindow::WorldWindow(QMainWindow* pa) : ConfigWindow(pa) {
-  simulation_ = NULL;
-  livecore_ = NULL;
-  annotations_ = NULL;
+  simulation_ = nullptr;
+  livecore_ = nullptr;
+  annotations_ = nullptr;
   updating_ = false;
   setupUi(this);
   world->loadState((char*)"worldView.xml");
@@ -37,10 +38,6 @@ WorldWindow::WorldWindow(QMainWindow* pa) : ConfigWindow(pa) {
   connect(pauseButton, SIGNAL(pressed()), this, SLOT(pause()));
   connect(restartButton, SIGNAL(pressed()), this, SLOT(restart()));
   connect(forwardButton, SIGNAL(pressed()), this, SLOT(forward()));
-  play_ = false; wconfig_.playSpeed = 50;
-  playTimer_ = new QTimer(this);
-  connect(playTimer_, SIGNAL(timeout()), this, SLOT(updateSimulation()));
-  playTimer_->start();
   connect(speedBox, SIGNAL(valueChanged(double)), this, SLOT(controlsChanged(double)));
   connect(playersBox, SIGNAL(valueChanged(int)), this, SLOT(controlsChanged(int)));
   connect(autoplayBox, SIGNAL(toggled(bool)), this, SLOT(controlsChanged(bool)));
@@ -63,6 +60,15 @@ WorldWindow::WorldWindow(QMainWindow* pa) : ConfigWindow(pa) {
 
   connect(this, SIGNAL(annotationsUpdated(AnnotationGroup*)), logWidget, SLOT(updateAnnotations(AnnotationGroup*)));
   connect(this, SIGNAL(annotationsUpdated(AnnotationGroup*)), world, SLOT(updateAnnotations(AnnotationGroup*)));
+  
+  play_ = false; 
+  wconfig_.playSpeed = 50;
+  state_timer_ = new QTimer(this);
+  connect(state_timer_, SIGNAL(timeout()), this, SLOT(updateSimulationState()));
+  state_timer_->start();
+  view_timer_ = new QTimer(this);
+  connect(view_timer_, SIGNAL(timeout()), this, SLOT(updateSimulationView()));
+  view_timer_->start();
  
   setMode(NoDraw);
   simControl->setWorld(world);
@@ -142,13 +148,12 @@ void WorldWindow::setDisplay(bool value) {
 
 void WorldWindow::stopSimulation() {
   if(inSimMode()) {
+    world->setSimulation(nullptr);
+    simControl->setSimulation(nullptr);
     if(simulation_) {
-      delete simulation_;
-      simulation_ = NULL;
+      simulation_.reset();
       play_ = false;
     }
-    world->setSimulation(simulation_);
-    simControl->setSimulation(simulation_);
   } else if(inLiveMode()) {
     if(livecore_)
       stopLiveMode();
@@ -158,31 +163,29 @@ void WorldWindow::stopSimulation() {
 void WorldWindow::startSimulation() {
   if(inSimMode()) {
     switch(wconfig_.mode) {
-      case BehaviorSim: simulation_ = new BehaviorSimulation(wconfig_.simPlayers, false, false); break;
-      case BehaviorSimLoc: simulation_ = new BehaviorSimulation(wconfig_.simPlayers, false, true); break;
+      case BehaviorSim: simulation_ = std::make_unique<BehaviorSimulation>(false); break;
+      case BehaviorSimLoc: simulation_ = std::make_unique<BehaviorSimulation>(true); break;
       case LocalizationSim: {
           if(wconfig_.locSimPathfile == "")
-            simulation_ = new LocalizationSimulation(wconfig_.seed);
+            simulation_ = std::make_unique<LocalizationSimulation>(wconfig_.seed);
           else
-            simulation_ = new LocalizationSimulation(wconfig_.locSimPathfile); 
+            simulation_ = std::make_unique<LocalizationSimulation>(wconfig_.locSimPathfile); 
         }
         break;
-      case IsolatedBehaviorSim: simulation_ = new IsolatedBehaviorSimulation(false); break;
-      case IsolatedBehaviorSimLoc: simulation_ = new IsolatedBehaviorSimulation(true); break;
-      case CoachSim: simulation_ = new CoachSimulation(); break;
-      case GoalieSim: simulation_ = new GoalieSimulation(); break;
+      case IsolatedBehaviorSim: simulation_ = std::make_unique<IsolatedBehaviorSimulation>(false); break;
+      case IsolatedBehaviorSimLoc: simulation_ = std::make_unique<IsolatedBehaviorSimulation>(true); break;
+      case CoachSim: simulation_ = std::make_unique<CoachSimulation>(); break;
+      case GoalieSim: simulation_ = std::make_unique<GoalieSimulation>(); break;
     }
     player_ = simulation_->defaultPlayer();
     if(wconfig_.autoplay) play_ = true;
-    world->setSimulation(simulation_);
-    simControl->setSimulation(simulation_);
+    world->setSimulation(simulation_.get());
+    simControl->setSimulation(simulation_.get());
   } else if(inLiveMode()) {
     startLiveMode();
   }
   if(inSimMode()) {
     skip();
-    updateSimulationView();
-    simText->setText(QString::fromStdString(simulation_->getSimInfo()));
   } else {
     world->updateDisplay(simconfig_.options);
   }
@@ -204,7 +207,8 @@ void WorldWindow::setMode(WorldMode mode, bool restart) {
   if(lastmode == mode && !restart) return;
   stopSimulation();
   wconfig_.mode = lastmode = mode;
-  startSimulation();
+  if(this->isVisible())
+    startSimulation();
   if(!restart) {
     simconfig_.loadFromFile(CONFIG_PATH(wconfig_.mode));
   }
@@ -233,7 +237,6 @@ void WorldWindow::skip() {
     while(cache.frame_info->frame_id < wconfig_.skip) {
       simulation_->simulationStep();
     }
-    updateSimulationView();
   }
 }
 
@@ -247,8 +250,8 @@ void WorldWindow::restart() {
 void WorldWindow::forward() {
   if(inSimMode()) {
     simulation_->simulationStep();
+    forward_ = true;
     updateSimulationView();
-    simText->setText(QString::fromStdString(simulation_->getSimInfo()));
   } else {
     emit nextSnapshot();
     world->updateDisplay(simconfig_.options);
@@ -259,14 +262,17 @@ void WorldWindow::back() {
   if(!inSimMode()) emit prevSnapshot();
 }
 
-void WorldWindow::updateSimulation() {
-  playTimer_->setInterval(1/wconfig_.playSpeed * 1000);
+void WorldWindow::updateSimulationState() {
+  state_timer_->setInterval(1/wconfig_.playSpeed * 1'000);
   if(!play_) return;
   if(!inSimMode()) return;
   forward();
 }
 
 void WorldWindow::updateSimulationView() {
+  view_timer_->setInterval(1.0f/3.0f * 1'000); // 3 FPS
+  if(!play_ && !forward_) return;
+  if(!inSimMode()) return;
   auto cache = simulation_->getGtMemoryCache(player_);
   updateMemory(cache);
   if(UTMainWnd::inst()->logWnd_->isVisible()) {
@@ -277,16 +283,19 @@ void WorldWindow::updateSimulationView() {
   UTMainWnd::inst()->stateWnd_->update(cache.memory);
   UTMainWnd::inst()->sensorWnd_->update(cache.memory);
   UTMainWnd::inst()->jointsWnd_->update(cache.memory);
+  simText->setText(QString::fromStdString(simulation_->getSimInfo()));
   world->updateDisplay(simconfig_.options);
+  forward_ = false;
 }
 
 void WorldWindow::startLiveMode() {
   if(!livecore_) {
-    livecore_ = new VisionCore(CORE_SIM,false,wconfig_.teamNumber, WO_TEAM_LISTENER);
+    livecore_ = std::make_unique<VisionCore>(CORE_SIM,false,wconfig_.teamNumber, WO_TEAM_LISTENER);
     livecore_->communications_->initUDP();
+    livecore_->textlog_->onlineMode() = true;
     livecache_.fill(livecore_->memory_);
     livecache_.world_object->init();
-    if(livecache_.robot_state == NULL || livecache_.game_state == NULL) return;
+    if(livecache_.robot_state == nullptr || livecache_.game_state == nullptr) return;
     updateMemory(livecache_);
     livetimer_ = new QTimer(this);
     connect(livetimer_, SIGNAL(timeout()), this, SLOT(updateLiveMode()));
@@ -294,16 +303,28 @@ void WorldWindow::startLiveMode() {
   livecache_.robot_state->team_ = wconfig_.teamColor;
   livecache_.game_state->gameContTeamNum = wconfig_.teamNumber;
   livetimer_->start(1000/30);
+  UTMainWnd::inst()->logWnd_->updateFrame(livecache_.memory);
 }
 
 void WorldWindow::updateLiveMode() {
+  if(!this->isVisible()) return;
+  if(UTMainWnd::inst()->logWnd_->isVisible()) {
+    auto entries = livecore_->textlog_->textEntries();
+    if(entries.size() > 0) {
+      UTMainWnd::inst()->logWnd_->setText(entries);
+      UTMainWnd::inst()->logWnd_->updateFrame(livecache_.memory, true);
+      livecore_->textlog_->textEntries().clear();
+    }
+  }
   livecache_.frame_info->frame_id++;
+  livecore_->communications_->processFrame();
   world->updateDisplay(simconfig_.options);
   updateMemory(livecache_);
 }
 
 void WorldWindow::stopLiveMode() {
   if(!livecore_) return;
+  livecore_.reset();
   livetimer_->stop();
 }
 
@@ -315,4 +336,9 @@ void WorldWindow::fieldClicked(Point2D pos, Qt::MouseButton button) {
 }
 
 void WorldWindow::fieldHovered(Point2D pos) {
+}
+  
+void WorldWindow::showEvent(QShowEvent* event) {
+  if(simulation_ == nullptr && livecore_ == nullptr)
+    startSimulation();
 }

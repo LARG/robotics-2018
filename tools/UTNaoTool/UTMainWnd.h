@@ -2,30 +2,22 @@
 #define UTMAINWND_H
 
 #include <QtGui/qmainwindow.h>
+#include <QFileDialog>
+
+#include <common/ToolPacket.h>
+#include <memory/LogWriter.h>
+#include <memory/MemoryFrame.h>
+#include <memory/LogViewer.h>
+#include <communications/StreamingMessage.h>
+#include <communications/CommInfo.h>
+#include <VisionCore.h>
+
+#include <thread>
+#include <memory>
 #include <vector>
 #include <stdio.h>
 
-#include <memory/LogViewer.h>
-#include <memory/MemoryFrame.h>
-#include <memory/LogWriter.h>
-#include <communications/StreamingMessage.h>
-
-#include <boost/bind.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
-#include <communications/CommInfo.h>
-
-using boost::asio::ip::tcp;
-typedef boost::shared_ptr<tcp::socket> socket_ptr;
-
-
-#include <QFileDialog>
-
-#include <VisionCore.h>
-#include <common/ToolPacket.h>
-
-#include "ToolConfig.h"
+#include <tool/ToolConfig.h>
 #include "ui_MainWindow.h"
 
 class UTMainWnd;
@@ -45,29 +37,27 @@ class SensorWindow;
 class TeamConfigWindow;
 class AnnotationGroup;
 class InterpreterModule;
+class TCPClient;
+class Arguments;
+
 
 void server(UTMainWnd *main);
 
 class UTMainWnd : public QMainWindow, public Ui_UTNaoTool {
 Q_OBJECT
 public:
-  UTMainWnd(const char *filename = NULL, bool core = false);
+  UTMainWnd(const Arguments& args);
   ~UTMainWnd();
 
   void sendUDPCommand(QString address, ToolPacket packet);
   void sendUDPCommandToCurrent(ToolPacket packet);
   QString getCurrentAddress();
 
-  void setFrameRange(int start = 0, int end = -1) {
-    startSpin->setValue(start);
-    endSpin->setValue(end);
-  }
-  static int loadInt(QTextStream &t, bool &ok);
+  void setFrameBounds(int start = 0, int end = -1);
   static UTMainWnd* inst() { return instance_; }
   static VisionCore* core() { return instance_->visionCore_; }
   static InterpreterModule* interpreter() { return instance_->visionCore_->interpreter_; }
   static std::string dataDirectory() { return std::string(getenv("NAO_HOME")) + "/data"; }
-  static bool reload_;
 
 private:
   static UTMainWnd* instance_;
@@ -90,7 +80,9 @@ private:
   // streaming
 public:
   bool isStreaming() { return isStreaming_; }
-  void processStream(socket_ptr sock);
+  bool isRunningCore() { return runCoreRadio->isChecked(); }
+  void processStreamBuffer(const StreamBuffer& buffer);
+  void processStreamExit();
   MemoryFrame stream_memory_;
   StreamingMessage stream_msg_;
 
@@ -110,13 +102,16 @@ public:
   SensorWindow* sensorWnd_;
   TeamConfigWindow* teamWnd_;
 
-  std::string rcPath;
+  std::string rcPath_;
+  std::unique_ptr<std::thread> t_sim_stream_;
+  int frame_id_;
 
 private:
   ToolConfig config_;
   bool loading_;
   LogWriter* logger_;
   AnnotationGroup* annotations_;
+  std::unique_ptr<TCPClient> tcpclient_;
 
 public slots:
 
@@ -161,9 +156,6 @@ public slots:
   void handleStreamFrame();
 
   void remoteRestartInterpreter();
-  void updateConfigFile();
-  void updateCalibrationFile();
-  void readCalibrationFile();
 
 Q_SIGNALS:
   void newStreamFrame();

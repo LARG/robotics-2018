@@ -1,4 +1,5 @@
-#include "ClassificationWidget.h"
+#include <tool/ClassificationWidget.h>
+#include <vision/ImageProcessor.h>
 #define generateForColor(c) (flags & (1 << c))
 
 ClassificationWidget::ClassificationWidget(QWidget* parent) : QWidget(parent), log_(NULL) {
@@ -24,7 +25,7 @@ ClassificationWidget::ClassificationWidget(QWidget* parent) : QWidget(parent), l
     strCol[c_YELLOW]="Yellow";
     strCol[c_ROBOT_WHITE] = "Robot White";
 
-    for (int i=0; i<NUM_Colors; i++) {
+    for (int i=0; i<Color::NUM_Colors; i++) {
         colorCombo->addItem(strCol[i]);
     }
     maxFrames_ = 0;
@@ -73,10 +74,10 @@ void ClassificationWidget::generateColorTable() {
     }
   }
   int yrad = yradius->value(), urad = uradius->value(), vrad = vradius->value();
-  std::vector<ImageBuffer> images = (currentCamera_ == Camera::TOP ? log_->getRawTopImages() : log_->getRawBottomImages());
+  auto images = (currentCamera_ == Camera::TOP ? log_->getRawTopImages() : log_->getRawBottomImages());
   std::vector<ImageParams> iparams = (currentCamera_ == Camera::TOP ? log_->getTopParams() : log_->getBottomParams());
   for(int frame = 0; frame < maxFrames_; frame++) {
-    unsigned char* image = images[frame].data();
+    auto image = images[frame];
     int count = annotations_.size();
     for(int i = 0; i < count; i++){
       VisionAnnotation* annotation = annotations_[i];
@@ -85,18 +86,17 @@ void ClassificationWidget::generateColorTable() {
       if(!annotation->isInFrame(frame)) continue;
       if(!annotation->isSample()) continue;
       if(!generateForColor(c)) continue;
-      vector<Point> points = annotation->getEnclosedPoints(frame);
+      std::vector<Point> points = annotation->getEnclosedPoints(frame);
       int pcount = points.size();
       for(int j=0; j < pcount; j++){
         Point p = points[j];
         if(p.x >= iparams[frame].width || p.y >= iparams[frame].height) continue;
-        Color current = ColorTableMethods::xy2color(image, original, p.x, p.y, width);
+        Color current = ColorTableMethods::xy2color(image.data(), original, p.x, p.y, width);
         if(!generateForColor(current)) continue;
-        ColorTableMethods::assignColor(image, colorTable, p.x, p.y, width, c, yrad, urad, vrad);
+        ColorTableMethods::assignColor(image.data(), colorTable, p.x, p.y, width, c, yrad, urad, vrad);
       }
     }
   }
-  //for(auto image : images) delete image;
   std::cout << "done\n";
   emit colorTableGenerated();
 }

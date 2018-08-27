@@ -2,8 +2,6 @@
 
 #include <ctime>
 
-#include <thread>
-
 // windows
 #include <tool/FilesWindow.h>
 #include <tool/LogEditorWindow.h>
@@ -20,16 +18,12 @@
 #include <tool/SensorWindow.h>
 #include <tool/TeamConfigWindow.h>
 #include <common/annotations/AnnotationGroup.h>
+#include <tool/args/ArgumentParser.h>
 
-//Networking
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
+#include <communications/TCPConnection.h>
 #include <common/WorldObject.h>
 #include <common/RobotInfo.h>
+#include <communications/CommunicationModule.h>
 
 #include <memory/PrivateMemory.h>
 #include <memory/LogReader.h>
@@ -57,11 +51,12 @@
 #include <math/RotationMatrix.h>
 #include <math/Vector3.h>
 
-UTMainWnd* UTMainWnd::instance_ = NULL;
-bool UTMainWnd::reload_ = false;
+#include <boost/filesystem/operations.hpp>
+#include <chrono>
 
-UTMainWnd::UTMainWnd(const char *directory, bool core):
-//  memory_log_(NULL),
+UTMainWnd* UTMainWnd::instance_ = NULL;
+
+UTMainWnd::UTMainWnd(const Arguments& args) :
   stream_memory_(false,MemoryOwner::TOOL_MEM, 0, 1),
   filesWnd_(NULL),
   logEditorWnd_(NULL),
@@ -143,6 +138,7 @@ UTMainWnd::UTMainWnd(const char *directory, bool core):
   connect (visionWnd_, SIGNAL(prevSnapshot()), this, SLOT(prevSnapshot()) );
   connect (visionWnd_, SIGNAL(nextSnapshot()), this, SLOT(nextSnapshot()) );
   connect (visionWnd_, SIGNAL(setCore(bool)), this, SLOT(setCore(bool)) );
+  connect (visionWnd_, SIGNAL(gotoSnapshot(int)), this, SLOT(gotoSnapshot(int)));
   connect (this, SIGNAL(setStreaming(bool)), visionWnd_, SLOT(setStreaming(bool)) );
   connect (this, SIGNAL(setStreaming(bool)), worldWnd_, SLOT(handleStreaming(bool)) );
   connect (this, SIGNAL(newLogFrame(int)), visionWnd_, SLOT(handleNewLogFrame(int)));
@@ -160,9 +156,9 @@ UTMainWnd::UTMainWnd(const char *directory, bool core):
   connect (viewLogRadio, SIGNAL(clicked()), this, SLOT(runLog()) );
   connect (streamRadio, SIGNAL(clicked()), this, SLOT(runStream()));
   connect (streamRadio, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
-  connect (localizationOnlyRadioButton, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
+  connect (bypassVisionRadioButton, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
   connect (visionOnlyRadioButton, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
-  connect (locVisRadioButton, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
+  connect (fullProcessRadioButton, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
   connect (onDemandCheckBox, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
   connect (logStreamCheckBox, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
   connect (coreBehaviorsCheckBox, SIGNAL(toggled(bool)), this, SLOT(saveConfig(bool)));
@@ -174,7 +170,7 @@ UTMainWnd::UTMainWnd(const char *directory, bool core):
   annotations_ = new AnnotationGroup();
   emit annotationsUpdated(annotations_);
 
-  rcPath = dataDirectory() + "/.utnaotoolrc";
+  rcPath_ = dataDirectory() + "/.utnaotoolrc";
   current_index_ = -1;
   runningCore_ = false;
   coreAvailable_ = false;
@@ -184,100 +180,72 @@ UTMainWnd::UTMainWnd(const char *directory, bool core):
   currentFrameSpin->setRange(0,0);
   frameSlider->setRange(0,0);
 
-  new std::thread(server,this);
-
   loadConfig();
-  if(!reload_) { // Unless we're reloading the latest log, don't set start/end up front
-    setFrameRange();
+  if(args.open_previous) {
+    setFrameBounds(args.frame_bounds[0], args.frame_bounds[1]);
+  } else {
+    // Setting the start/end frames only makes sense if we're reloading a
+    // recently-opened log, because otherwise we probably don't know how many
+    // frames are in the log we're opening.
+    setFrameBounds();
   }
-  if(directory) config_.logFile = directory;
-  if(reload_) reopenLog();
-  else if(directory) {
-    loadLog(config_.logFile);
-    if (core) {
-      runningCore_ = true;
-      runCore();
-    }
+  if(!args.log_path.empty()) {
+    auto path = boost::filesystem::canonical(args.log_path);
+    config_.logPath = path.string();
   }
+
+  if(args.open_previous) {
+    if(config_.logPath.empty()) 
+      printf("Can't reopen the last log because the path was "
+        "not specified, and the path does not exist in your "
+        "configuration file at: %s\n", rcPath_.c_str()
+      );
+    else reopenLog();
+  }
+  else if(args.open_recent) openRecent();
+  else if(!config_.logPath.empty() && !args.log_path.empty())
+    loadLog(config_.logPath);
+  
+  if(!args.ip_address.empty())
+    filesWnd_->setCurrentLocation(args.ip_address);
+  if(args.bypass_vision)
+    bypassVisionRadioButton->setChecked(true);
+  if(args.vision_only)
+    visionOnlyRadioButton->setChecked(true);
+  if(args.run_core)
+    setCore(true);
 }
 
 void UTMainWnd::handleStreamFrame() {
   gotoSnapshot(0);
 }
 
-void server(UTMainWnd *main) {
-  try {
-    while(true) {
-      while(!main->isVisible() || !main->isStreaming())
-        sleep(0.01);
-      boost::asio::io_service io_service;
-      socket_ptr sock(new tcp::socket(io_service));
-      tcp::acceptor acceptor(io_service,tcp::endpoint(tcp::v4(),CommInfo::TOOL_TCP_PORT));
-      acceptor.accept(*sock);
-      main->processStream(sock);
-    }
-  } catch (...) {
-    fprintf(stderr, "Error starting TCP server - may have multiple tool instances running.\n");
+void UTMainWnd::processStreamBuffer(const StreamBuffer& buffer) {
+  LogReader stream_reader(buffer);
+  bool res = stream_reader.readMemory(stream_memory_, frame_id_++);
+  if (!res) {
+    std::cout << "Problem reading memory from tcp message" << std::endl;
+    return;
   }
-}
-
-void UTMainWnd::processStream(socket_ptr sock) {
-  std::size_t ret;
-  unsigned long &send_len = stream_msg_.send_len_;
-  std::size_t expected_len = sizeof(send_len);
-  try {
-    for (;;) {
-      ret = boost::asio::read(*sock,boost::asio::buffer(&send_len,expected_len));
-      if (ret != expected_len) {
-        std::cout << "Couldn't read send_len " << ret << " " << expected_len << std::endl << std::flush;
-        return;
-      }
-      if (send_len > MAX_STREAMING_MESSAGE_LEN) {
-        std::cout << "MESSAGE TOO LARGE " << send_len << " " << MAX_STREAMING_MESSAGE_LEN << std::endl << std::flush;
-        return;
-      }
-      ret = boost::asio::read(*sock,boost::asio::buffer(&(stream_msg_.orig_len_),expected_len));
-      if (ret != expected_len) {
-        std::cout << "Couldn't read orig_len " << ret << " " << expected_len << std::endl << std::flush;
-        return;
-      }
-      ret = boost::asio::read(*sock,boost::asio::buffer(&stream_msg_.data_,send_len - 2 * expected_len));
-      char *msg = (char*)stream_msg_.postReceive(ret);
-      if (msg == NULL) {
-        std::cout << "Invalid tcp message" << std::endl << std::flush;
-        return;
-      }
-      StreamBuffer sb(msg, stream_msg_.orig_len_);
-      LogReader stream_reader(sb);
-      bool res = stream_reader.readMemory(stream_memory_, current_index_);
-      if (!res) {
-        std::cout << "Problem reading memory from tcp message" << std::endl;
-        return;
-      }
-      delete []msg;
-      emit newStreamFrame();
-
-      // Log the stream
-      if(config_.logStream) {
-        if(!logger_->isOpen()) {
-          logger_->open("stream", true);
-          annotations_->clear();
-          annotationsUpdated(annotations_);
-        }
-        logger_->writeMemory(stream_memory_);
-        annotations_->save(logger_->directory());
-      } else if(logger_->isOpen()) logger_->close();
-      
-    }
-  } catch (boost::system::system_error) {
-    if(logger_->isOpen()) {
-      annotations_->save(logger_->directory());
+  emit newStreamFrame();
+  // LogViewer the stream
+  if(config_.logStream) {
+    if(!logger_->isOpen()) {
+      logger_->open("stream", true);
       annotations_->clear();
       annotationsUpdated(annotations_);
-      logger_->close();
     }
-    std::cout << "Error reading from tcp, disconnecting" << std::endl << std::flush;
-    return;
+    logger_->writeMemory(stream_memory_);
+    annotations_->save(logger_->directory());
+  } else if(logger_->isOpen()) logger_->close();
+}
+
+void UTMainWnd::processStreamExit() {
+  if(logger_->isOpen()) {
+    annotations_->save(logger_->directory());
+    annotations_->clear();
+    annotationsUpdated(annotations_);
+    logger_->close();
   }
 }
 
@@ -298,11 +266,9 @@ void UTMainWnd::loadLog(std::string directory) {
 }
 
 void UTMainWnd::loadLog(const char *directory) {
-  config_.logFile = directory;
+  config_.logPath = directory;
   saveConfig();
   printf("Loading frames %i to %i of file %s\n", config_.logStart, config_.logEnd, directory);
-  //if(memory_log_) delete memory_log_;
-
   if(config_.onDemand)
     memory_log_ = std::make_unique<LogViewer>(directory, config_.logStart, config_.logEnd);
   else
@@ -315,7 +281,7 @@ void UTMainWnd::loadLog(const char *directory) {
 
   // load the corresponding text file as well
   setCore(false);
-  std::string textfile = config_.logFile + "/frames.txt";
+  std::string textfile = config_.logPath + "/frames.txt";
   logWnd_->loadTextFile(textfile.c_str()); // done in setCore // not always apparently
 
   numFrameEdit->setText(QString::number(size-1));
@@ -364,6 +330,13 @@ void UTMainWnd::runCore() {
     remove("core.txt");
 
     visionCore_->opponents_->reInit();
+    if(config_.logWindowConfig.filterTextLogs)
+      visionCore_->textlog()->setFilters(
+        config_.logWindowConfig.minLevel,
+        config_.logWindowConfig.maxLevel,
+        static_cast<TextLogger::Type>(config_.logWindowConfig.module)
+      );
+    else visionCore_->textlog()->clearFilters();
 
     for (unsigned i = 0; i < memory_log_->size(); i++) {
       runCoreFrame(i, i == 0, i == memory_log_->size() - 1);
@@ -388,28 +361,30 @@ void UTMainWnd::runCore() {
 
 void UTMainWnd::runCoreFrame(int i, bool start, bool end) {
   MemoryFrame& memory = memory_log_->getFrame(i);
-  visionCore_->updateMemory(&memory,config_.locOnly);
-  if (start) {
+  auto cache = MemoryCache::read(memory);
+  bool locEnabled = cache.localization_mem != nullptr;
+  visionCore_->updateMemory(&memory,config_.bypassVision);
+  if(start) {
     // load either sim or robot color tables based on the first frame of the log
-    if (config_.locOnly) {
+    if (config_.bypassVision) {
       visionCore_->interpreter_->initFromMemory();
     } else {
-      visionCore_->vision_->loadColorTables();
+      visionCore_->vision_->initSpecificModule();
       visionCore_->interpreter_->restart();
     }
-    visionCore_->localization_->initFromMemory();
+    if(!config_.visionOnly && locEnabled)
+      visionCore_->localization_->initFromMemory();
     visionCore_->audio_->initFromMemory();
     visionCore_->enableTextLogging("core.txt");
   }
-  if (config_.locOnly){
-    visionCore_->localization_->processFrame();
+  if(config_.visionOnly || config_.fullProcess)
+    visionCore_->vision_->processFrame();
+  if(config_.bypassVision || config_.fullProcess){
+    if(locEnabled)
+      visionCore_->localization_->processFrame();
     visionCore_->opponents_->processFrame();
     if(config_.coreBehaviors)
       visionCore_->interpreter_->processBehaviorFrame();
-  } else if (config_.visOnly) {
-    visionCore_->vision_->processFrame();
-  } else {
-    visionCore_->processVisionFrame();
   }
   visionCore_->audio_->processFrame();
 }
@@ -418,8 +393,8 @@ void UTMainWnd::runLog() {
   stopStream();
   if (runningCore_) {
     runningCore_ = false;
-    loadLog(config_.logFile.c_str());
-    std::string textfile = config_.logFile + "/frames.txt";
+    loadLog(config_.logPath.c_str());
+    std::string textfile = config_.logPath + "/frames.txt";
     logWnd_->loadTextFile(textfile.c_str());
     int index = current_index_;
     current_index_ = -1;
@@ -447,14 +422,19 @@ void UTMainWnd::runStream() {
   isStreaming_ = true;
   stream_memory_ = MemoryFrame(false,MemoryOwner::TOOL_MEM, 0, 1);
   sleep(0.05); // this is terrible
-  sendUDPCommandToCurrent(ToolPacket::StreamBegin);
+  QString address = getCurrentAddress();
+  if(address.contains("core")) address = "127.0.0.1";
+  frame_id_ = 0;
+  tcpclient_ = std::make_unique<TCPClient>(CommInfo::TOOL_TCP_PORT);
+  tcpclient_->register_receiver(&UTMainWnd::processStreamBuffer, this);
+  tcpclient_->loop_client(address.toStdString());
   logSelectWnd_->sendLogSettings();
   emit setStreaming(true);
 }
 
 void UTMainWnd::stopStream() {
-  if (isStreaming_)
-    sendUDPCommandToCurrent(ToolPacket::StreamEnd);
+  tcpclient_.reset();
+  processStreamExit();
   isStreaming_ = false;
   emit setStreaming(false);
 }
@@ -515,9 +495,14 @@ void UTMainWnd::nextSnapshot() {
 }
 
 void UTMainWnd::reopenLog() {
+  if(config_.logPath.empty()) return;
+  // We're most likely opening the log that we were recently using. Often this
+  // takes place after a crash, so we try to reset the state as closely as possible
+  // by running core (if previously selected) and going to the frame we were viewing
+  // before the tool closed.
   bool core = runCoreRadio->isChecked();
   int frame = config_.logFrame;
-  loadLog(config_.logFile);
+  loadLog(config_.logPath);
   currentFrameSpin->setValue(frame);
   if(core) {
     coreAvailable_ = false;
@@ -540,8 +525,7 @@ bool UTMainWnd::openLog() {
 }
 
 bool UTMainWnd::openRecent() {
-
-  // find most recent log
+  printf("Opening most recent log based on modification date.\n");
   QDir* logDir = new QDir(QString(getenv("NAO_HOME")) + "/logs/");
   QStringList filters;
   logDir->setSorting(QDir::Time);
@@ -655,78 +639,6 @@ void UTMainWnd::remoteRestartInterpreter() {
   sendUDPCommandToCurrent(ToolPacket::RestartInterpreter);
 }
 
-void UTMainWnd::updateConfigFile() {
-
-  if (getCurrentAddress() == "localhost") { // Not required for simulator
-    cout << "Error: config file is not supported for simulator!" << endl;
-    return;
-  }
-
-  RobotConfig config;
-  config.robot_id = getCurrentAddress().section('.', 3).toInt();
-  config.team = filesWnd_->teamNumBox->value();
-  config.role = filesWnd_->roleBox->value();
-
-  if (config.team != 23){
-    cout << "WARNING! Setting team # to " << config.team << " while our RC2011 team number is 23" << endl;
-  }
-
-  // Write file to set values
-  config.saveToFile("./config.txt");
-
-  // Send the file to the robot
-  QString cmd = "scp ";
-  cmd += "./config.txt ";
-  cmd += "nao@" + getCurrentAddress() + ":~/data/config.txt ";
-  std::cout << "Executing command: " << cmd.toStdString() << std::endl;
-  QProcess processSend;
-  processSend.start(cmd);
-  if (!processSend.waitForStarted()) {
-    cout << "Error: unable to copy config.txt to " << getCurrentAddress().toStdString() << endl << flush;
-    return;
-  }
-  processSend.waitForFinished();
-  std::cout << "Done!" << std::endl;
-
-}
-
-void UTMainWnd::updateCalibrationFile() {
-
-  if (getCurrentAddress() == "localhost") { // Not required for simulator
-    cout << "Error: config file is not supported for simulator!" << endl;
-    return;
-  }
-
-  // Send the file to the robot
-  filesWnd_->sendFile("./calibration.txt","~/data","calibration.txt");
-  filesWnd_->sendFile(filesWnd_->dataPath + "defaultcamera.cal","~/data","defaultcamera.cal");
-  QString id = getCurrentAddress().split(".")[3];
-  filesWnd_->sendFile(filesWnd_->dataPath + id + "camera.cal","~/data",id+"camera.cal");
-}
-
-void UTMainWnd::readCalibrationFile() {
-  // Copy over the file from the robot first to not overwrite useful values
-  QString cmd = "scp ";
-  cmd += "nao@" + getCurrentAddress() + ":~/data/calibration.txt ";
-  cmd += "./calibration.txt";
-  std::cout << "Executing command: " << cmd.toStdString() << std::endl;
-  QProcess processGet;
-  processGet.start(cmd);
-  if (!processGet.waitForStarted()) {
-    cout << "Error: unable to copy calibration.txt from " << getCurrentAddress().toStdString() << endl << flush;
-  }
-  processGet.waitForFinished();
-
-  // Read file to get values
-  Calibration calibration;
-  if (calibration.readFromFile("./calibration.txt")) {
-    //visionWnd_->updateCalibration(calibration.tilt_top_cam_, calibration.roll_top_cam_, calibration.tilt_bottom_cam_, calibration.roll_bottom_cam_, calibration.head_pan_offset_, calibration.head_tilt_offset_);
-  } else {
-    cout << "Error: unable to read calibration.txt from " << getCurrentAddress().toStdString() << endl << flush;
-  }
-}
-
-
 void UTMainWnd::sendUDPCommand(QString address, ToolPacket packet) {
   if(address == "core") return;
   UDPWrapper sender(CommInfo::TOOL_UDP_PORT, false, address.toStdString(), UDPWrapper::Outbound);
@@ -740,13 +652,13 @@ void UTMainWnd::sendUDPCommandToCurrent(ToolPacket packet) {
   
 void UTMainWnd::loadConfig() {
   loading_ = true;
-  if(config_.loadFromFile(rcPath)) {
+  if(config_.loadFromFile(rcPath_)) {
     loadingConfig(config_);
   }
   onDemandCheckBox->setChecked(config_.onDemand);
-  localizationOnlyRadioButton->setChecked(config_.locOnly);
-  visionOnlyRadioButton->setChecked(config_.visOnly);
-  locVisRadioButton->setChecked(config_.locAndVis);
+  bypassVisionRadioButton->setChecked(config_.bypassVision);
+  visionOnlyRadioButton->setChecked(config_.visionOnly);
+  fullProcessRadioButton->setChecked(config_.fullProcess);
   logStreamCheckBox->setChecked(config_.logStream);
   coreBehaviorsCheckBox->setChecked(config_.coreBehaviors);
   startSpin->setValue(config_.logStart);
@@ -772,9 +684,9 @@ void UTMainWnd::saveConfig() {
   if(loading_) return;
   config_.streaming = streamRadio->isChecked();
   config_.onDemand = onDemandCheckBox->isChecked();
-  config_.locOnly = localizationOnlyRadioButton->isChecked();
-  config_.visOnly = visionOnlyRadioButton->isChecked();
-  config_.locAndVis = locVisRadioButton->isChecked();
+  config_.bypassVision = bypassVisionRadioButton->isChecked();
+  config_.visionOnly = visionOnlyRadioButton->isChecked();
+  config_.fullProcess = fullProcessRadioButton->isChecked();
   config_.logStream = logStreamCheckBox->isChecked();
   config_.coreBehaviors = coreBehaviorsCheckBox->isChecked();
   config_.logStart = startSpin->value();
@@ -782,16 +694,12 @@ void UTMainWnd::saveConfig() {
   config_.logFrame = currentFrameSpin->value();
   config_.logStep = stepSpin->value();
   savingConfig(config_);
-  config_.saveToFile(rcPath);
+  config_.saveToFile(rcPath_);
 }
 
-int UTMainWnd::loadInt(QTextStream &t, bool &ok) {
-  QString line = t.readLine();
-  if (line.isNull()) {
-    ok = false;
-    return 0;
-  }
-  return line.toInt(&ok);
+void UTMainWnd::setFrameBounds(int start, int end) {
+  startSpin->setValue(start);
+  endSpin->setValue(end);
 }
 
 void UTMainWnd::addressChanged() {

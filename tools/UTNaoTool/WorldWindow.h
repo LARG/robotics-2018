@@ -39,6 +39,7 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
     bool inLiveMode();
     void startLiveMode();
     void stopLiveMode();
+    void showEvent(QShowEvent* event) override;
   public slots:
     void loadConfig(const ToolConfig& config);
     void saveConfig(ToolConfig& config);
@@ -49,7 +50,7 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
     void updateLiveMode();
     void setMode(WorldMode mode, bool restart = false);
     void updateDisplay(bool = true);
-    void updateSimulation();
+    void updateSimulationState();
     void updateSimulationView();
 
     void skip();
@@ -79,16 +80,17 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
     std::vector<WorldMode> modes_;
     int player_;
     
-    Simulation* simulation_;
-    QTimer* playTimer_, liveTimer_;
+    std::unique_ptr<Simulation> simulation_;
+    QTimer *state_timer_, *view_timer_;
     bool play_;
     WorldConfig wconfig_;
     bool updating_;
-    VisionCore* livecore_;
+    std::unique_ptr<VisionCore> livecore_;
     MemoryCache livecache_;
     QTimer* livetimer_;
     AnnotationGroup* annotations_;
     SimulatorConfig simconfig_;
+    bool forward_ = false;
 };
 
 #endif

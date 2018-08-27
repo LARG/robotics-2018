@@ -2,6 +2,7 @@
 #include <localization/LocalizationModule.h>
 #include <common/File.h>
 #include <sstream>
+#include <common/Util.h>
 
 #define SECONDS_PER_FRAME (1.0/30.0)
 #define RADS_PER_FRAME (DEG_T_RAD * 1.0)
@@ -16,7 +17,7 @@ const string PATH_DIR = string(getenv("NAO_HOME")) + "/data/paths";
 #define team_ 0
 
 LocalizationSimulation::LocalizationSimulation(string pathfile) : iparams_(Camera::TOP), cg_(team_, player_) {
-  vector<LocSimAgent::Type> types = { LocSimAgent::Default };
+  vector<LocSimAgent::Type> types = { LocSimAgent::Type::Default };
   init(types);
   SimulationPath path;
   path.loadFromFile(PATH_DIR + "/" + pathfile);
@@ -25,7 +26,7 @@ LocalizationSimulation::LocalizationSimulation(string pathfile) : iparams_(Camer
 }
 
 LocalizationSimulation::LocalizationSimulation(int seed) : iparams_(Camera::TOP), cg_(team_, player_), seed_(seed)  {
-  vector<LocSimAgent::Type> types = { LocSimAgent::Default };
+  vector<LocSimAgent::Type> types = { LocSimAgent::Type::Default };
   init(types);
 }
 
@@ -50,27 +51,24 @@ void LocalizationSimulation::init(vector<LocSimAgent::Type> types) {
     agents_[type] = LocSimAgent(type);
   }
   for(auto& kvp : agents_) {
-    activePlayers_.push_back(kvp.first);
+    activePlayers_.push_back(static_cast<int>(kvp.first));
     startCore(kvp.second);
   }
   ballmove_ = 0;
   outputBadPaths_ = false;
 }
 
-MemoryFrame* LocalizationSimulation::getGtMemory(int) {
-  return gtcache_.memory;
-}
-
-MemoryFrame* LocalizationSimulation::getBeliefMemory(int player) {
-  return getBeliefMemoryCache(player).memory;
-}
-
-MemoryCache LocalizationSimulation::getGtMemoryCache(int) {
+MemoryCache LocalizationSimulation::getGtMemoryCache(int) const {
   return gtcache_;
 }
 
-MemoryCache LocalizationSimulation::getBeliefMemoryCache(int player) {
-  return agents_[(LocSimAgent::Type)player].cache;
+MemoryCache LocalizationSimulation::getBeliefMemoryCache(int player) const {
+  auto t = static_cast<LocSimAgent::Type>(player);
+  auto it = agents_.find(t);
+  if(it == agents_.end()) {
+    throw std::runtime_error(util::format("Invalid player requested from localization simulation: %s\n", it->first));
+  }
+  return it->second.cache;
 }
 
 void LocalizationSimulation::setPath(const SimulationPath& path) {
@@ -181,8 +179,8 @@ void LocalizationSimulation::stepError() {
     agent.rotError += rot * rot * RAD_T_DEG * RAD_T_DEG;
     agent.steps += 1;
   }
-  if(complete() && outputBadPaths_ && agents_.find(LocSimAgent::Default) != agents_.end()) {
-    auto& agent = agents_[LocSimAgent::Default];
+  if(complete() && outputBadPaths_ && agents_.find(LocSimAgent::Type::Default) != agents_.end()) {
+    auto& agent = agents_[LocSimAgent::Type::Default];
     if(agent.distRMSE() > maxDistError_ || agent.rotRMSE() > maxRotError_ || agent.distRMSE() != agent.distRMSE()) {
       string timestamp = generateTimestamp();
       stringstream ss;
@@ -203,8 +201,8 @@ void LocalizationSimulation::stepPose() {
 
   auto cpoint = self.loc;
   auto target = path_.currentPoint();
-  auto dist = (target - cpoint).getMagnitude();
-  auto diff = (target - path_.lastPoint());
+  auto diff = (target - cpoint);
+  auto dist = diff.getMagnitude();
   Pose2D disp;
 
   // Turn if we're not facing the target point
@@ -287,7 +285,7 @@ void LocalizationSimulation::printError() {
   for(auto& kvp : agents_) {
     auto& agent = kvp.second;
     fprintf(stderr, "%s RMSE dist error: %2.2f, rot error: %2.2f, steps: %i\n",
-      agent.name.c_str(), sqrtf(agent.distError / agent.steps), sqrtf(agent.rotError / agent.steps), agent.steps);
+      agent.name().c_str(), sqrtf(agent.distError / agent.steps), sqrtf(agent.rotError / agent.steps), agent.steps);
   }
 }
 
@@ -298,14 +296,14 @@ string LocalizationSimulation::getSimInfo() {
   for(auto& kvp : agents_) {
     auto& agent = kvp.second;
     snprintf(buffer, maxsize, "%s RMSE dist error: %2.2f, rot error: %2.2f, steps: %i\n",
-      agent.name.c_str(), sqrtf(agent.distError / agent.steps), sqrtf(agent.rotError / agent.steps), agent.steps);
+      agent.name().c_str(), sqrtf(agent.distError / agent.steps), sqrtf(agent.rotError / agent.steps), agent.steps);
     info += buffer;
   }
   return info;
 }
 
 int LocalizationSimulation::defaultPlayer() {
-  return (int)LocSimAgent::Default;
+  return static_cast<int>(LocSimAgent::Type::Default);
 }
 
 vector<string> LocalizationSimulation::getTextDebug(int player) {

@@ -39,7 +39,7 @@ FilesWindow::FilesWindow(QMainWindow* p) : ConfigWindow(p) {
   // until we get simulator back
   //locationBox->addItem("localhost"); // JM 2/6/2014 Why is this necessary?
   locationBox->addItem("core");
-  std::string ipList = std::string(getenv("NAO_HOME")) + "/data/ipList.txt";
+  std::string ipList = util::cfgpath(util::Data) + "/ip_list.txt";
   QFile file(ipList.c_str()); // List of IP's now defined in a file to avoid recompiles !
   QString line;
   if (file.open(QIODevice::ReadOnly) ) {       
@@ -68,28 +68,24 @@ FilesWindow::FilesWindow(QMainWindow* p) : ConfigWindow(p) {
   //connect (botCamButton, SIGNAL(clicked()), SLOT(setBottomCameraBehavior()));
   connect (testOdometryButton, SIGNAL(clicked()), SLOT(setTestOdometry()));
   
-  connect (restartLuaButton, SIGNAL(clicked()), parent, SLOT(remoteRestartInterpreter()));
-  connect (uploadButton, SIGNAL(clicked()), this, SLOT(sendLua()));
+  connect (restartPythonButton, SIGNAL(clicked()), parent, SLOT(remoteRestartInterpreter()));
   connect (uploadButton, SIGNAL(clicked()), this, SLOT(sendPython()));
-  connect (configButton, SIGNAL(clicked()), this, SLOT(sendSimpleConfig()));
-  //connect (verifyConfigButton, SIGNAL(clicked()), this, SLOT(verifySimpleConfig()));
+  connect (upRobotCfgButton, SIGNAL(clicked()), this, SLOT(sendRobotConfig()));
+  //connect (verifyConfigButton, SIGNAL(clicked()), this, SLOT(verifyRobotConfig()));
 
   connect (downLogsButton, SIGNAL(clicked()), this, SLOT(getLogs()));
   connect (removeLogsButton, SIGNAL(clicked()), this, SLOT(removeLogs()));
 
   connect (upBinaryButton, SIGNAL(clicked()), this, SLOT(sendBinary()));
   connect (upAllButton, SIGNAL(clicked()), this, SLOT(sendAll()));
-  connect (upEveryButton, SIGNAL(clicked()), this, SLOT(sendEverything()));
 
   connect (upColorButton, SIGNAL(clicked()), this, SLOT(sendColorTable()));
-  //connect (upAutoloadButton, SIGNAL(clicked()), this, SLOT(sendAutoloadFile()));
   connect (upVisionButton, SIGNAL(clicked()), this, SLOT(sendVision()));
   connect (upMotionButton, SIGNAL(clicked()), this, SLOT(sendMotion()));
   connect (upNaoButton, SIGNAL(clicked()), this, SLOT(sendInterface()));
-  connect (upMofButton, SIGNAL(clicked()), this, SLOT(sendMotionFiles()));
   connect (upCfgButton, SIGNAL(clicked()), this, SLOT(sendConfigFiles()));
 
-  connect (verifyEveryButton, SIGNAL(clicked()), this, SLOT(verifyEverything()));
+  connect (verifyEveryButton, SIGNAL(clicked()), this, SLOT(verifyAll()));
 
   connect (restartNaoQiButton, SIGNAL(clicked()), this, SLOT(restartNaoQi()));
   //connect (mp3Button, SIGNAL(clicked()), this, SLOT(sendMp3Files()));
@@ -107,8 +103,7 @@ FilesWindow::FilesWindow(QMainWindow* p) : ConfigWindow(p) {
 
   locationBox->setCurrentIndex(0);
   loadBehaviors();
-  int sampleIndex = behaviorBox->findText("sample");
-  if(sampleIndex >= 0) behaviorBox->setCurrentIndex(sampleIndex);
+  behaviorBox->setCurrentIndex(behaviorBox->findText("sample"));
 }
 
 ProcessExecutor::Callback FilesWindow::getStatusCallback(QString message) {
@@ -220,16 +215,6 @@ void FilesWindow::sendCopyRobotCommand(QString command, bool verbose) {
   executor_.sendCopyRobotCommand(address, command, verbose, func);
 }
 
-void FilesWindow::sendLua(bool verbose) {
-  std::cout << "-- Sending lua --" << std::endl;
-  sendCopyRobotCommand("lua",verbose);
-}
-
-void FilesWindow::verifyLua(bool verbose) {
-  std::cout << "-- Verifying lua --" << std::endl;
-  sendCopyRobotCommand("lua --verify",verbose);
-}
-
 void FilesWindow::sendPython(bool verbose) {
   std::cout << "-- Sending python --" << std::endl;
   sendCopyRobotCommand("python",verbose);
@@ -258,17 +243,6 @@ void FilesWindow::sendAll(bool verbose) {
 void FilesWindow::verifyAll(bool verbose) {
   std::cout << "-- Verify all --" << std::endl;
   sendCopyRobotCommand("all --verify",verbose);
-}
-
-void FilesWindow::sendEverything(bool verbose) {
-  std::cout << "-- Sending everything --" << std::endl;
-  sendCopyRobotCommand("everything",verbose);
-}
-
-void FilesWindow::verifyEverything(bool verbose) {
-  std::cout << "-- Verify everything --" << std::endl;
-  sendCopyRobotCommand("everything --verify",verbose);
-  verifySimpleConfig();
 }
 
 void FilesWindow::sendVision(bool verbose) {
@@ -301,16 +275,6 @@ void FilesWindow::verifyInterface(bool verbose) {
   sendCopyRobotCommand("nao --verify",verbose);
 }
 
-void FilesWindow::sendMotionFiles(bool verbose) {
-  std::cout << "-- Sending motion files --" << std::endl;
-  sendCopyRobotCommand("motion_file",verbose);
-}
-
-void FilesWindow::verifyMotionFiles(bool verbose) {
-  std::cout << "-- Verifying motion files --" << std::endl;
-  sendCopyRobotCommand("motion_file --verify",verbose);
-}
-
 void FilesWindow::sendColorTable(bool verbose) {
   std::cout << "-- Sending color tables --" << std::endl;
   sendCopyRobotCommand("color_table",verbose);
@@ -321,52 +285,32 @@ void FilesWindow::verifyColorTable(bool verbose) {
   sendCopyRobotCommand("color_table --verify",verbose);
 }
 
-void FilesWindow::sendWireless(bool verbose) {
-  std::cout << "-- Sending wireless --" << std::endl;
-  sendCopyRobotCommand("wireless",verbose);
-}
-
-//void FilesWindow::verifyWireless(bool verbose) {
-  //std::cout << "-- Verifying wireless --" << std::endl;
-  //sendCopyRobotCommand("wireless --verify",verbose);
-//}
-
-void FilesWindow::sendAutoloadFile(bool verbose) {
-  std::cout << "-- Sending autoload --" << std::endl;
-  sendCopyRobotCommand("autoload",verbose);
-}
-
-void FilesWindow::verifyAutoloadFile(bool verbose) {
-  std::cout << "-- Verifying autoload --" << std::endl;
-  sendCopyRobotCommand("autoload --verify",verbose);
-}
-
 void FilesWindow::sendConfigFiles(bool verbose) {
   std::cout << "-- Sending config files --" << std::endl;
-  sendCopyRobotCommand("config_file",verbose);
+  sendCopyRobotCommand("configs",verbose);
   sendCopyRobotCommand("scripts",verbose);
 }
 
 void FilesWindow::verifyConfigFiles(bool verbose) {
   std::cout << "-- Verifying config files --" << std::endl;
-  sendCopyRobotCommand("config_file --verify",verbose);
+  sendCopyRobotCommand("configs --verify",verbose);
   sendCopyRobotCommand("scripts --verify",verbose);
 }
 
-void FilesWindow::sendSimpleConfig(bool verbose) {
+void FilesWindow::sendRobotConfig(bool verbose) {
   QString address = ((UTMainWnd*)parent)->getCurrentAddress();
   RobotConfig config;
   config.team = teamNumBox->value();
-  config.self = config.role = roleBox->value();
+  config.self = roleBox->value();
   config.robot_id = address.section('.', 3).toInt();
   executor_.sendRobotConfig(address, config, verbose);
 }
 
-void FilesWindow::verifySimpleConfig(bool verbose) {
+void FilesWindow::verifyRobotConfig(bool verbose) {
   QString address = ((UTMainWnd*)parent)->getCurrentAddress();
   RobotConfig config;
   config.team = teamNumBox->value();
-  config.self = config.role = roleBox->value();
+  config.self = roleBox->value();
   config.robot_id = address.section('.', 3).toInt();
   executor_.verifyRobotConfig(address, config, verbose);
 }
@@ -490,25 +434,24 @@ void FilesWindow::checkStatus(bool repeat){
     };
     executor_.checkRobotStatus(address, callback);
   }
-  // check every 10 seconds 
-  statusTimer->singleShot(10 * 1000,this,SLOT(checkStatus()));
+  // check every 10 seconds
+  if(repeat)
+    statusTimer->singleShot(10 * 1000,this,SLOT(checkStatus()));
 }
 
 // enable or disable the buttons
 void FilesWindow::enableButtons(bool b){
 
-  restartLuaButton->setEnabled(b);
+  restartPythonButton->setEnabled(b);
   uploadButton->setEnabled(b);
-  configButton->setEnabled(b);
+  upRobotCfgButton->setEnabled(b);
 
   downLogsButton->setEnabled(b);
   removeLogsButton->setEnabled(b);
 
   upBinaryButton->setEnabled(b);
   upAllButton->setEnabled(b);
-  upEveryButton->setEnabled(b);
   upColorButton->setEnabled(b);
-  //upAutoloadButton->setEnabled(b);
 
   restartNaoQiButton->setEnabled(b);
   stopNaoqiButton->setEnabled(b);
@@ -517,7 +460,6 @@ void FilesWindow::enableButtons(bool b){
   upVisionButton->setEnabled(b);
   upMotionButton->setEnabled(b);
   upNaoButton->setEnabled(b);
-  upMofButton->setEnabled(b);
   upCfgButton->setEnabled(b);
 
   verifyEveryButton->setEnabled(b);
@@ -550,6 +492,10 @@ void FilesWindow::locationChanged(int index){
   UTMainWnd::inst()->logSelectWnd_->updateSelectedIP(address);
   UTMainWnd::inst()->addressChanged();
   checkStatus(false);
+}
+
+void FilesWindow::setCurrentLocation(std::string ip) {
+  setCurrentLocation(QString::fromStdString(ip));
 }
 
 void FilesWindow::setCurrentLocation(QString ip) {

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="maximumSize">
@@ -62,18 +62,25 @@
     <widget class="QComboBox" name="playerBox"/>
    </item>
    <item row="2" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="penalizeButton">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="btnPenalize">
        <property name="text">
         <string>Penalize</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="flipButton">
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btnFlip">
        <property name="text">
         <string>Flip </string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="btnHideBall">
+       <property name="text">
+        <string>Hide Ball</string>
        </property>
       </widget>
      </item>

@@ -1,8 +1,8 @@
 #include <QtGui>
 #include <algorithm>
 
-#include "VisionWindow.h"
-#include "UTMainWnd.h"
+#include <tool/VisionWindow.h>
+#include <tool/UTMainWnd.h>
 #include <common/ColorConversion.h>
 
 #include <memory/RobotVisionBlock.h>
@@ -16,25 +16,27 @@
 
 #include <common/WorldObject.h>
 #include <common/Field.h>
+#include <common/ColorSpaces.h>
 
 #include <vision/ImageProcessor.h>
 #include <common/annotations/SelectionType.h>
-#include "calibration/JointCalibrator.h"
+#include <tool/calibration/JointCalibrator.h>
 
 VisionWindow::VisionWindow(QMainWindow* parent, VisionCore *core) :
+    ConfigWindow(parent),
     core_(core),
     parent_(parent),
     currentBigImageType_(RAW_IMAGE),
-    currentBigImageCam_(IMAGE_TOP),
-    robot_vision_block_(NULL),
-    image_block_(NULL),
-    camera_block_(NULL),
-    joint_block_(NULL),
-    sensor_block_(NULL),
-    world_object_block_(NULL),
-    body_model_block_(NULL),
-    robot_state_block_(NULL),
-    last_memory_(NULL),
+    currentBigImageCam_(Camera::TOP),
+    robot_vision_block_(nullptr),
+    image_block_(nullptr),
+    camera_block_(nullptr),
+    joint_block_(nullptr),
+    sensor_block_(nullptr),
+    world_object_block_(nullptr),
+    body_model_block_(nullptr),
+    robot_state_block_(nullptr),
+    last_memory_(nullptr),
     vision_memory_(new MemoryFrame(false,MemoryOwner::TOOL_MEM, 0, 1)),
     initialized_(false),
     enableDraw_(true)
@@ -49,76 +51,82 @@ VisionWindow::VisionWindow(QMainWindow* parent, VisionCore *core) :
   bigImage->setMouseTracking(true);
 
   // Connect UI objects
-  connect (rawImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToRawTop()));  // For some reason it didn't like using
-  connect (rawImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToRawBottom()));  // For some reason it didn't like using
-  connect (segImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToSegTop()));  // the #defines RAWIMAGE etc
-  connect (segImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToSegBottom()));  // the #defines RAWIMAGE etc
-  connect (horizontalBlobImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToHorizontalBlobTop()));
-  connect (horizontalBlobImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToHorizontalBlobBottom()));
-  connect (verticalBlobImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToVerticalBlobTop()));
-  connect (verticalBlobImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToVerticalBlobBottom()));
-  connect (objImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToObjTop()));
-  connect (objImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToObjBottom()));
-  connect (transformedImageTop, SIGNAL(clicked(int,int,int)), this, SLOT(changeToTransformedTop()));
-  connect (transformedImageBottom, SIGNAL(clicked(int,int,int)), this, SLOT(changeToTransformedBottom()));
+  connect(rawImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToRawTop()));  // For some reason it didn't like using
+  connect(rawImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToRawBottom()));  // For some reason it didn't like using
+  connect(segImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToSegTop()));  // the #defines RAWIMAGE etc
+  connect(segImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToSegBottom()));  // the #defines RAWIMAGE etc
+  connect(horizontalBlobImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToHorizontalBlobTop()));
+  connect(horizontalBlobImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToHorizontalBlobBottom()));
+  connect(verticalBlobImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToVerticalBlobTop()));
+  connect(verticalBlobImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToVerticalBlobBottom()));
+  connect(objImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToObjTop()));
+  connect(objImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToObjBottom()));
+  connect(transformedImageTop, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToTransformedTop()));
+  connect(transformedImageBottom, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(changeToTransformedBottom()));
 
-  connect (bigImage, SIGNAL(mouseXY(int,int)), this, SLOT(updateCursorInfo(int,int)));
-  connect (bigImage, SIGNAL(clicked(int,int,int)), this, SLOT(updateClicked(int,int,int)));
+  connect(bigImage, SIGNAL(moved(int,int)), this, SLOT(updateCursorInfo(int,int)));
+  connect(bigImage, SIGNAL(clicked(int,int,Qt::MouseButton)), this, SLOT(handleClicked(int,int,Qt::MouseButton)));
 
-  connect (classification->classificationBox, SIGNAL(toggled(bool)), this, SLOT(updateClassificationCheck(bool)));
-  connect (calibrationBox, SIGNAL(toggled(bool)), this, SLOT(updateCalibrationCheck(bool)));
-  connect (checkerboardBox, SIGNAL(toggled(bool)), this, SLOT(updateCheckerboardCheck(bool)));
-  connect (overlayCheck, SIGNAL(clicked()), this, SLOT(redrawImages()));
-  connect (horizonCheck, SIGNAL(clicked()), this, SLOT(redrawImages()));
-  connect (saveImgCheck, SIGNAL(clicked()), this, SLOT(saveImages()));
+  connect(classification->classificationBox, SIGNAL(toggled(bool)), this, SLOT(updateClassificationCheck(bool)));
+  connect(cbxCalibration, SIGNAL(toggled(bool)), this, SLOT(updateCalibrationCheck(bool)));
+  connect(cbxOverlay, SIGNAL(clicked()), this, SLOT(controlsChanged()));
+  connect(cbxHorizon, SIGNAL(clicked()), this, SLOT(controlsChanged()));
+  connect(cbxTooltip, SIGNAL(clicked()), this, SLOT(controlsChanged()));
+  connect(cbxCalibration, SIGNAL(clicked()), this, SLOT(controlsChanged()));
+  connect(cbxCheckerboard, SIGNAL(clicked()), this, SLOT(controlsChanged()));
 
-  connect (actionNew_Bottom, SIGNAL(triggered()), this, SLOT(bottomNewTable()) );
-  connect (actionOpen_Bottom, SIGNAL(triggered()), this, SLOT(bottomOpenTable()) );
-  connect (actionSave_As_Bottom, SIGNAL(triggered()), this, SLOT(bottomSaveTableAs()) );
-  connect (actionSave_Bottom, SIGNAL(triggered()), this, SLOT(bottomSaveTable()) );
+  connect(actionNew_Bottom, SIGNAL(triggered()), this, SLOT(bottomNewTable()) );
+  connect(actionOpen_Bottom, SIGNAL(triggered()), this, SLOT(bottomOpenTable()) );
+  connect(actionSave_As_Bottom, SIGNAL(triggered()), this, SLOT(bottomSaveTableAs()) );
+  connect(actionSave_Bottom, SIGNAL(triggered()), this, SLOT(bottomSaveTable()) );
 
-  connect (actionNew_Top, SIGNAL(triggered()), this, SLOT(topNewTable()) );
-  connect (actionOpen_Top, SIGNAL(triggered()), this, SLOT(topOpenTable()) );
-  connect (actionSave_As_Top, SIGNAL(triggered()), this, SLOT(topSaveTableAs()) );
-  connect (actionSave_Top, SIGNAL(triggered()), this, SLOT(topSaveTable()) );
-
-  connect (bigImage, SIGNAL(selected(Selection*)), annot, SLOT(selected(Selection*)));
-  connect (annot, SIGNAL(selectionTypeChanged(SelectionType)), bigImage, SLOT(selectionTypeChanged(SelectionType)));
-  connect (annot, SIGNAL(selectionEnabled(bool)), bigImage, SLOT(setSelectionEnabled(bool)));
-  connect (annot, SIGNAL(setCurrentSelections(std::vector<Selection*>)), bigImage, SLOT(setCurrentSelections(std::vector<Selection*>)));
-  connect (this, SIGNAL(newLogLoaded(LogViewer*)), annot, SLOT(handleNewLogLoaded(LogViewer*)));
-  connect (this, SIGNAL(newLogFrame(int)), annot, SLOT(handleNewLogFrame(int)));
-  connect (this, SIGNAL(cameraChanged(Camera::Type)), annot, SLOT(setCurrentCamera(Camera::Type)));
-
-  connect (this, SIGNAL(cameraChanged(Camera::Type)), classification, SLOT(setCurrentCamera(Camera::Type)));
-  connect (this, SIGNAL(newLogLoaded(LogViewer*)), classification, SLOT(handleNewLogLoaded(LogViewer*)));
-  connect (annot, SIGNAL(setCurrentAnnotations(std::vector<VisionAnnotation*>)), classification, SLOT(setAnnotations(std::vector<VisionAnnotation*>)));
-  connect (classification, SIGNAL(colorTableGenerated()), this, SLOT(update()));
-  connect (classification->undoButton, SIGNAL(clicked()), this, SLOT(doUndo()));
-  connect (bigImage, SIGNAL(clicked(int,int,int)), annot, SLOT(handleClick(int,int,int)));
-
-  connect (this, SIGNAL(cameraChanged(Camera::Type)), analysis, SLOT(setCurrentCamera(Camera::Type)));
-  connect (this, SIGNAL(newLogLoaded(LogViewer*)), analysis, SLOT(handleNewLogLoaded(LogViewer*)));
-  connect (annot, SIGNAL(setCurrentAnnotations(std::vector<VisionAnnotation*>)), analysis, SLOT(setAnnotations(std::vector<VisionAnnotation*>)));
-  connect (analysis, SIGNAL(colorTableGenerated()), this, SLOT(update()));
-  connect (classification, SIGNAL(colorTableGenerated()), analysis, SLOT(handleColorTableGenerated()));
-  connect (this, SIGNAL(colorTableLoaded()), analysis, SLOT(handleColorTableGenerated()));
-  connect (this, SIGNAL(newLogFrame(int)), analysis, SLOT(handleNewLogFrame(int)));
-  connect (analysis, SIGNAL(memoryChanged()), this, SLOT(update()));
-
-  connect (this, SIGNAL(newLogFrame(int)), icalibration, SLOT(handleNewLogFrame(int)));
-  connect (this, SIGNAL(newLogLoaded(LogViewer*)), icalibration, SLOT(handleNewLogLoaded(LogViewer*)));
-  connect (this, SIGNAL(newStreamFrame()), icalibration, SLOT(handleNewStreamFrame()));
+  connect(actionNew_Top, SIGNAL(triggered()), this, SLOT(topNewTable()) );
+  connect(actionOpen_Top, SIGNAL(triggered()), this, SLOT(topOpenTable()) );
+  connect(actionSave_As_Top, SIGNAL(triggered()), this, SLOT(topSaveTableAs()) );
+  connect(actionSave_Top, SIGNAL(triggered()), this, SLOT(topSaveTable()) );
   
-  connect (this, SIGNAL(newLogFrame(int)), ecalibration, SLOT(handleNewLogFrame(int)));
-  connect (this, SIGNAL(newLogLoaded(LogViewer*)), ecalibration, SLOT(handleNewLogLoaded(LogViewer*)));
-  connect (this, SIGNAL(newStreamFrame()), ecalibration, SLOT(handleNewStreamFrame()));
+
+  connect(bigImage, SIGNAL(selected(Selection*)), annot, SLOT(selected(Selection*)));
+  connect(bigImage, SIGNAL(dragged(int,int,Qt::MouseButton)), annot, SLOT(handleDragged(int,int,Qt::MouseButton)));
+  connect(bigImage, SIGNAL(hovered(int,int)), annot, SLOT(handleHovered(int,int)));
+  connect(annot, SIGNAL(selectionTypeChanged(SelectionType)), bigImage, SLOT(selectionTypeChanged(SelectionType)));
+  connect(annot, SIGNAL(selectionEnabled(bool)), bigImage, SLOT(setSelectionEnabled(bool)));
+  connect(annot, SIGNAL(setCurrentSelections(std::vector<Selection*>)), bigImage, SLOT(setCurrentSelections(std::vector<Selection*>)));
+  connect(annot, SIGNAL(setCurrentLogFrame(int)), UTMainWnd::inst(), SLOT(gotoSnapshot(int)));
+  connect(this, SIGNAL(newLogLoaded(LogViewer*)), annot, SLOT(handleNewLogLoaded(LogViewer*)));
+  connect(this, SIGNAL(newLogFrame(int)), annot, SLOT(handleNewLogFrame(int)));
+  connect(this, SIGNAL(cameraChanged(Camera::Type)), annot, SLOT(setCurrentCamera(Camera::Type)));
+
+  connect(this, SIGNAL(cameraChanged(Camera::Type)), classification, SLOT(setCurrentCamera(Camera::Type)));
+  connect(this, SIGNAL(newLogLoaded(LogViewer*)), classification, SLOT(handleNewLogLoaded(LogViewer*)));
+  connect(annot, SIGNAL(setCurrentAnnotations(std::vector<VisionAnnotation*>)), classification, SLOT(setAnnotations(std::vector<VisionAnnotation*>)));
+  connect(classification, SIGNAL(colorTableGenerated()), this, SLOT(update()));
+  connect(classification->undoButton, SIGNAL(clicked()), this, SLOT(doUndo()));
+
+  connect(this, SIGNAL(cameraChanged(Camera::Type)), analysis, SLOT(setCurrentCamera(Camera::Type)));
+  connect(this, SIGNAL(newLogLoaded(LogViewer*)), analysis, SLOT(handleNewLogLoaded(LogViewer*)));
+  connect(annot, SIGNAL(setCurrentAnnotations(std::vector<VisionAnnotation*>)), analysis, SLOT(setAnnotations(std::vector<VisionAnnotation*>)));
+  connect(analysis, SIGNAL(colorTableGenerated()), this, SLOT(update()));
+  connect(classification, SIGNAL(colorTableGenerated()), analysis, SLOT(handleColorTableGenerated()));
+  connect(this, SIGNAL(colorTableLoaded()), analysis, SLOT(handleColorTableGenerated()));
+  connect(this, SIGNAL(newLogFrame(int)), analysis, SLOT(handleNewLogFrame(int)));
+  connect(analysis, SIGNAL(memoryChanged()), this, SLOT(update()));
+
+  connect(this, SIGNAL(newLogFrame(int)), icalibration, SLOT(handleNewLogFrame(int)));
+  connect(this, SIGNAL(newLogLoaded(LogViewer*)), icalibration, SLOT(handleNewLogLoaded(LogViewer*)));
+  connect(this, SIGNAL(newStreamFrame()), icalibration, SLOT(handleNewStreamFrame()));
+  
+  connect(this, SIGNAL(newLogFrame(int)), ecalibration, SLOT(handleNewLogFrame(int)));
+  connect(this, SIGNAL(newLogLoaded(LogViewer*)), ecalibration, SLOT(handleNewLogLoaded(LogViewer*)));
+  connect(this, SIGNAL(newStreamFrame()), ecalibration, SLOT(handleNewStreamFrame()));
   
   connect(this, SIGNAL(calibrationSampleAdded(Sample)), ecalibration, SLOT(addSample(Sample)));
   connect(ecalibration->clearButton, SIGNAL(clicked()), this, SLOT(clearSamples()));
   connect(ecalibration, SIGNAL(calibrationsUpdated()), this, SLOT(calibrationsUpdated()));
 
-  connect (this, SIGNAL(colorTableLoaded()), this, SLOT(update()));
+  connect(this, SIGNAL(colorTableLoaded()), this, SLOT(update()));
+
+  connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(controlsChanged(int)));
 
   bigImage->setSelectionEnabled(false);
 
@@ -132,7 +140,7 @@ VisionWindow::VisionWindow(QMainWindow* parent, VisionCore *core) :
   segRGB[c_YELLOW] = qRgb(255, 255, 0);
   segRGB[c_ROBOT_WHITE] = qRgb(185, 185, 185);
 
-  for (int i=0; i<NUM_Colors; i++) {
+  for (int i=0; i<Color::NUM_Colors; i++) {
     segCol[i].setRgb(segRGB[i]);
   }
   sampleColor.setRgb(qRgb(255, 0, 0));
@@ -142,7 +150,6 @@ VisionWindow::VisionWindow(QMainWindow* parent, VisionCore *core) :
   doingClassification_ = false;
 
   doingCalibration_ = false;
-  checkerboard_ = false;
   jcalibrator_ = new JointCalibrator();
   assignProcessors();
   assignImageWidgets();
@@ -156,21 +163,21 @@ void VisionWindow::assignImageWidgets() {
     _widgetAssignments[horizontalBlobImageTop] =
     _widgetAssignments[verticalBlobImageTop] =
     _widgetAssignments[objImageTop] =
-    _widgetAssignments[transformedImageTop] = IMAGE_TOP;
+    _widgetAssignments[transformedImageTop] = Camera::TOP;
   _widgetAssignments[rawImageBottom] =
     _widgetAssignments[segImageBottom] =
     _widgetAssignments[horizontalBlobImageBottom] =
     _widgetAssignments[verticalBlobImageBottom] =
     _widgetAssignments[objImageBottom] =
-    _widgetAssignments[transformedImageBottom] = IMAGE_BOTTOM;
+    _widgetAssignments[transformedImageBottom] = Camera::BOTTOM;
 
-  _widgetAssignments[bigImage] = IMAGE_TOP;
+  _widgetAssignments[bigImage] = Camera::TOP;
 }
 
 void VisionWindow::assignProcessors() {
-  ImageProcessor *top = core_->vision_->top_processor_, *bottom = core_->vision_->bottom_processor_;
-  _imageProcessors[IMAGE_TOP] = top;
-  _imageProcessors[IMAGE_BOTTOM] = bottom;
+  ImageProcessor *top = core_->vision_->top_processor(), *bottom = core_->vision_->bottom_processor();
+  _imageProcessors[Camera::TOP] = top;
+  _imageProcessors[Camera::BOTTOM] = bottom;
 
   annot->setImageProcessors(top,bottom);
   icalibration->setImageProcessors(top,bottom);
@@ -211,7 +218,7 @@ void VisionWindow::handleRunningCore() {
 void VisionWindow::update(MemoryFrame* memory) {
   initialized_ = true;
   last_memory_ = memory;
-
+  std::cout << "Updated vision window" << std::endl;
   *vision_memory_ = *memory;
   core_->updateMemory(vision_memory_);
 
@@ -224,17 +231,18 @@ void VisionWindow::update(MemoryFrame* memory) {
   vision_memory_->getBlockByName(body_model_block_, "vision_body_model");
   vision_memory_->getBlockByName(robot_state_block_, "robot_state");
 
-  ImageProcessor *top = core_->vision_->top_processor_;
-  ImageProcessor *bottom = core_->vision_->bottom_processor_;
+  ImageProcessor *top = core_->vision_->top_processor();
+  ImageProcessor *bottom = core_->vision_->bottom_processor();
   RobotCalibration cal = ecalibration->getCalibration();
   top->setCalibration(cal);
   bottom->setCalibration(cal);
 
   // run core to get intermediate vision debug
-  if (((UTMainWnd*)parent_)->runCoreRadio->isChecked() || doingClassification_)
+  if(UTMainWnd::inst()->isRunningCore() || doingClassification_) {
     core_->vision_->processFrame();
-  core_->vision_->updateTransforms();
-
+  } else {
+    core_->vision_->updateTransforms();
+  }
   redrawImages();
 }
 
@@ -248,10 +256,10 @@ void VisionWindow::updateCursorInfo(int x, int y) {
   ImageWidget* rawWidget;
 
   switch(image) {
-    case IMAGE_TOP:
+    case Camera::TOP:
       rawWidget = rawImageTop;
       break;
-    case IMAGE_BOTTOM:
+    case Camera::BOTTOM:
       rawWidget = rawImageBottom;
       break;
     default: return;
@@ -290,7 +298,7 @@ void VisionWindow::updateCursorInfo(int x, int y) {
     segLabel->setText("Seg (N/A)");
   }
 
-  if (!core_ || !core_->vision_ || !toolCheck->isChecked()) {
+  if (!core_ || !core_->vision_ || !config_.tooltip) {
     mouseOverBlobIndex_ = -1;
     mouseOverLineIndex_ = -1;
     mouseOverObjectIndex_ = -1;
@@ -313,7 +321,7 @@ void VisionWindow::updateCursorInfo(int x, int y) {
   // see if we're over a line
   mouseOverLineIndex_ = -1;
   mouseOverLineType_ = 0;
-  if (currentBigImageType_ == RAW_IMAGE && overlayCheck->isChecked()) {
+  if (currentBigImageType_ == RAW_IMAGE && config_.all) {
     updateCursorInfoRaw(x,y,image);
   }
 
@@ -387,14 +395,11 @@ int VisionWindow::getImageAssignment(ImageWidget* widget){
   return _widgetAssignments[widget];
 }
 
-// DO NOT REMOVE
-// vim: expandtab:noai:sts=2:sw=2:ts=2
-
 void VisionWindow::handleNewLogFrame(int frame){
   assignProcessors();
   frame_ = frame;
-  if (this->isVisible())
-    emit newLogFrame(frame);
+  if(!this->isVisible()) return;
+  emit newLogFrame(frame_);
 }
 
 void VisionWindow::handleNewStreamFrame() {
@@ -402,9 +407,11 @@ void VisionWindow::handleNewStreamFrame() {
 }
 
 void VisionWindow::handleNewLogLoaded(LogViewer* log){
-  //if (this->isVisible())
   assignProcessors();
-  emit newLogLoaded(log);
+  log_ = log;
+  frame_ = -1;
+  if(!this->isVisible()) return;
+  emit newLogLoaded(log_);
 }
 
 bool VisionWindow::eventFilter(QObject *object, QEvent *e) {
@@ -414,11 +421,12 @@ bool VisionWindow::eventFilter(QObject *object, QEvent *e) {
     // The annotationList and UTVisionWindow don't seem to ever send the same event,
     // so this should work.
     std::string oName = object->objectName().toStdString();
-    if(oName != "annotationList" && oName != "UTVisionWindow") return false;
+    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
+    static const auto validNames = std::set<std::string>({"annotationList", "UTVisionWindow", "lstSources"});
+    if(validNames.find(oName) == validNames.end()) return false;
     e->setAccepted(false);
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
     int mods = QApplication::keyboardModifiers();
-    switch (keyEvent ->key()) {
+    switch (keyEvent->key()) {
       case Qt::Key_Comma:
         emit prevSnapshot();
         break;
@@ -446,4 +454,46 @@ bool VisionWindow::eventFilter(QObject *object, QEvent *e) {
 
 void VisionWindow::setStreaming(bool value) {
   streaming_ = value;
+}
+
+void VisionWindow::loadConfig(const ToolConfig& tconfig) {
+  config_ = tconfig.visionConfig;
+  tabs->setCurrentIndex(config_.tab);
+  cbxOverlay->setChecked(config_.all);
+  cbxHorizon->setChecked(config_.horizon);
+  cbxTooltip->setChecked(config_.tooltip);
+  cbxCalibration->setChecked(config_.calibration);
+  cbxCheckerboard->setChecked(config_.checkerboard);
+}
+
+void VisionWindow::saveConfig(ToolConfig& tconfig) {
+  tconfig.visionConfig = config_;
+}
+
+void VisionWindow::controlsChanged() {
+  if(loading_) return;
+  config_.tab = tabs->currentIndex();
+  config_.all = cbxOverlay->isChecked();
+  config_.horizon = cbxHorizon->isChecked();
+  config_.tooltip = cbxTooltip->isChecked();
+  config_.calibration = cbxCalibration->isChecked();
+  config_.checkerboard = cbxCheckerboard->isChecked();
+  ConfigWindow::saveConfig();
+  redrawImages();
+}
+
+void VisionWindow::showEvent(QShowEvent*) {
+  if(frame_ > 0)
+    emit newLogFrame(frame_);
+  if(log_ != nullptr)
+    emit newLogLoaded(log_);
+}
+    
+void VisionWindow::wheelEvent(QWheelEvent* event) {
+  if(!bigImage->underMouse()) return;
+  int deg = event->delta() / 8;
+  int steps = deg / 15;
+  if(steps > 0) emit nextSnapshot();
+  else if(steps < 0) emit prevSnapshot();
+  event->accept();
 }

@@ -8,9 +8,12 @@ ToolProcess::ToolProcess() : process(NULL) { }
 ToolProcess::~ToolProcess() { if(process) delete process; }
 
 bool PE::workerInitialized_ = false;
-mutex PE::qlock_;
+mutex PE::qmutex_;
+condition_variable PE::qcv_;
 vector<queue<ToolProcess>> PE::pqueues_ = vector<queue<ToolProcess>>(PE::NumPriorities);
 map<QString,ToolProcess*> PE::connections_;
+unique_ptr<thread> PE::worker_thread_;
+bool PE::stopping_ = false;
 
 PE::ProcessExecutor() {
   environment_ = QProcessEnvironment::systemEnvironment();
@@ -22,8 +25,15 @@ PE::ProcessExecutor() {
   if(!workerInitialized_) {
     qRegisterMetaType<ProcessExecutor::RobotStatus>("ProcessExecutor::RobotStatus");
     workerInitialized_ = true;
-    new thread(PE::workerThread);
+    worker_thread_ = std::make_unique<std::thread>(&PE::workerProcess);
   }
+}
+
+PE::~ProcessExecutor() {
+  stopping_ = true;
+  qcv_.notify_one();
+  worker_thread_->join();
+  worker_thread_.reset();
 }
 
 void PE::sendCopyRobotCommand(QString ip, QString command, bool verbose, PE::Callback callback) {
@@ -72,26 +82,34 @@ bool PE::sendCopyRobotCommandSync(QString ip, QString command, bool verbose, PE:
 
 void PE::openSSH(QString ip, StatusCallback callback) {
   if(connections_.find(ip) != connections_.end()) {
-    callback(Connected);
+    checkRobotStatus(ip, callback);
     return;
   }
   ToolProcess* tp = new ToolProcess();
   QString name = "Open SSH: ";
+  callback(Connecting);
   tp->task = [=] {
-    QProcess* scp = new QProcess();
+    QProcess* scp = tp->process = new QProcess();
     QString host = "nao@";
     host.append(ip);
     QStringList args;
     args.push_back(host);
+    args.push_back("-tt");
     QString cmd = "ssh";
+    scp->setProcessChannelMode(QProcess::MergedChannels);
     scp->start(cmd, args);
-    if(!scp->waitForStarted()) {
-      callback(Dead);
-      return;
+    if(scp->waitForStarted()) {
+      if(scp->waitForReadyRead()) {
+        connections_[ip] = tp;
+        QString s = scp->readAllStandardOutput();
+        if(!s.contains("No route to host")) {
+          checkRobotStatus(ip, callback);
+          return;
+        }
+      }
     }
-    tp->process = scp;
-    cout << "Opened SSH connection to " << ip.toStdString() << "\n";
-    connections_[ip] = tp;
+    tp->aborted = true;
+    callback(Dead);
   };
   tp->name = name + ip;
   queueProcess(*tp, High);
@@ -138,6 +156,20 @@ void PE::sendNaoqiCommand(QString ip, QString command) {
     cout << "done!\n";
   };
   queueProcess(func, command + " naoqi", High);
+}
+
+void PE::compile(PE::Callback callback) {
+  auto func = [=] {
+    cout << "Compiling with optimizations enabled...";
+    std::cout.flush();
+    QString command = basepath_ + "/build/compile";
+    QStringList args;
+    args.push_back("robot");
+    args.push_back("--optimize");
+    executeSimpleCommand(command, args, true);
+    cout << "done!";
+  };
+  queueProcess(func, "compile for robot");
 }
 
 void PE::setRobotTime(QString ip) {
@@ -213,7 +245,9 @@ bool PE::executeSimpleCommand(QString command, QStringList args, bool verbose) {
 
 void PE::checkRobotStatus(QString ip, StatusCallback callback) {
   if(connections_.find(ip) != connections_.end()) {
-    QString output = connections_[ip]->process->readAll();
+    if(connections_[ip]->aborted) {
+      callback(Dead); return;
+    }
     QString home(getenv("HOME"));
     QDir qdir(home + "/.ssh");
     auto qelist = qdir.entryList(QStringList("*nao@" + ip + "*"), QDir::System);
@@ -266,26 +300,6 @@ void PE::verifyRobotConfig(QString ip, RobotConfig config, bool verbose) {
   };
   queueProcess(func, "verify config");
 }
-void PE::verifyRobotConfigOld(QString ip, RobotConfig config, bool verbose) {
-  auto func = [=] {
-    QString path = basepath_ + "/build/config.yaml";
-    config.saveToFile(path.toStdString());
-    sendCopyRobotCommandSync(ip, "simple_config --config_file \"" + path + "\" --verify_old", verbose);
-  };
-  queueProcess(func, "verify config");
-}
-
-void PE::sendLua(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "lua", verbose);
-}
-
-void PE::verifyLua(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "lua --verify", verbose);
-}
-void PE::verifyLuaOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "lua --verify_old", verbose);
-}
-
 void PE::sendPython(QString ip, bool verbose) {
   sendCopyRobotCommand(ip, "python", verbose);
 }
@@ -293,20 +307,30 @@ void PE::sendPython(QString ip, bool verbose) {
 void PE::verifyPython(QString ip, bool verbose) {
   sendCopyRobotCommand(ip, "python --verify", verbose);
 }
-void PE::verifyPythonOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "python --verify_old", verbose);
+
+void PE::sendBinary(QString ip, bool verbose, bool optimize) {
+  if(optimize)
+    sendCopyRobotCommand(ip, "nao motion vision --optimize", verbose);
+  else
+    sendCopyRobotCommand(ip, "nao motion vision", verbose);
 }
 
-void PE::sendBinary(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "nao motion vision", verbose);
+void PE::verifyBinary(QString ip, bool verbose, bool optimize) {
+  if(optimize)
+    sendCopyRobotCommand(ip, "nao motion vision --verify --optimize", verbose);
+  else
+    sendCopyRobotCommand(ip, "nao motion vision --verify", verbose);
 }
 
-void PE::verifyBinary(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "nao motion vision --verify", verbose);
+void PE::sendConfigFiles(QString ip, bool verbose) {
+  sendCopyRobotCommand(ip, "configs", verbose);
+  sendCopyRobotCommand(ip, "scripts", verbose);
 }
-void PE::verifyBinaryOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "nao motion vision --verify_old", verbose);
+void PE::verifyConfigFiles(QString ip, bool verbose) {
+  sendCopyRobotCommand(ip, "configs --verify", verbose);
+  sendCopyRobotCommand(ip, "scripts --verify", verbose);
 }
+
 
 void PE::sendMotionFiles(QString ip, bool verbose) {
   sendCopyRobotCommand(ip, "motion_file", verbose);
@@ -314,9 +338,6 @@ void PE::sendMotionFiles(QString ip, bool verbose) {
 
 void PE::verifyMotionFiles(QString ip, bool verbose) {
   sendCopyRobotCommand(ip, "motion_file --verify", verbose);
-}
-void PE::verifyMotionFilesOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "motion_file --verify_old", verbose);
 }
 
 void PE::sendColorTable(QString ip, bool verbose) {
@@ -326,19 +347,9 @@ void PE::sendColorTable(QString ip, bool verbose) {
 void PE::verifyColorTable(QString ip, bool verbose) {
   sendCopyRobotCommand(ip, "color_table --verify", verbose);
 }
-void PE::verifyColorTableOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "color_table --verify_old", verbose);
-}
 
-void PE::sendConfigFiles(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "config_file", verbose);
-}
-
-void PE::verifyConfigFiles(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "config_file --verify", verbose);
-}
-void PE::verifyConfigFilesOld(QString ip, bool verbose) {
-  sendCopyRobotCommand(ip, "config_file --verify_old", verbose);
+void PE::notifyCompletion(PE::Callback callback) {
+  queueProcess([=]{ callback(true); }, "notify completion");
 }
 
 void PE::queueProcess(PE::Task task, const QString& name, ProcessPriority priority) {
@@ -349,25 +360,33 @@ void PE::queueProcess(PE::Task task, const QString& name, ProcessPriority priori
 }
 
 void PE::queueProcess(ToolProcess tp, ProcessPriority priority) {
+  std::lock_guard<std::mutex> lock(qmutex_);
   auto& pqueue = pqueues_[priority];
-  qlock_.lock();
   pqueue.push(tp);
-  qlock_.unlock();
+  qcv_.notify_one();
 }
 
-void PE::workerThread() {
-  while(true) {
-    bool found = false;
-    for(auto& pqueue : pqueues_) {
-      if(pqueue.empty()) continue;
-      qlock_.lock();
-      auto proc = pqueue.front();
-      pqueue.pop();
-      qlock_.unlock();
-      proc.task();
-      found = true;
-      break;
+void PE::workerProcess() {
+  while(!stopping_) {
+    {
+      std::unique_lock<std::mutex> lock(qmutex_);
+      qcv_.wait(lock, []{
+        if(stopping_) return true;
+        for(auto& pq : pqueues_)
+          if(!pq.empty()) return true;
+        return false;
+      });
     }
-    if(!found) sleep(0.2);
+    for(auto& pq : pqueues_) {
+      while(!pq.empty()) {
+        ToolProcess tp;
+        {
+          std::lock_guard<std::mutex> lock(qmutex_);
+          tp = pq.front();
+          pq.pop();
+        }
+        tp.task();
+      }
+    }
   }
 }

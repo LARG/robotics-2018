@@ -22,6 +22,7 @@ class VisionBlocks;
 class ImageProcessor;
 class LogViewer;
 class RobotCalibration;
+class MemoryFrame;
 
 class JCSettings : public CalibratorSettings {
   public:
@@ -33,8 +34,9 @@ class JCSettings : public CalibratorSettings {
 
 class JointCalibrator {
   public:
-    typedef JointDataset Dataset;
-    typedef JointMeasurement Measurement;
+    using Corners = std::vector<Eigen::Vector2f>;
+    using Dataset = JointDataset;
+    using Measurement = JointMeasurement;
     JointCalibrator();
     ~JointCalibrator();
     void takeSamples(LogViewer* log);
@@ -52,12 +54,13 @@ class JointCalibrator {
     std::vector<float> convertParams(const RobotCalibration& cal) const;
     float evaluate(const Dataset& d, const std::vector<float>& offsets) const;
     float evaluate(const Measurement& m, const std::vector<float>& offsets) const;
-    void setCalibration(RobotCalibration* cal);
-    const RobotCalibration* getCalibration() const { return cal_; }
-    std::vector<Eigen::Vector2f> findChessboardCorners(unsigned char* image) const;
-    std::vector<Eigen::Vector2f> findChessboardCorners(cv::Mat& image) const;
-    std::vector<Eigen::Vector2f> projectChessboardCorners(bool left) const;
-    float computeProjectionError(const std::vector<Eigen::Vector2f>& icorners, const std::vector<Eigen::Vector2f>& pcorners) const;
+    void setCalibration(const RobotCalibration& cal);
+    const RobotCalibration& getCalibration() const { return *cal_; }
+    Corners findChessboardCorners(unsigned char* image) const;
+    Corners findChessboardCorners(cv::Mat& image) const;
+    Corners projectChessboardCorners(bool left) const;
+    float computeProjectionError(const Corners& icorners, const Corners& pcorners) const;
+    bool validateProjection(const Corners& icorners, const Corners& pcorners) const;
     bool& left();
     const bool& left() const;
   private:
@@ -65,14 +68,14 @@ class JointCalibrator {
     const std::vector<int>& jointMap() const;
 
     JCSettings settings_;
-    ImageProcessor* processor_;
-    ImageParams* params_;
-    MemoryCache* cache_;
-    VisionBlocks* vblocks_;
-    MemoryFrame* memory_;
-    RobotCalibration* cal_;
+    std::unique_ptr<ImageParams> params_;
+    std::unique_ptr<ImageProcessor> processor_;
+    std::unique_ptr<MemoryCache> cache_;
+    std::unique_ptr<VisionBlocks> vblocks_;
+    std::unique_ptr<MemoryFrame> memory_;
+    std::unique_ptr<RobotCalibration> cal_;
     float error_;
-    std::thread* thread_;
+    std::unique_ptr<std::thread> thread_;
     bool calibrating_;
     std::string datafile_;
 };

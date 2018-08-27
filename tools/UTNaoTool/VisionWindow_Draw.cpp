@@ -1,4 +1,9 @@
+#include <UTMainWnd.h>
 #include <VisionWindow.h>
+#include <yuview/YUVImage.h>
+#include <tool/Util.h>
+#include <vision/Classifier.h>
+#include <common/ColorSpaces.h>
 
 #define MIN_PEN_WIDTH 3
 #define IS_RUNNING_CORE (core_ && core_->vision_ && ((UTMainWnd*)parent_)->runCoreRadio->isChecked())
@@ -23,44 +28,43 @@ void VisionWindow::redrawImages() {
 
 void VisionWindow::updateBigImage(ImageWidget* source) {
   ImageProcessor* processor = getImageProcessor(source);
-  int width = processor->getImageWidth(), height = processor->getImageHeight();
-  bigImage->setImageSource(source->getImage(), width, height);
+  bigImage->setImageSource(source->getImage());
 }
 
 void VisionWindow::updateBigImage() {
   switch(currentBigImageType_) {
     case RAW_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(rawImageTop);
       else
         updateBigImage(rawImageBottom);
         break;
     case SEG_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(segImageTop);
       else
         updateBigImage(segImageBottom);
         break;
     case OBJ_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(objImageTop);
       else
         updateBigImage(objImageBottom);
         break;
     case HORIZONTAL_BLOB_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(horizontalBlobImageTop);
       else
         updateBigImage(horizontalBlobImageBottom);
         break;
     case VERTICAL_BLOB_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(verticalBlobImageTop);
       else
         updateBigImage(verticalBlobImageBottom);
         break;
     case TRANSFORMED_IMAGE:
-      if (currentBigImageCam_ == IMAGE_TOP)
+      if (currentBigImageCam_ == Camera::TOP)
         updateBigImage(transformedImageTop);
       else
         updateBigImage(transformedImageBottom);
@@ -70,7 +74,7 @@ void VisionWindow::updateBigImage() {
   // draw all pixels of seg image in big window
   if (currentBigImageType_ == SEG_IMAGE){
     drawSegmentedImage(bigImage);
-    if (overlayCheck->isChecked()) {
+    if (cbxOverlay->isChecked()) {
       drawBall(bigImage);
       drawBallCands(bigImage);
       drawBeacons(bigImage);
@@ -88,7 +92,7 @@ void VisionWindow::redrawImages(ImageWidget* rawImage, ImageWidget* segImage, Im
   objImage->fill(0);
   drawBall(objImage);
 
-  if(horizonCheck->isChecked()) {
+  if(cbxHorizon->isChecked()) {
     drawHorizonLine(rawImage);
     drawHorizonLine(segImage);
     drawHorizonLine(horizontalBlobImage);
@@ -96,7 +100,7 @@ void VisionWindow::redrawImages(ImageWidget* rawImage, ImageWidget* segImage, Im
   }
 
   // if overlay is on, then draw objects on the raw and seg image as well
-  if (overlayCheck->isChecked()) {
+  if (cbxOverlay->isChecked()) {
     drawBall(rawImage);
     drawBallCands(rawImage);
     drawBeacons(rawImage);
@@ -128,38 +132,17 @@ void VisionWindow::drawRawImage(ImageWidget* widget) {
     widget->fill(0);
     return;
   }
-  for (int y = 0; y < iparams.height; y++) {
-    for (int x = 0; x < iparams.width; x+=2) {
-
-      color::Yuv422 yuyv;
-      yuyv.y0 = (int) (*(image++));
-      yuyv.u = (int) (*(image++));
-      yuyv.y1 = (int) (*(image++));
-      yuyv.v = (int) (*(image++));
-
-
-      color::Rgb rgb1, rgb2;
-      color::yuv422ToRgb(yuyv, rgb1, rgb2);
-
-      // First pixel
-      QRgb value1 = qRgb(rgb1.r, rgb1.g, rgb1.b);
-      widget->setPixel(x, y, value1);
-
-      // Second Pixel
-      QRgb value2 = qRgb(rgb2.r, rgb2.g, rgb2.b);
-      Coordinates u = cmatrix.undistort(x, y);
-      widget->setPixel(u.x + 1, u.y, value2);
-
-    }
-  }
-
+  auto yuv = yuview::YUVImage::CreateFromRawBuffer(image, iparams.width, iparams.height);
+  auto q = util::yuvToQ(yuv);
+  widget->setImageSource(&q);
 }
 
 void VisionWindow::drawSmallSegmentedImage(ImageWidget *image) {
   ImageProcessor* processor = getImageProcessor(image);
   const ImageParams& iparams = processor->getImageParams();
   unsigned char* segImg = processor->getSegImg();
-  int hstep = 4, vstep = 2;
+  int hstep, vstep;
+  processor->color_segmenter_->getStepSize(hstep, vstep);
   if (robot_vision_block_ == NULL || segImg == NULL) {
     image->fill(0);
     return;
@@ -214,11 +197,13 @@ void VisionWindow::drawSegmentedImage(ImageWidget *image) {
       }
     }
   }
-  if(horizonCheck->isChecked())
+  if(cbxHorizon->isChecked())
     drawHorizonLine(image);
 }
 
 void VisionWindow::drawBall(ImageWidget* image) {
+  if(!config_.all) return;
+  if(!config_.ball) return;
   QPainter painter(image->getImage());
   painter.setPen(QPen(QColor(0, 255, 127), 3));
   if(IS_RUNNING_CORE) {
@@ -235,8 +220,8 @@ void VisionWindow::drawBall(ImageWidget* image) {
   else if (world_object_block_ != NULL) {
     WorldObject* ball = &world_object_block_->objects_[WO_BALL];
     if(!ball->seen) return;
-    if( (ball->fromTopCamera && _widgetAssignments[image] == IMAGE_BOTTOM) ||
-        (!ball->fromTopCamera && _widgetAssignments[image] == IMAGE_TOP) ) return;
+    if( (ball->fromTopCamera && _widgetAssignments[image] == Camera::BOTTOM) ||
+        (!ball->fromTopCamera && _widgetAssignments[image] == Camera::TOP) ) return;
     int radius = ball->radius;
     painter.drawEllipse(ball->imageCenterX - radius, ball->imageCenterY - radius, radius * 2, radius * 2);
   }
@@ -246,7 +231,9 @@ void VisionWindow::drawBallCands(ImageWidget* image) {
 }
 
 void VisionWindow::drawHorizonLine(ImageWidget *image) {
-  if (robot_vision_block_ && _widgetAssignments[image] == IMAGE_TOP) {
+  if(!config_.horizon) return;
+  if(!config_.all) return;
+  if (robot_vision_block_ && _widgetAssignments[image] == Camera::TOP) {
     HorizonLine horizon = robot_vision_block_->horizon;
     if (horizon.exists) {
       QPainter painter(image->getImage());
@@ -272,8 +259,8 @@ void VisionWindow::drawWorldObject(ImageWidget* image, QColor color, int worldOb
     painter.setPen(wpen);
     WorldObject* object = &world_object_block_->objects_[worldObjectID];
     if(!object->seen) return;
-    if( (object->fromTopCamera && _widgetAssignments[image] == IMAGE_BOTTOM) ||
-        (!object->fromTopCamera && _widgetAssignments[image] == IMAGE_TOP) ) return;
+    if( (object->fromTopCamera && _widgetAssignments[image] == Camera::BOTTOM) ||
+        (!object->fromTopCamera && _widgetAssignments[image] == Camera::TOP) ) return;
     int offset = 10;      // 5
     int x1, y1, x2, y2;
 
@@ -294,6 +281,7 @@ void VisionWindow::drawWorldObject(ImageWidget* image, QColor color, int worldOb
 }
 
 void VisionWindow::drawBeacons(ImageWidget* image) {
+  if(!config_.all) return;
   if(world_object_block_ == NULL) return;
   map<WorldObjectType,vector<QColor>> beacons = {
     { WO_BEACON_BLUE_YELLOW, { segCol[c_BLUE], segCol[c_YELLOW] } },
@@ -310,8 +298,8 @@ void VisionWindow::drawBeacons(ImageWidget* image) {
   for(auto beacon : beacons) {
     auto& object = world_object_block_->objects_[beacon.first];
     if(!object.seen) continue;
-    if(object.fromTopCamera && _widgetAssignments[image] == IMAGE_BOTTOM) continue;
-    if(!object.fromTopCamera && _widgetAssignments[image] == IMAGE_TOP) continue;
+    if(object.fromTopCamera && _widgetAssignments[image] == Camera::BOTTOM) continue;
+    if(!object.fromTopCamera && _widgetAssignments[image] == Camera::TOP) continue;
     QPen tpen(beacon.second[0]), bpen(beacon.second[1]);
 
     int width = cmatrix.getCameraWidthByDistance(object.visionDistance, 110);

@@ -1191,7 +1191,7 @@
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QPushButton" name="restartLuaButton">
+      <widget class="QPushButton" name="restartPythonButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -1399,39 +1399,7 @@
      <string>Config Files</string>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="0">
-      <widget class="QPushButton" name="upMofButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Send mofs</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
-      <widget class="QPushButton" name="upCfgButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Send cfgs</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
       <widget class="QPushButton" name="upColorButton">
        <property name="enabled">
         <bool>false</bool>
@@ -1443,12 +1411,12 @@
         </size>
        </property>
        <property name="text">
-        <string>Send ctable</string>
+        <string>Send C Table</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QPushButton" name="configButton">
+     <item row="2" column="0">
+      <widget class="QPushButton" name="upRobotCfgButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -1459,7 +1427,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Send RConfig</string>
+        <string>Send Robot Cfg</string>
        </property>
       </widget>
      </item>
@@ -1507,6 +1475,22 @@
        </item>
       </layout>
      </item>
+     <item row="3" column="0">
+      <widget class="QPushButton" name="upCfgButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>18</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Send Other Cfgs</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QGroupBox" name="groupBox_5">
@@ -1543,23 +1527,13 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QPushButton" name="upEveryButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Send every</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="3" column="0">
       <widget class="QPushButton" name="upVisionButton">
        <property name="enabled">
         <bool>false</bool>
@@ -1569,7 +1543,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="4" column="0">
       <widget class="QPushButton" name="upMotionButton">
        <property name="enabled">
         <bool>false</bool>
@@ -1579,7 +1553,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="5" column="0">
       <widget class="QPushButton" name="upNaoButton">
        <property name="enabled">
         <bool>false</bool>
@@ -1589,7 +1563,7 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="6" column="0">
       <widget class="QPushButton" name="uploadButton">
        <property name="enabled">
         <bool>false</bool>

@@ -11,44 +11,37 @@ unsigned int MAX_MODULES_PER_COLUMN = 15;
 
 LogSelectWindow* LogSelectWindow::instance_ = NULL;
 
-LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &block_names) : ConfigWindow(pa), naoUDP(NULL) {
+LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &block_names) : ConfigWindow(pa), naoUDP(NULL), block_names_(block_names.begin(), block_names.end()) {
   instance_ = this;
-  parent = pa;
+  loadConfig();
+}
+
+void LogSelectWindow::init() {
+  if(initialized_) return;
   centralWidget = new QWidget;
   this->setCentralWidget(centralWidget);
   QGridLayout *layout = new QGridLayout;
   centralWidget->setLayout(layout);
 
-  //Snapshot* s = new Snapshot();
-  //NUM_MODULES = s->memModules.size();
-  // add behavior_trace
-  std::ifstream in((std::string(getenv("NAO_HOME")) + "/data/moduleList.txt").c_str());
-  std::string block_name;
-  while (in.good()) {
-    in >> block_name;
-    if (in.good())
-      block_names.push_back(block_name);
-  }
-  block_names.push_back(std::string("behavior_trace"));
-
-  NUM_MODULES = block_names.size();
+  nmodules_ = block_names_.size();
 
   // module names
-  QString moduleNames[NUM_MODULES];
+  QString moduleNames[nmodules_];
 
-  for (int i = 0; i < NUM_MODULES; i++)
-    moduleNames[i] = QString::fromStdString(block_names[i]);
-
+  auto it = block_names_.begin();
+  for (int i = 0; i < nmodules_; i++) {
+    moduleNames[i] = QString::fromStdString(*it++);
+  }
 
   //QLabel* batchLabel = new QLabel("Batch");
 
-  moduleLabels = new QLabel*[NUM_MODULES];
-  moduleChecks = new QCheckBox*[NUM_MODULES];
+  moduleLabels = new QLabel*[nmodules_];
+  moduleChecks = new QCheckBox*[nmodules_];
 
   // set values, add to layout
   int column = 0;
   int row = 0;
-  for (int i = 0; i < NUM_MODULES; i++) {
+  for (int i = 0; i < nmodules_; i++) {
     moduleLabels[i] = new QLabel;
     moduleChecks[i] = new QCheckBox;
     if (row == 0) {
@@ -79,7 +72,7 @@ LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &bloc
     // add to layout
     layout->addWidget(moduleLabels[i], row, column);
     layout->addWidget(moduleChecks[i], row, column+1);
-    connect(moduleChecks[i], SIGNAL(toggled(bool)), (UTMainWnd*)parent, SLOT(saveConfig(bool)));
+    connect(moduleChecks[i], SIGNAL(toggled(bool)), this, SLOT(controlsChanged()));
 
     row++;
     if ((uint16_t)(row - 1) == MAX_MODULES_PER_COLUMN) {
@@ -106,15 +99,15 @@ LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &bloc
   freqLabel->setText("Log Interval (s)");
 
 
-  layout->addWidget(sendButton, NUM_MODULES+2, 0);
-  layout->addWidget(logButton, NUM_MODULES+3, 0);
-  layout->addWidget(frameCount, NUM_MODULES+3, 1);
-  layout->addWidget(forceStopLogButton, NUM_MODULES+3, 2);
-  layout->addWidget(frequency, NUM_MODULES + 4, 1);
-  layout->addWidget(freqLabel, NUM_MODULES + 4, 0);
+  layout->addWidget(sendButton, nmodules_+2, 0);
+  layout->addWidget(logButton, nmodules_+3, 0);
+  layout->addWidget(frameCount, nmodules_+3, 1);
+  layout->addWidget(forceStopLogButton, nmodules_+3, 2);
+  layout->addWidget(frequency, nmodules_ + 4, 1);
+  layout->addWidget(freqLabel, nmodules_ + 4, 0);
 
-  //layout->addWidget(batchButton, NUM_MODULES+4, 1); // no batch yet
-  //layout->addWidget(batchLabel, NUM_MODULES+4, 0);
+  //layout->addWidget(batchButton, nmodules_+4, 1); // no batch yet
+  //layout->addWidget(batchLabel, nmodules_+4, 0);
 
   // Todd: add some 'group selection' buttons
   int NUM_GROUPS = 5;
@@ -126,14 +119,13 @@ LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &bloc
   for (int i = 0; i < NUM_GROUPS; i++){
     groupLabels[i] = new QLabel;
     groupLabels[i]->setText(labels[i].c_str());
-    layout->addWidget(groupLabels[i], NUM_MODULES+5+i, 0);
+    layout->addWidget(groupLabels[i], nmodules_+5+i, 0);
     groupChecks[i] = new QCheckBox;
-    layout->addWidget(groupChecks[i], NUM_MODULES+5+i, 1);
+    layout->addWidget(groupChecks[i], nmodules_+5+i, 1);
   }
 
   connect (logButton, SIGNAL(clicked()), this, SLOT(toggleLogEnabled()));
   connect (forceStopLogButton, SIGNAL(clicked()), this, SLOT(logModeOff()));
-  //connect (batchButton, SIGNAL(toggled(bool)), parent, SLOT(setBatchEnabled(bool)));
   connect (sendButton, SIGNAL(clicked()), this, SLOT(sendLogSettings()));
 
   int ind = 0;
@@ -146,23 +138,38 @@ LogSelectWindow::LogSelectWindow(QMainWindow* pa, std::vector<std::string> &bloc
 
   resize(120,200);
 
-  setWindowTitle(tr("Select Modules to Log"));
+  setWindowTitle(tr("Select memory blocks to stream/log"));
+  initialized_ = true;
+
 }
 
 LogSelectWindow* LogSelectWindow::inst() { return instance_; }
 
 void LogSelectWindow::saveConfig(ToolConfig& config) {
-  config.loggingModules.clear();
-  for (int i = 0; i < NUM_MODULES; i++)
-    if (moduleChecks[i]->isChecked())
-      config.loggingModules.push_back(moduleLabels[i]->text().toStdString());
+  config.memorySelectConfig = config_;
 }
 
 void LogSelectWindow::loadConfig(const ToolConfig& config) {
-  for(int i = 0; i < config.loggingModules.size(); i++)
-    for(int j = 0; j < NUM_MODULES; j++)
-      if(moduleLabels[j]->text().toStdString() == config.loggingModules[i])
-        moduleChecks[j]->setChecked(true);
+  config_ = config.memorySelectConfig;
+  loadConfig();
+}
+
+void LogSelectWindow::loadConfig() {
+  if(!initialized_) {
+    block_names_.insert(
+      config_.additional_blocks.begin(), config_.additional_blocks.end()
+    );
+    nmodules_ = block_names_.size();
+    init();
+    initialized_ = true;
+  }
+  for(int j = 0; j < nmodules_; j++) {
+    auto label = moduleLabels[j]->text().toStdString();
+    auto it = config_.selected_blocks.find(label);
+    if(it != config_.selected_blocks.end()) {
+      moduleChecks[j]->setChecked(it->second);
+    }
+  }
 }
 
 void LogSelectWindow::sendLogSettings() {
@@ -177,10 +184,12 @@ void LogSelectWindow::sendLogSettings(QString ip){
   QString data;
 
   //std::vector<bool> en;
-  //en.resize(NUM_MODULES, false);
+  //en.resize(nmodules_, false);
 
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     data += moduleLabels[i]->text();
+    if (moduleChecks[i]->isChecked())
+      cout << moduleLabels[i]->text().toStdString() << endl;
     if (moduleChecks[i]->isChecked())
       data += " 1";
     else
@@ -188,7 +197,8 @@ void LogSelectWindow::sendLogSettings(QString ip){
     data += ",";
   }
   data += '|';
-  snprintf(tp.data.data(), ToolPacket::DATA_LENGTH, data.toStdString().c_str());
+  memcpy(tp.data.data(), data.toStdString().c_str(), ToolPacket::DATA_LENGTH);
+  // objectSelect->updatePacket(tp);
   UTMainWnd::inst()->sendUDPCommand(ip, tp);
 
   cout << "Selections sent" << endl;
@@ -245,7 +255,7 @@ void LogSelectWindow::stopMultiLogging(vector<QString> ips, function<void(QStrin
   if (naoUDP != NULL)
     delete naoUDP;
   naoUDP = new UDPWrapper(CommInfo::TOOL_UDP_PORT, false, "127.0.0.1", UDPWrapper::Inbound);
-  auto listener = [=](void*) {
+  auto listener = [=]() {
     set<QString> awaiting;
     for(auto ip : ips) awaiting.insert(ip);
     while(true) {
@@ -262,28 +272,27 @@ void LogSelectWindow::stopMultiLogging(vector<QString> ips, function<void(QStrin
       if(awaiting.size() == 0) break;
     }
   };
-  naoUDP->startListenThread(listener, this);
+  naoUDP->startListenThread(listener);
 }
 
 void LogSelectWindow::listenForLoggingStatus() {
-  QString address = ((UTMainWnd*)parent)->getCurrentAddress();
+  auto address = UTMainWnd::inst()->getCurrentAddress();
   if (naoUDP != NULL)
     delete naoUDP;
   naoUDP = new UDPWrapper(CommInfo::TOOL_UDP_PORT, false, address.toStdString().c_str(), UDPWrapper::Inbound);
-  naoUDP->startListenThread(LogSelectWindow::listenUDP,this);
+  naoUDP->startListenThread(&LogSelectWindow::listenUDP,this);
 }
 
-void LogSelectWindow::listenUDP(void* arg) {
-  LogSelectWindow* window = reinterpret_cast<LogSelectWindow*>(arg);
+void LogSelectWindow::listenUDP() {
   ToolPacket tp;
-  bool res = window->naoUDP->recv(tp);
+  bool res = this->naoUDP->recv(tp);
   if(!res) return;
   if(tp.message = ToolPacket::LogComplete)
-    window->logModeOff(false);
+    this->logModeOff(false);
 }
 
 void LogSelectWindow::locGroupToggled(bool toggle){
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     if (moduleLabels[i]->text() == "game_state" ||
         moduleLabels[i]->text() == "localization" ||
         moduleLabels[i]->text() == "team_packets" ||
@@ -296,7 +305,7 @@ void LogSelectWindow::locGroupToggled(bool toggle){
 }
 
 void LogSelectWindow::visionGroupToggled(bool toggle){
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     if (moduleLabels[i]->text() == "robot_vision" ||
         moduleLabels[i]->text() == "camera_info" ||
         moduleLabels[i]->text() == "world_objects" ||
@@ -310,7 +319,7 @@ void LogSelectWindow::visionGroupToggled(bool toggle){
 }
 
 void LogSelectWindow::visionRawGroupToggled(bool toggle){
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     if (moduleLabels[i]->text() == "robot_vision" ||
         moduleLabels[i]->text() == "camera_info" ||
         moduleLabels[i]->text() == "world_objects" ||
@@ -325,7 +334,7 @@ void LogSelectWindow::visionRawGroupToggled(bool toggle){
 }
 
 void LogSelectWindow::behaviorGroupToggled(bool toggle){
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     if (moduleLabels[i]->text() == "game_state" ||
         moduleLabels[i]->text() == "localization" ||
         //moduleLabels[i]->text() == "opponents" ||
@@ -341,7 +350,7 @@ void LogSelectWindow::behaviorGroupToggled(bool toggle){
 }
 
 void LogSelectWindow::allGroupToggled(bool toggle){
-  for (int i = 0; i < NUM_MODULES; i++){
+  for (int i = 0; i < nmodules_; i++){
     if (moduleLabels[i]->text() == "vision_frame_info") continue;
     if (moduleLabels[i]->text() == "robot_state") continue;
     moduleChecks[i]->setChecked(toggle);
@@ -351,3 +360,13 @@ void LogSelectWindow::allGroupToggled(bool toggle){
 void LogSelectWindow::updateSelectedIP(QString address){
   sendButton->setText("Send to "+address);
 }
+
+void LogSelectWindow::controlsChanged() {
+  if(loading_) return;
+  for(int i = 0; i < nmodules_; i++) {
+    auto label = moduleLabels[i]->text().toStdString();
+    config_.selected_blocks[label] = moduleChecks[i]->isChecked();
+  }
+  ConfigWindow::saveConfig();
+}
+

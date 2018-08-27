@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>568</height>
+    <height>613</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,13 +31,26 @@
   <property name="windowTitle">
    <string>AnnotationWidget</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="cbxEnable">
+     <property name="text">
+      <string>Annotation Mode</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>190</height>
+       <height>255</height>
       </size>
      </property>
      <property name="title">
@@ -69,8 +82,14 @@
         </item>
         <item>
          <widget class="QLabel" name="label_3">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Frame Range</string>
+           <string>Frames</string>
           </property>
          </widget>
         </item>
@@ -86,40 +105,116 @@
       <item row="0" column="1" colspan="2">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QLineEdit" name="annotname"/>
+         <widget class="QLineEdit" name="annotname">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="colorBox"/>
+         <widget class="QComboBox" name="colorBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="selectionTypeBox"/>
+         <widget class="QComboBox" name="selectionTypeBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QSpinBox" name="minBox"/>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="1" colspan="2">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="rdoCustom">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="minBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>to</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="maxBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>to</string>
+          <item row="0" column="2">
+           <widget class="QRadioButton" name="rdoAll">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>15</height>
+             </size>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+            <property name="text">
+             <string>All</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QSpinBox" name="maxBox"/>
+          <item row="0" column="1">
+           <widget class="QRadioButton" name="rdoCurrent">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>15</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Current</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QComboBox" name="cameraBox"/>
+         <widget class="QComboBox" name="cameraBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QCheckBox" name="cbxSampleSet">
         <property name="maximumSize">
          <size>
@@ -140,20 +235,23 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="defineMovementsButton">
+      <item row="1" column="0" colspan="3">
+       <widget class="QCheckBox" name="cbxAuto">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>20</height>
+          <height>15</height>
          </size>
         </property>
         <property name="text">
-         <string>Move</string>
+         <string>Auto-Create Annotation Groups</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="1" colspan="2">
        <widget class="QPushButton" name="clearMovementsButton">
         <property name="maximumSize">
          <size>
@@ -162,7 +260,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Clear</string>
+         <string>Clear Movements</string>
         </property>
        </widget>
       </item>
@@ -179,6 +277,19 @@
      </property>
      <property name="text">
       <string>Update Selected</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="saveButton">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Save to File</string>
      </property>
     </widget>
    </item>
@@ -337,26 +448,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="saveButton">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Save to File</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QCheckBox" name="checkBox">
-     <property name="text">
-      <string>Annotation Mode</string>
-     </property>
     </widget>
    </item>
   </layout>

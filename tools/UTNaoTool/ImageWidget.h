@@ -14,56 +14,63 @@
 #include <common/annotations/SelectionType.h>
 #include <common/annotations/SelectionMode.h>
 #include <common/annotations/EllipseSelection.h>
+#include <common/annotations/ManualSelection.h>
 #include <common/annotations/PolygonSelection.h>
 #include <common/annotations/RectangleSelection.h>
 #include <common/annotations/Selection.h>
 
-#define UTPolygon PolygonSelection
-#define UTEllipse EllipseSelection
-#define UTRectangle RectangleSelection
+#include <opencv2/core/core.hpp>
 
 class QPaintEvent;
 
 class ImageWidget : public QWidget {
   Q_OBJECT
-  Q_PROPERTY(bool selectionEnabled READ getSelectionEnabled WRITE setSelectionEnabled)
+    Q_PROPERTY(bool selectionEnabled READ getSelectionEnabled WRITE setSelectionEnabled)
 
   public:
-   ImageWidget(QWidget *parent);
-   void setImageSize(int width, int height, QImage::Format format = QImage::Format_RGB32);
-   void setImageSource(QImage* image, int width, int height);
-   inline void setPixel(int x, int y, QRgb value) {
-     img_->setPixel(x, y, value);
-   }
-   inline QRgb getPixel(int x, int y) {
-     return img_->pixel(x, y);
-   }
-   inline void fill(unsigned char value) {
-     img_->fill(value);
-   }
-   inline void save(const QString& path, const char* fmt, int v) {
-     img_->save(path, fmt, v);
-   }
-   inline QImage* getImage() { return img_.get(); }
+    using Polygon = PolygonSelection;
+    using Rectangle = RectangleSelection;
+    using Ellipse = EllipseSelection;
+    using Manual = ManualSelection;
+    ImageWidget(QWidget *parent);
+    void setImageSize(int width, int height, QImage::Format format = QImage::Format_RGB32);
+    inline void setPixel(int x, int y, QRgb value) {
+      img_->setPixel(x, y, value);
+    }
+    inline QRgb getPixel(int x, int y) {
+      return img_->pixel(x, y);
+    }
+    inline void fill(unsigned char value) {
+      img_->fill(value);
+    }
+    inline void save(const QString& path, const char* fmt, int v) {
+      img_->save(path, fmt, v);
+    }
+    inline QImage* getImage() { return img_.get(); }
 
-   void paintEvent(QPaintEvent *event);
-   void mousePressEvent(QMouseEvent *event);
-   void mouseReleaseEvent(QMouseEvent *event);
-   void mouseMoveEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
-   void setSelectionType(SelectionType);
-   bool getSelectionEnabled();
+    void setSelectionType(SelectionType);
+    bool getSelectionEnabled();
 
 
-  public slots:
-    void selectionTypeChanged(SelectionType);
+    public slots:
+      void selectionTypeChanged(SelectionType);
     void setSelectionEnabled(bool);
     void setCurrentSelections(std::vector<Selection*>);
+    void setImageSource(const QImage* image);
+    void setImageSource(const cv::Mat& image, int format = CV_8UC1);
 
-  signals:
-    void clicked(int x, int y, int button);
-    void mouseXY(int x, int y);
+signals:
+    void clicked(int x, int y, Qt::MouseButton button);
+    void dragged(int x, int y, Qt::MouseButton button);
+    void moved(int x, int y);
+    void hovered(int x, int y);
     void selected(Selection*);
+
   private:
     std::unique_ptr<QImage> img_;
     int width_, height_;
@@ -80,9 +87,9 @@ class ImageWidget : public QWidget {
     void drawSelectionPolygon();
     void drawSelectionEllipse();
     void drawStoredSelections();
-    void drawPolygon(UTPolygon*);
-    void drawEllipse(UTEllipse*);
-    void drawRectangle(UTRectangle*,bool);
+    void drawPolygon(Polygon*);
+    void drawEllipse(Ellipse*);
+    void drawRectangle(Rectangle*,bool);
 
     void zoomIn(int,int,int,int);
     void zoomOut();
@@ -96,7 +103,7 @@ class ImageWidget : public QWidget {
     std::vector<QRect> zoomstack_;
     std::vector<QPoint> selectionVertices_;
     std::vector<Selection*> selections_;
-    QColor selectionColor_;
+    QColor selectionColor_, hoverColor_;
 };
 
 #endif

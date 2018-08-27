@@ -6,8 +6,9 @@
 SimControlWidget::SimControlWidget(QWidget* parent) : QWidget(parent) {
   setupUi(this);
   simulation_ = NULL;
-  connect(flipButton, SIGNAL(clicked()), this, SLOT(flip()));
-  connect(penalizeButton, SIGNAL(clicked()), this, SLOT(penalize()));
+  connect(btnFlip, SIGNAL(clicked()), this, SLOT(flip()));
+  connect(btnPenalize, SIGNAL(clicked()), this, SLOT(penalize()));
+  connect(btnHideBall, SIGNAL(clicked()), this, SLOT(hideBall()));
 }
 
 Qt::KeyboardModifiers SimControlWidget::modifiers() {
@@ -52,8 +53,10 @@ void SimControlWidget::fieldHovered(Point2D pos) {
 void SimControlWidget::fieldClicked(Point2D pos, Qt::MouseButton button) {
   if(!simulation_) return;
   if(button == Qt::LeftButton && (modifiers() == Qt::ControlModifier)) {
+    printf("move ball to %2.f,%2.f\n", pos.x, pos.y);
     simulation_->moveBall(pos);
   } else if (button == Qt::RightButton && (modifiers() == Qt::ControlModifier)) {
+    printf("teleport ball to %2.f,%2.f\n", pos.x, pos.y);
     simulation_->teleportBall(pos);
   }
 }
@@ -69,4 +72,8 @@ void SimControlWidget::fieldDragged(Point2D start, Point2D end, Qt::MouseButton 
     else
       simulation_->teleportPlayer(start, orientation, player);
   }
+}
+
+void SimControlWidget::hideBall() {
+  simulation_->moveBall(Point2D(10'000,10'000));
 }

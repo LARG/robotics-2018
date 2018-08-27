@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>431</width>
+    <width>439</width>
     <height>445</height>
    </rect>
   </property>
@@ -23,10 +23,10 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_4">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Frame</string>
+       <string>Start</string>
       </property>
      </widget>
     </item>
@@ -40,16 +40,13 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>/</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
+    <item row="2" column="1">
+     <widget class="QSpinBox" name="startSpin">
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="maximum">
+       <number>999999999</number>
       </property>
      </widget>
     </item>
@@ -73,6 +70,26 @@
       </property>
       <property name="readOnly">
        <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Frame</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>/</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -112,100 +129,196 @@
       </item>
      </layout>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Start</string>
-      </property>
-     </widget>
+    <item row="2" column="4">
+     <layout class="QHBoxLayout" name="horizontalLayout"/>
     </item>
-    <item row="2" column="1">
-     <widget class="QSpinBox" name="startSpin">
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="maximum">
-       <number>999999999</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>End</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="3">
-     <widget class="QSpinBox" name="endSpin">
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="minimum">
-       <number>-1</number>
-      </property>
-      <property name="maximum">
-       <number>999999999</number>
-      </property>
-      <property name="value">
+    <item row="4" column="0" colspan="5">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="verticalSpacing">
        <number>0</number>
       </property>
-     </widget>
-    </item>
-    <item row="2" column="4">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="fastForwardButton">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>16777215</height>
-         </size>
+      <item row="0" column="1" colspan="4">
+       <widget class="QFrame" name="frame">
+        <property name="styleSheet">
+         <string notr="true">background-color:rgb(199, 255, 199);</string>
         </property>
-        <property name="text">
-         <string/>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="icon">
-         <iconset resource="Resources.qrc">
-          <normaloff>:/images/forward.png</normaloff>:/images/forward.png</iconset>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetNoConstraint</enum>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="viewLogRadio">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(199, 255, 199);</string>
+             </property>
+             <property name="text">
+              <string>View Log</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">memory_group</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="runCoreRadio">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(199, 255, 199);</string>
+             </property>
+             <property name="text">
+              <string>Run Core</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">memory_group</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="streamRadio">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(199, 255, 199);</string>
+             </property>
+             <property name="text">
+              <string>Stream</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">memory_group</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="playButton">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>16777215</height>
-         </size>
+      <item row="1" column="1" colspan="4">
+       <widget class="QFrame" name="frame_2">
+        <property name="styleSheet">
+         <string notr="true">background-color:rgb(207, 255, 247);</string>
         </property>
-        <property name="text">
-         <string/>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="icon">
-         <iconset resource="Resources.qrc">
-          <normaloff>:/images/play.png</normaloff>:/images/play.png</iconset>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QRadioButton" name="fullProcessRadioButton">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(207, 255, 247);</string>
+             </property>
+             <property name="text">
+              <string>Full Process</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">core_group</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="visionOnlyRadioButton">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(207, 255, 247);</string>
+             </property>
+             <property name="text">
+              <string>Vision Only</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">core_group</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="bypassVisionRadioButton">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(207, 255, 247);</string>
+             </property>
+             <property name="text">
+              <string>Bypass Vision</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">core_group</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="pauseButton">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>16777215</height>
-         </size>
+      <item row="2" column="1" colspan="4">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="text">
-         <string/>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-        <property name="icon">
-         <iconset resource="Resources.qrc">
-          <normaloff>:/images/pause.png</normaloff>:/images/pause.png</iconset>
-        </property>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QCheckBox" name="onDemandCheckBox">
+             <property name="text">
+              <string>Run On Demand</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="coreBehaviorsCheckBox">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(207, 255, 247);</string>
+             </property>
+             <property name="text">
+              <string>Run Python Bvr</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="logStreamCheckBox">
+             <property name="text">
+              <string>Log Stream</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="0" column="0" colspan="5">
+     <widget class="QSlider" name="frameSlider">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </item>
     <item row="3" column="0" colspan="5">
      <layout class="QGridLayout" name="gridLayout_2">
@@ -219,16 +332,6 @@
         </property>
         <property name="flat">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="logSelectButton">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>Log Select</string>
         </property>
        </widget>
       </item>
@@ -298,16 +401,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="logButton">
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>Log</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="filesButton">
         <property name="enabled">
@@ -321,7 +414,7 @@
       <item row="3" column="2">
        <widget class="QPushButton" name="teamButton">
         <property name="text">
-         <string>Team Cfg</string>
+         <string>Team Config</string>
         </property>
        </widget>
       </item>
@@ -351,7 +444,7 @@
       <item row="4" column="1">
        <widget class="QPushButton" name="logEditorButton">
         <property name="text">
-         <string>Log Edit</string>
+         <string>Log Editor</string>
         </property>
         <property name="autoDefault">
          <bool>false</bool>
@@ -361,103 +454,48 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </item>
-    <item row="4" column="0" colspan="5">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="runCoreRadio">
-        <property name="text">
-         <string>Run Core</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">memory_group</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QCheckBox" name="coreBehaviorsCheckBox">
-        <property name="text">
-         <string>Core Behaviors</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QRadioButton" name="localizationOnlyRadioButton">
-        <property name="text">
-         <string>Loc Only</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">core_group</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QRadioButton" name="visionOnlyRadioButton">
-        <property name="text">
-         <string>Vis Only</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">core_group</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QRadioButton" name="streamRadio">
-        <property name="text">
-         <string>Stream</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">memory_group</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QRadioButton" name="locVisRadioButton">
-        <property name="text">
-         <string>Loc + Vis</string>
-        </property>
-        <property name="checked">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="logSelectButton">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <attribute name="buttonGroup">
-         <string notr="true">core_group</string>
-        </attribute>
+        <property name="text">
+         <string>Memory Select</string>
+        </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="viewLogRadio">
-        <property name="text">
-         <string>View Log</string>
-        </property>
-        <property name="checked">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="logButton">
+        <property name="mouseTracking">
          <bool>true</bool>
         </property>
-        <attribute name="buttonGroup">
-         <string notr="true">memory_group</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QCheckBox" name="logStreamCheckBox">
         <property name="text">
-         <string>Log Stream</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QCheckBox" name="onDemandCheckBox">
-        <property name="text">
-         <string>Run On Demand</string>
+         <string>Text Log</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="0" column="0" colspan="5">
-     <widget class="QSlider" name="frameSlider">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>End</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QSpinBox" name="endSpin">
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="minimum">
+       <number>-1</number>
+      </property>
+      <property name="maximum">
+       <number>999999999</number>
+      </property>
+      <property name="value">
+       <number>0</number>
       </property>
      </widget>
     </item>
@@ -469,7 +507,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>431</width>
+     <width>439</width>
      <height>25</height>
     </rect>
    </property>
@@ -579,12 +617,14 @@
   <tabstop>frameSlider</tabstop>
   <tabstop>currentFrameSpin</tabstop>
   <tabstop>startSpin</tabstop>
+  <tabstop>endSpin</tabstop>
+  <tabstop>stepSpin</tabstop>
   <tabstop>worldButton</tabstop>
   <tabstop>fullVisionButton</tabstop>
   <tabstop>filesButton</tabstop>
   <tabstop>motionButton</tabstop>
-  <tabstop>logButton</tabstop>
   <tabstop>logSelectButton</tabstop>
+  <tabstop>logButton</tabstop>
   <tabstop>jointsButton</tabstop>
   <tabstop>stateButton</tabstop>
   <tabstop>cameraButton</tabstop>
@@ -596,9 +636,13 @@
   <tabstop>viewLogRadio</tabstop>
   <tabstop>runCoreRadio</tabstop>
   <tabstop>streamRadio</tabstop>
-  <tabstop>locVisRadioButton</tabstop>
-  <tabstop>localizationOnlyRadioButton</tabstop>
+  <tabstop>fullProcessRadioButton</tabstop>
   <tabstop>visionOnlyRadioButton</tabstop>
+  <tabstop>bypassVisionRadioButton</tabstop>
+  <tabstop>onDemandCheckBox</tabstop>
+  <tabstop>coreBehaviorsCheckBox</tabstop>
+  <tabstop>logStreamCheckBox</tabstop>
+  <tabstop>numFrameEdit</tabstop>
  </tabstops>
  <resources>
   <include location="Resources.qrc"/>

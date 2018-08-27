@@ -1,11 +1,11 @@
-#ifndef PROCESS_EXECUTOR_H
-#define PROCESS_EXECUTOR_H
+#pragma once
 
 #include <iostream>
 #include <queue>
 #include <functional>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <unistd.h>
 
 #include <QProcess>
@@ -21,6 +21,7 @@ struct ToolProcess {
   QProcess* process;
   ToolProcess();
   ~ToolProcess();
+  bool aborted = false;
 };
 
 class ProcessExecutor {
@@ -38,6 +39,7 @@ class ProcessExecutor {
     };
       
     ProcessExecutor();
+    ~ProcessExecutor();
     typedef std::function<void(bool)> Callback;
     typedef std::function<void(RobotStatus)> StatusCallback;
     typedef std::function<void()> Task;
@@ -56,33 +58,27 @@ class ProcessExecutor {
 
     void sendRobotConfig(QString ip, RobotConfig config, bool verbose = true);
     void verifyRobotConfig(QString ip, RobotConfig config, bool verbose = true);
-    void verifyRobotConfigOld(QString ip, RobotConfig config, bool verbose = true);
 
     void sendMotionFiles(QString ip, bool verbose = true);
     void verifyMotionFiles(QString ip, bool verbose = true);
-    void verifyMotionFilesOld(QString ip, bool verbose = true);
 
     void sendConfigFiles(QString ip, bool verbose = true);
     void verifyConfigFiles(QString ip, bool verbose = true);
-    void verifyConfigFilesOld(QString ip, bool verbose = true);
 
     void sendWireless(QString ip, bool verbose = true);
 
-    void sendLua(QString ip, bool verbose = true);
-    void verifyLua(QString ip, bool verbose = true);
-    void verifyLuaOld(QString ip, bool verbose = true);
-
     void sendPython(QString ip, bool verbose = true);
     void verifyPython(QString ip, bool verbose = true);
-    void verifyPythonOld(QString ip, bool verbose = true);
 
     void sendColorTable(QString ip, bool verbose = true);
     void verifyColorTable(QString ip, bool verbose = true);
-    void verifyColorTableOld(QString ip, bool verbose = true);
 
-    void sendBinary(QString ip, bool verbose = true);
-    void verifyBinary(QString ip, bool verbose = true);
-    void verifyBinaryOld(QString ip, bool verbose = true);
+    void sendBinary(QString ip, bool verbose = true, bool optimize = false);
+    void verifyBinary(QString ip, bool verbose = true, bool optimize = false);
+
+    void notifyCompletion(CALLBACK(callback));
+
+    void compile(CALLBACK(callback));
 
   private:
     bool sendCopyRobotCommandSync(QString command, QString ip, bool verbose, CALLBACK(callback));
@@ -92,12 +88,13 @@ class ProcessExecutor {
     QString basepath_, logpath_, datapath_;
 
     static std::map<QString,ToolProcess*> connections_;
-    static std::mutex qlock_;
+    static std::mutex qmutex_;
+    static std::condition_variable qcv_;
     static std::vector<std::queue<ToolProcess>> pqueues_;
+    static std::unique_ptr<std::thread> worker_thread_;
     static void queueProcess(Task task, const QString& name, ProcessPriority priority = Normal);
     static void queueProcess(ToolProcess tp, ProcessPriority priority = Normal);
-    static void workerThread();
+    static void workerProcess();
     static bool workerInitialized_;
+    static bool stopping_;
 };
-
-#endif

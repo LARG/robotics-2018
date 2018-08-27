@@ -19,14 +19,16 @@ class SimulationPath : public YamlConfig {
     bool empty() { return !points_.size(); }
     const Point2D& currentPoint() { return points_.front(); }
     const Point2D& lastPoint() { return last_; }
-    std::list<Point2D>::iterator begin() { return points_.begin(); }
-    std::list<Point2D>::iterator end() { return points_.end(); }
+    auto begin() { return points_.begin(); }
+    auto begin() const { return points_.begin(); }
+    auto end() { return points_.end(); }
+    auto end() const { return points_.end(); }
     void pop();
     void flip();
     static SimulationPath generate(int length = 25, int seed = Random::SEED);
-    virtual void deserialize(const YAML::Node& node);
-    void serialize(YAML::Emitter& emitter) const;
   private:
+    void deserialize(const YAML::Node& node) override;
+    void serialize(YAML::Emitter& emitter) const override;
     std::list<Point2D> points_;
     Point2D last_;
 };

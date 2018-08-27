@@ -1,7 +1,6 @@
 #include "RobotControllerWidget.h"
 #include "UTMainWnd.h"
 #include <common/ToolPacket.h>
-#include "joystickxbox.h"
 
 #define CROP(vec,MIN,MAX) for(int i = 0; i < vec.size(); i++) { vec[i] = std::max((float)MIN, std::min((float)MAX, (float)vec[i])); }
 #define SNAP(vec,thresh) for(int i = 0; i < vec.size(); i++) { vec[i] = fabs(vec[i]) < thresh ? 0 : vec[i]; }
@@ -29,8 +28,6 @@ RobotControllerWidget::RobotControllerWidget(QWidget* parent) : ConfigWidget(par
   velocity_ << 0,0,0;
   stance_ = Poses::SITTING;
 
-  // Xbox control of robot
-  initXboxJoystick();
 }
 
 void RobotControllerWidget::loop() {
@@ -106,33 +103,6 @@ Vector3f RobotControllerWidget::processAccel(Vector3f vel) {
   else
     accel[2] = -vel[2];
 
-  // XBox control
-  if(updateXboxJoystick()) {
-    ControllerInfo controllerData = getControllerInfo();
-    if (abs(controllerData.x) >= .1 || abs(controllerData.y) >= .1) {
-    accel[0] = controllerData.y;
-    accel[1] = -1 * controllerData.x;
-
-    } else {
-    accel[0] = -vel[0];
-    accel[1] = -vel[1];
-      }
-
-
-      if (abs(controllerData.y2) >= .05) {
-    accel[2] = controllerData.y2;
-      } else {
-    accel[2] = -vel[2];
-      }
-
-      //if (controllerData.x2 > 0) {
-        //player->_action = JS_PASS_ACTION;
-      //}
-
-      //if (controllerData.lt > .5) {
-        //player->_action = JS_SHOOT_ACTION;
-      //}
-  }
   return accel;
 }
 

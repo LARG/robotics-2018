@@ -40,59 +40,59 @@ void GLDrawer::draw(const map<DisplayOption,bool>& displayOptions) {
     return;
   }
 
-  if (display_[SHOWFIELD]) drawField();
+  if (display_[SHOW_FIELD]) drawField();
   overlayBasicInfoText();
 
   if(annotations_) drawAnnotations();
 
   // draw robots, ball, objects
-  if (display_[SHOWROBOT]) drawRobot();
-  if (display_[SHOWBALL]) drawBall();
-  if (display_[SHOWRELATIVEOBJECTS]) localizationGL.drawRelativeObjects(gtcache_.world_object, bcache_.world_object,gtcache_.robot_state);
-  if (display_[SHOWODOMETRY]) drawOdometry();
-  if (display_[SHOWODOMETRYOVERLAY]) overlayOdometry();
-  if (display_[SHOWRELATIVEOBJECTUNCERTS]) localizationGL.drawRelativeObjectUncerts(gtcache_.world_object, bcache_.world_object, gtcache_.robot_state, bcache_.localization_mem);
-  if (display_[SHOWBEACONS]) drawBeacons();
+  if (display_[SHOW_ROBOT]) drawRobot();
+  if (display_[SHOW_BALL]) drawBall();
+  if (display_[SHOW_RELATIVE_OBJECTS]) localizationGL.drawRelativeObjects(gtcache_.world_object, bcache_.world_object,gtcache_.robot_state);
+  if (display_[SHOW_ODOMETRY]) drawOdometry();
+  if (display_[SHOW_ODOMETRY_OVERLAY]) overlayOdometry();
+  if (display_[SHOW_RELATIVE_OBJECT_UNCERTS]) localizationGL.drawRelativeObjectUncerts(gtcache_.world_object, bcache_.world_object, gtcache_.robot_state, bcache_.localization_mem);
+  if (display_[SHOW_BEACONS]) drawBeacons();
 
   // truth data from sim
-  if (display_[SHOWTRUTHROBOT]) drawTruthRobot();
-  if (display_[SHOWTRUTHOVERLAY]) overlayTruthText();
-  if (display_[SHOWTRUTHBALL]) drawTruthBall();
+  if (display_[SHOW_TRUTH_ROBOT]) drawTruthRobot();
+  if (display_[SHOW_TRUTH_OVERLAY]) overlayTruthText();
+  if (display_[SHOW_TRUTH_BALL]) drawTruthBall();
 
   // overlay some text
-  if (display_[SHOWOBSERVATIONTEXTOVERLAY]) overlayObservationText();
-  if (display_[SHOWLOCATIONTEXTOVERLAY]) overlayLocationText();
-  if (display_[SHOWALTERNLOCATIONTEXTOVERLAY]) overlayAlternLocationText();
-  if (display_[SHOWOBJECTIDTEXTOVERLAY]) overlayObjectIDText();
-  if (display_[SHOWSONAROVERLAY]) overlaySonar();
+  if (display_[SHOW_OBSERVATION_TEXT_OVERLAY]) overlayObservationText();
+  if (display_[SHOW_LOCATION_TEXT_OVERLAY]) overlayLocationText();
+  if (display_[SHOW_ALTERN_LOCATION_TEXT_OVERLAY]) overlayAlternLocationText();
+  if (display_[SHOW_OBJECT_ID_TEXT_OVERLAY]) overlayObjectIDText();
+  if (display_[SHOW_SONAR_OVERLAY]) overlaySonar();
 
   // opponents
-  if (display_[SHOWSEENOPPONENT]) drawSeenOpponents();
-  if (display_[SHOWGTOPPONENT]) drawGtOpponents();
-  if (display_[SHOWFILTEREDOPPONENTS]) drawFilteredOpponents();
-  if (display_[SHOWOPPONENTOVERLAY]) overlayOpponentText();
+  if (display_[SHOW_SEEN_OPPONENT]) drawSeenOpponents();
+  if (display_[SHOW_GT_OPPONENT]) drawGtOpponents();
+  if (display_[SHOW_FILTERED_OPPONENTS]) drawFilteredOpponents();
+  if (display_[SHOW_OPPONENT_OVERLAY]) overlayOpponentText();
 
   // teammates
-  if (display_[SHOWTEAMMATES]) drawTeammates();
+  if (display_[SHOW_TEAMMATES]) drawTeammates();
 
   // team packet info
-  if (display_[SHOWTEAMPACKETS]) drawTeamPackets(teammate, false);
-  if (display_[SHOWCOACHBALLPACKETS]) drawCoachBallPackets();
-  if (display_[SHOWTEAMBALLPACKETS]) drawTeamBallPackets();
-  if (display_[SHOWTEAMOVERLAY]) overlayTeamPackets();
+  if (display_[SHOW_TEAM_PACKETS]) drawTeamPackets(teammate, false);
+  if (display_[SHOW_COACH_BALL_PACKETS]) drawCoachBallPackets();
+  if (display_[SHOW_TEAM_BALL_PACKETS]) drawTeamBallPackets();
+  if (display_[SHOW_TEAM_OVERLAY]) overlayTeamPackets();
 
   // behavior
-  if (display_[SHOWTARGETPOINT]) drawTargetPoint();
+  if (display_[SHOW_TARGET_POINT]) drawTargetPoint();
   if (bcache_.behavior->useDottedPath) drawPathPoints();
 
-  if (display_[SHOWSTATICKICKREGION]) drawStaticKickRegion();
-  if (display_[SHOWLIVEKICKREGION]) drawLiveKickRegion();
-  if (display_[SHOWKICKCHOICES]) drawKickChoices();
-  if (display_[SHOWKICKCHOICEOVERLAY]) overlayKickChoices();
+  if (display_[SHOW_STATIC_KICK_REGION]) drawStaticKickRegion();
+  if (display_[SHOW_LIVE_KICK_REGION]) drawLiveKickRegion();
+  if (display_[SHOW_KICK_CHOICES]) drawKickChoices();
+  if (display_[SHOW_KICK_CHOICE_OVERLAY]) overlayKickChoices();
 
   // live
-  if (display_[SHOWALLPACKETS]) drawAllTeamPackets();
-  if (display_[SHOWALLPACKETSOVERLAY]) overlayAllTeamPackets();
+  if (display_[SHOW_ALL_PACKETS]) drawAllTeamPackets();
+  if (display_[SHOW_ALL_PACKETS_OVERLAY]) overlayAllTeamPackets();
 }
 
 void GLDrawer::drawField() {
@@ -102,11 +102,11 @@ void GLDrawer::drawField() {
   }
 
   objectsGL.drawGreenCarpet();
-  if(display_[SHOWGOALS]) {
+  if(display_[SHOW_GOALS]) {
     objectsGL.drawGoal(gtcache_.world_object->objects_[WO_OPP_GOAL].loc,1.0);
     objectsGL.drawGoal(gtcache_.world_object->objects_[WO_OWN_GOAL].loc,1.0);
   }
-  if(display_[SHOWLINES]) {
+  if(display_[SHOW_LINES]) {
     for (int i = LINE_OFFSET; i < LINE_OFFSET + NUM_LINES; i++){
       WorldObject* wo = &(gtcache_.world_object->objects_[i]);
       objectsGL.drawFieldLine(wo->loc, wo->endLoc);
@@ -153,9 +153,9 @@ void GLDrawer::drawBall(){
   WorldObject* ball = &(gtcache_.world_object->objects_[WO_BALL]);
   objectsGL.drawBall(ball->loc,1.0);
 
-  if (display_[SHOWBALLVEL])
+  if (display_[SHOW_BALL_VEL])
     objectsGL.drawBallVel(ball->loc, ball->absVel, 1.0);
-  if (display_[SHOWBALLUNCERT]) {
+  if (display_[SHOW_BALL_UNCERT]) {
     basicGL.colorRGB(Colors::Orange);
     localizationGL.drawUncertaintyEllipse(ball->loc,ball->sd);
   }
@@ -213,11 +213,11 @@ void GLDrawer::drawSimRobots(vector<MemoryCache> caches) {
     WorldObject* robot = &(gtcache_.world_object->objects_[i]);
     // draw robot tilt/roll
     robotGL.drawTiltedRobot(robot->loc, robot->height, robot->orientation, tilt, roll);
-    if (display_[SHOWNUMBERS]){
+    if (display_[SHOW_NUMBERS]){
       parent_->renderText(robot->loc.x/FACT,robot->loc.y/FACT,600/FACT,QString::number(i));
     }
     // show roles
-    if (display_[SHOWROLES]){
+    if (display_[SHOW_ROLES]){
       QFont serifFont( "Courier", 16);
       serifFont.setBold(true);
       parent_->setFont(serifFont);
@@ -266,13 +266,13 @@ void GLDrawer::drawRobot(){
   }
 
   robotGL.drawTiltedRobot(self->loc, self->height, self->orientation, tilt, roll);
-  if (display_[SHOWROBOTUNCERT]) {
+  if (display_[SHOW_ROBOT_UNCERT]) {
     localizationGL.drawUncertaintyEllipse(self->loc,self->sd);
     localizationGL.drawUncertaintyAngle(self->loc,self->orientation,self->sdOrientation);
   }
 
   // possibly draw role over robot
-  if (display_[SHOWROLES]){
+  if (display_[SHOW_ROLES]){
     QFont serifFont( "Courier", 12);
     parent_->setFont(serifFont);
     parent_->renderText(self->loc.x/FACT, self->loc.y/FACT, 400/FACT,
@@ -342,9 +342,9 @@ void GLDrawer::drawAlternateRobots(vector<MemoryCache> caches) {
 
     // draw ball
     objectsGL.drawBallColor(ball, alpha, color);
-    if (display_[SHOWBALLVEL])
+    if (display_[SHOW_BALL_VEL])
       objectsGL.drawBallVelColor(ball, bvel, alpha, color);
-    if (display_[SHOWBALLUNCERT]) {
+    if (display_[SHOW_BALL_UNCERT]) {
       basicGL.colorRGBAlpha(color,alpha);
       localizationGL.drawUncertaintyEllipse(ball, bcov);
     }
@@ -715,7 +715,7 @@ void GLDrawer::drawKickChoices(){
 
   QFont serifFont( "Courier", 10);
   parent_->setFont(serifFont);
-  if (display_[SHOWKICKNAMEOVERLAY]) {
+  if (display_[SHOW_KICK_NAME_OVERLAY]) {
     parent_->renderText(eval.leftPoint.x/FACT, eval.leftPoint.y/FACT, 100/FACT,
                QString(kickNames[i].c_str()));
   }
