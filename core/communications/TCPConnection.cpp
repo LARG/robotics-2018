@@ -3,7 +3,7 @@
 #include <memory/StreamBuffer.h>
 #include <boost/asio/error.hpp>
 
-#define DEBUG_TCP true
+#define DEBUG_TCP false
 #define ERROR_END_OF_FILE 2
 
 using error_code = TCPConnection::error_code;

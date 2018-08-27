@@ -58,51 +58,6 @@ const float FORWARD_EXTRA_FOOT_HEIGHT = 0.01;
 const float PENDULUM_HEIGHT = 300.0;
 
 
-void Walk2014Generator::setWalkParameters(const RSWalkParameters & params) {
-
-
-  max_percent_change_ = max(0.f, min(1.f, params.max_percent_change_));
-
-  // Update deltas
-  delta_com_offset_ = max_percent_change_ * (params.com_offset_ - curr_com_offset_);
-  delta_forward_change_ = max_percent_change_ * (params.forward_change_ - curr_forward_change_);
-  delta_left_change_ = max_percent_change_ * (params.left_change_ - curr_left_change_);
-  delta_turn_change_ = max_percent_change_ * (params.turn_change_ - curr_turn_change_);
-  delta_base_walk_period_ = max_percent_change_ * (params.base_walk_period_ - curr_base_walk_period_);
-  delta_walk_hip_height_ = max_percent_change_ * (params.walk_hip_height_ - curr_walk_hip_height_);
-  delta_stand_hip_height_ = max_percent_change_ * (params.walk_hip_height_ - curr_stand_hip_height_);
-  delta_max_forward_ = max_percent_change_ * (params.max_forward_ - curr_max_forward_);
-  delta_max_left_ = max_percent_change_ * (max(0.0f, params.max_left_) - curr_max_left_);
-  delta_max_turn_ = max_percent_change_ * (max(0.0f, params.max_turn_) - curr_max_turn_);
-  delta_base_leg_lift_ = max_percent_change_ * (params.base_leg_lift_ - curr_base_leg_lift_);
-  delta_arm_swing_ = max_percent_change_ * (params.arm_swing_ - curr_arm_swing_);
-  delta_fwd_extra_foot_height_ = max_percent_change_ * (params.forward_extra_foot_height_ - curr_fwd_extra_foot_height_);
-  delta_left_extra_foot_height_ = max_percent_change_ * (params.left_extra_foot_height_ - curr_left_extra_foot_height_);
-  delta_start_lift_divisor_ = max_percent_change_ * (params.start_lift_divisor_ - curr_start_lift_divisor_);
-  delta_pendulum_height_ = max_percent_change_ * (params.pendulum_height_ - curr_pendulum_height_);
-  //std::cout << "[Walk2014Generator::setWalkParameters]: Arm swing = ";
-  // std::cout << params.arm_swing_;
-  // std::cout << " " << delta_arm_swing_ << std::endl;
-  // Update actual parameters to new values
-  com_offset_ = params.com_offset_;
-  forward_change_ = params.forward_change_;
-  left_change_ = params.left_change_;
-  turn_change_ = params.turn_change_;
-  base_walk_period_ = params.base_walk_period_;
-  walk_hip_height_ = params.walk_hip_height_;
-  // use walk_hip_height in place of stand_hip_height
-  // stand_hip_height_ = params.walk_hip_height_;
-  max_forward_ = params.max_forward_;
-  max_left_ = max(0.0f, params.max_left_);
-  max_turn_ = max(0.0f, params.max_turn_);
-  base_leg_lift_ = params.base_leg_lift_;           
-  arm_swing_ = params.arm_swing_;
-  forward_extra_foot_height_ = params.forward_extra_foot_height_;
-  left_extra_foot_height_ = params.left_extra_foot_height_;
-  start_lift_divisor_ = params.start_lift_divisor_;
-  pendulum_height_ = params.pendulum_height_;
-}
-
 
 void checkNaN(float n, string s){
   if(n != n){
@@ -265,12 +220,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
   // start of a walk step cycle, ie when t = 0
   if (t == 0) {
     
-    // Go back to normal walk parameters when standing.
-    if (request->body.forward == 0 and request->body.left == 0 and request->body.turn == 0)
-      restoreDefaultWalkParameters();
-
     // First move walk parameters towards their target values.
-    updateAllWalkParameters();
     bodyModel.setPendulumHeight(curr_pendulum_height_);
 
     active = request->body;
@@ -772,33 +722,6 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
   return j;
 }
 
-void updateCurrentParameter(float& curr_value, float target, float change) {
-
-  if (change < 0) {
-    curr_value = max(target, curr_value + change);
-  } else if(change > 0) {
-    curr_value = min(target, curr_value + change);
-  }
-}
-
-void Walk2014Generator::updateAllWalkParameters() {
-  updateCurrentParameter(curr_com_offset_, com_offset_, delta_com_offset_);
-  updateCurrentParameter(curr_forward_change_, forward_change_, delta_forward_change_);
-  updateCurrentParameter(curr_left_change_, left_change_, delta_left_change_);
-  updateCurrentParameter(curr_turn_change_, turn_change_, delta_turn_change_);
-  updateCurrentParameter(curr_base_walk_period_, base_walk_period_, delta_base_walk_period_);
-  updateCurrentParameter(curr_walk_hip_height_, walk_hip_height_, delta_walk_hip_height_);
-  // updateCurrentParameter(curr_stand_hip_height_, stand_hip_height_, delta_stand_hip_height_);
-  updateCurrentParameter(curr_max_forward_, max_forward_, delta_max_forward_);
-  updateCurrentParameter(curr_max_left_, max_left_, delta_max_left_);
-  updateCurrentParameter(curr_max_turn_, max_turn_, delta_max_turn_);
-  updateCurrentParameter(curr_fwd_extra_foot_height_, forward_extra_foot_height_, delta_fwd_extra_foot_height_);
-  updateCurrentParameter(curr_left_extra_foot_height_, left_extra_foot_height_, delta_left_extra_foot_height_);
-  updateCurrentParameter(curr_base_leg_lift_, base_leg_lift_, delta_base_leg_lift_);
-  updateCurrentParameter(curr_start_lift_divisor_, start_lift_divisor_, delta_start_lift_divisor_);
-  updateCurrentParameter(curr_arm_swing_, arm_swing_, delta_arm_swing_);
-  updateCurrentParameter(curr_pendulum_height_, pendulum_height_, delta_pendulum_height_);
-}
 
 
 void Walk2014Generator::restoreDefaultWalkParameters() {

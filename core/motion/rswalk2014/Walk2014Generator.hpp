@@ -192,10 +192,8 @@ class Walk2014Generator : Generator {
     Hpr hipAngles(float Hyp, float Hp, float Hr, float Kp, float Ap,
                   float Ar, float xf, float yf, float zf, XYZ_Coord e);
 
-    void setWalkParameters(const RSWalkParameters & params);
     void ellipsoidClampWalk(float &forward, float &left, float &turn, float speed);
     float evaluateWalkVolume(float x, float y, float z);
-    void updateAllWalkParameters();
     void restoreDefaultWalkParameters();
 
     // GSL parameters

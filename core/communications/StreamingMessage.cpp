@@ -5,7 +5,7 @@
 #include <zlib.h>
 #include <iostream>
 
-#define DEBUG_SM true
+#define DEBUG_SM false
   
 bool StreamingMessage::preSend(const unsigned char *data,int32_t n) {
   if(DEBUG_SM) printf("pre-sending data of size %i (max %i)\n", n, MAX_STREAMING_MESSAGE_LEN);
