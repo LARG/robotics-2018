@@ -7,8 +7,7 @@ from __future__ import absolute_import
 
 import core
 # from memory import *
-from memory import (game_state, robot_state, world_objects, processed_sonar,
-                    vision_frame_info, robot_vision, sensors, odometry)
+from memory import game_state, robot_state, world_objects, processed_sonar, vision_frame_info, robot_vision, sensors, odometry
 import mem_objects
 
 

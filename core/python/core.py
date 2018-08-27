@@ -24,6 +24,7 @@ def init():
     global Timer
     global TOOL
     global CONFIG_ID
+    global OPTIMIZE, DEBUG
 
     swig = pythonswig_module
     Timer = swig.Timer
@@ -37,6 +38,8 @@ def init():
     opponentsC = instance.opponents_
     text_logger = instance.textlog()
     TOOL = (instance.type_ == swig.CORE_TOOL)
+    OPTIMIZE = instance.EnableOptimizations()
+    DEBUG = not OPTIMIZE
 
     joint_values = pythonC.joint_values_
     sensor_values = pythonC.sensor_values_

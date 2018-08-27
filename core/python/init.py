@@ -58,7 +58,6 @@ def processFrame():
     """Perform computations for each frame of python behavior."""
     try:
         global firstFrame
-        core.instance.preVision()
         if firstFrame:
             memory.world_objects.init(memory.robot_state.team_)
             core.visionC.initSpecificModule()
@@ -67,7 +66,6 @@ def processFrame():
             firstFrame = False
 
         core.visionC.processFrame()
-        core.instance.postVision()
         core.localizationC.processFrame()
         core.opponentsC.processFrame()
         processBehaviorFrame()
