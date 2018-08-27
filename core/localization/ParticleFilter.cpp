@@ -1,6 +1,7 @@
 #include <localization/ParticleFilter.h>
 #include <memory/FrameInfoBlock.h>
 #include <memory/OdometryBlock.h>
+#include <common/Random.h>
 
 ParticleFilter::ParticleFilter(MemoryCache& cache, TextLogger*& tlogger) 
   : cache_(cache), tlogger_(tlogger), dirty_(true) {
@@ -23,10 +24,10 @@ void ParticleFilter::processFrame() {
   particles().resize(100);
   auto frame = cache_.frame_info->frame_id;
   for(auto& p : particles()) {
-    p.x = rand_.sampleN(frame * 5, 250);
-    p.y = rand_.sampleN(0, 250);
-    p.t = rand_.sampleN(0, M_PI / 4);
-    p.w = rand_.sampleU();
+    p.x = Random::inst().sampleN() * 250 + (frame * 5); //static_cast<int>(frame * 5), 250);
+    p.y = Random::inst().sampleN() * 250; // 0., 250);
+    p.t = Random::inst().sampleN() * M_PI / 4;  //0., M_PI / 4);
+    p.w = Random::inst().sampleU();
   }
 }
 

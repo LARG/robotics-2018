@@ -1,7 +1,6 @@
 #pragma once
 
 #include <math/Pose2D.h>
-#include <common/Random.h>
 #include <memory/MemoryCache.h>
 #include <memory/LocalizationBlock.h>
 #include <localization/Logging.h>
@@ -24,7 +23,6 @@ class ParticleFilter {
   private:
     MemoryCache& cache_;
     TextLogger*& tlogger_;
-    Random rand_;
 
     mutable Pose2D mean_;
     mutable bool dirty_;
