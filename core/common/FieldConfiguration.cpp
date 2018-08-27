@@ -54,3 +54,30 @@ void BeliefConfiguration::serialize(YAML::Emitter& emitter) const {
   YAML_SERIALIZE(emitter, gtconfig);
   YAML_SERIALIZE(emitter, bconfig);
 }
+
+void GameConfiguration::deserialize(const YAML::Node& node) {
+  YAML_D(game_state);
+  YAML_D(blue_goals);
+  YAML_D(red_goals);
+  node["roles"] >> s_roles;
+  for(auto kvp : s_roles)
+    roles[kvp.first] = fromName_Role(kvp.second);
+  node["states"] >> s_states;
+  for(auto kvp : s_states)
+    states[kvp.first] = fromName_State(kvp.second);
+  YAML_D(objects);
+}
+
+void GameConfiguration::serialize(YAML::Emitter& emitter) const {
+  YAML_S(game_state);
+  YAML_S(blue_goals);
+  YAML_S(red_goals);
+  for(auto kvp : roles)
+    s_roles[kvp.first] = toName_Role(kvp.second);
+  emitter << YAML::Key << "roles" << YAML::Value << s_roles;
+  for(auto kvp : states)
+    s_states[kvp.first] = toName_State(kvp.second);
+  emitter << YAML::Key << "states" << YAML::Value << s_states;
+  YAML_S(objects);
+}
+

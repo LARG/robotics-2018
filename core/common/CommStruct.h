@@ -9,8 +9,8 @@ DECLARE_INTERNAL_SCHEMA(struct CommStruct {
   SCHEMA_METHODS(CommStruct);
   SCHEMA_FIELD(std::array<uint8_t,WO_TEAM_LAST> packetsMissed);
 
-  //int getPacketsMissed(int mate);
-  //void setPacketsMissed(int mate, int missed);
+  int getPacketsMissed(int mate);
+  void setPacketsMissed(int mate, int missed);
 
 });
 #endif
