@@ -1,12 +1,13 @@
 """Module for loading C++ objects."""
 
-from __future__ import print_function
-from __future__ import division
 from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
-import sys
-import pythonswig_module
 import math
+import sys
+
+import pythonswig_module
 # import getpass
 
 DEG_T_RAD = math.pi / 180.0

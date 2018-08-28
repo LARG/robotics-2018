@@ -80,7 +80,7 @@ public:
     set(Kick::NO_KICK,Kick::LEFT,0.0,3000);
   }
 
-  void setFwdKick(Kick::Leg leg, float desired_distance) {
+  void setFwdKick(Kick::Leg leg=Kick::RIGHT, float desired_distance=1000.0f) {
     set(Kick::STRAIGHT,leg,0.0,desired_distance);
   }
 
