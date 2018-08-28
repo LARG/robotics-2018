@@ -30,7 +30,7 @@ tar zxvf libpng-1.5.23.tar.gz
 cd libpng-*
 cmake .
 make
-sudo mv libpng15.so* /usr/lib/x86_64-linux-gnu/
+sudo cp libpng15.so* /usr/lib/x86_64-linux-gnu/
 cd ..
 
 #libs=( alglib yaml-cpp flatbuffers )
@@ -52,6 +52,8 @@ cd swig-*
 make -j8
 sudo make install
 sudo ln -sf /usr/local/bin/swig /usr/local/bin/swig3.0
+cd ..
+rm swig-3.0.8.tar.gz
 
 cd $NAO_HOME/lib/flatbuffers
 mkdir -p build

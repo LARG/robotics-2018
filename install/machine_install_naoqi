@@ -75,7 +75,7 @@ setup_includes() {
 
 # setup_naoqi_base_sdk
 # setup_cross_toolchain
-setup_gcc_cross_compiler
+# setup_gcc_cross_compiler
 setup_qibuild
 # setup_link_libs
 # setup_includes
