@@ -15,7 +15,7 @@ You should use these steps to obtain, setup, and run code on the lab machines an
 4. Go to the nao build directory at `~/nao/trunk/build` and compile the core libraries and the tool.
 
         cd ~/nao/trunk/build
-        ./compile everything
+        ./compile all 
 
 <a id="starting_up"></a>
 #### Starting up the Robot
@@ -122,7 +122,8 @@ The Nao robots are expensive machines that can break fairly easily from falling 
 <a id="personal"></a>
 ### Instructions for Installing the Codebase on Your Personal Linux Machine
 
-To install the codebase on your personal machine, you should be running</a> [Ubuntu 16.04 64-bit](http://releases.ubuntu.com/trusty/ubuntu-16.04.5-desktop-amd64.iso). The code may work on other configurations with some adjustments to the setup procedure, but these aren't officially supported. The setup process will configure your machine for building and running 32-bit software, which can cause conflicts with other applications in Ubuntu. It is **strongly suggested** that you use a fresh Ubuntu install for this. This may be easiest to accomplish using a [virtual machine](https://www.virtualbox.org/wiki/Downloads). You can also [download a preconfigured VM](http://www.cs.utexas.edu/~AustinVilla/preconfigured.tar.gz) with the codebase already installed.
+To install the codebase on your personal machine, you should be running</a> [Ubuntu 16.04 64-bit](http://releases.ubuntu.com/trusty/ubuntu-16.04.5-desktop-amd64.iso). The code may work on other configurations with some adjustments to the setup procedure, but these aren't officially supported. The setup process will configure your machine for building and running 32-bit software, which can cause conflicts with other applications in Ubuntu. It is **strongly suggested** that you use a fresh Ubuntu install for this. This may be easiest to accomplish using a [virtual machine](https://www.virtualbox.org/wiki/Downloads). 
+<!--You can also [download a preconfigured VM](http://www.cs.utexas.edu/~AustinVilla/preconfigured.tar.gz) with the codebase already installed. !-->
 
 1. Read the [Robot Care](nao.html#care) section above.
 2. Create and enter the install folder in your home directory: 

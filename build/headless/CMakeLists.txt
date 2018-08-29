@@ -102,7 +102,7 @@ FIND_AND_LINK(headless libxcb-dri3.so.0)
 FIND_AND_LINK(headless libxcb-present.so.0)
 FIND_AND_LINK(headless libxcb-sync.so.1)
 FIND_AND_LINK(headless libxshmfence.so.1)
-FIND_AND_LINK(headless libQGLViewer.so)
+FIND_AND_LINK(headless libQGLViewer-qt4.so)
 FIND_AND_LINK(headless librt.so.1)
 
 TARGET_LINK_LIBRARIES(headless ${Boost_LIBRARIES} ${FFTW_LIBRARIES} ${PNG_LIBRARIES} ${OPENCV2_LIBS} core ${LIBFLATBUFFERS}x64 ${LIBYAML-CPP}x64 ${ALGLIB}x64 rswalk2014 _pythonswig_module)
