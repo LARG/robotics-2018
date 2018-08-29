@@ -2,15 +2,15 @@
 
 * * *
 
-This tutorial is intended to provide some familiarity with the basics of the Austin Villa codebase for the purpose of controlling robot behaviors, vision, and localization. Any feedback or requests for clarification may be sent to [Jacob Menashe](https://github.com/jmenashe).
+This tutorial is intended to provide some familiarity with the basics of the Austin Villa codebase for the purpose of controlling robot behaviors, vision, and localization. Any feedback or requests for clarification may be sent to [Josiah Hanna](https://github.com/jpha226).
 
-Please refer to the [Nao Intro](general_setup.md) to run the initial robot setup before proceeding with this tutorial.
+Please refer to the [Nao Intro](class_setup.md) to run the initial robot setup before proceeding with this tutorial.
 
 * * *
 
 ### Hello World
 
-This section will walk you through creating a simple Hello World program on the Nao. This assumes you've completed the [nao setup](general_setup.md).
+This section will walk you through creating a simple Hello World program on the Nao. This assumes you've completed the [nao setup](class_setup.md).
 
 1. Open five terminal windows - this isn't always necessary, but will help with debugging.
 2. SSH into the nao with the first one, and run `nao stop`. When the nao is stopped, run `naoqi`
@@ -131,7 +131,7 @@ printf("total orange pixels: %i\n", total);
 
 ### Creating a new memory block
 
-The following checklist is provided as a rough guide for creating an entirely new memory block. This guide assumes you are adding the block for vision processing. Analogous steps may be taken for other modules.
+The following checklist is provided as a rough guide for creating an entirely new memory block. This guide assumes you are adding the block for vision processing. Analogous steps may be taken for other modules. It is unlikely (though not impossible) that you will need to add an entirely new memory block for this course.
 
 0. Create the block in the [memory](../core/memory) directory.
 1. Add a line near the bottom of [generate_block_operations.py](../build/core/generate_block_operations.py) specifying the id of your block (first) and the class name of the block (second). For example:

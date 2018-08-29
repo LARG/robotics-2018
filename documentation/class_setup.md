@@ -5,7 +5,7 @@ All assignments for this course will revolve around programming humanoid Nao rob
 
 ### Initial Setup on Lab Machines
 
-You should use these steps to obtain, setup, and run code on the lab machines and robots for the first time. Note that these steps do **not** work on the departmental machines. See the bottom of this page for instructions if you want to try and install the codebase on your personal Linux machine, or if you'd like to have access to a preconfigured virtual machine.
+You should use these steps to obtain, setup, and run code on the lab machines and robots for the first time. Note that these steps do **not** work on the departmental machines. See the bottom of this page for instructions if you want to try and install the codebase on your personal Linux machine.
 
 1. Read the [Robot Care](#care) section below.
 2. Copy and run the `lab_setup` script from my home directory to yours with the following command. **This script will delete your ~/nao directory**.
@@ -53,7 +53,7 @@ cd ~/nao/trunk/install
 
 It can sometimes be advantageous to connect to the robot with an ethernet cable rather than over wireless, particularly when transferring logs, or when there are latency issues. To do so you'll need to follow these steps:
 
-1.  Create a manual connection: IP: 11.0.1.75, Subnet Mask: 255.255.255.0, Gateway (if required): 0.0.0.0. If you're running linux on a virtual machine, create this connection on the host operating system.
+1.  Create a manual connection: IP: 11.0.1.75, Subnet Mask: 255.255.0.0, Gateway (if required): 0.0.0.0. If you're running linux on a virtual machine, create this connection on the host operating system.
 2.  Connect your machine with an ethernet cable to the robot. The robot's ethernet port is on the back of its head.
 3.  Use the IP address 11.0.1.XX when accessing the robot, where XX is the robot number taped on the back of the head near the ear.
 
@@ -122,8 +122,7 @@ The Nao robots are expensive machines that can break fairly easily from falling 
 <a id="personal"></a>
 ### Instructions for Installing the Codebase on Your Personal Linux Machine
 
-To install the codebase on your personal machine, you should be running</a> [Ubuntu 16.04 64-bit](http://releases.ubuntu.com/trusty/ubuntu-16.04.5-desktop-amd64.iso). The code may work on other configurations with some adjustments to the setup procedure, but these aren't officially supported. The setup process will configure your machine for building and running 32-bit software, which can cause conflicts with other applications in Ubuntu. It is **strongly suggested** that you use a fresh Ubuntu install for this. This may be easiest to accomplish using a [virtual machine](https://www.virtualbox.org/wiki/Downloads). 
-<!--You can also [download a preconfigured VM](http://www.cs.utexas.edu/~AustinVilla/preconfigured.tar.gz) with the codebase already installed. !-->
+To install the codebase on your personal machine, you should be running</a> [Ubuntu 16.04 64-bit](http://releases.ubuntu.com/trusty/ubuntu-16.04.5-desktop-amd64.iso). The code may work on other configurations with some adjustments to the setup procedure, but these aren't officially supported. The setup process will configure your machine for building and running 32-bit software, which can cause conflicts with other applications in Ubuntu. It is **strongly suggested** that you use a fresh Ubuntu install for this. This may be easiest to accomplish using a [virtual machine](https://www.virtualbox.org/wiki/Downloads).
 
 1. Read the [Robot Care](nao.html#care) section above.
 2. Create and enter the install folder in your home directory: 
@@ -131,7 +130,7 @@ To install the codebase on your personal machine, you should be running</a> [Ubu
         mkdir -p ~/nao/trunk && cd ~/nao/trunk
 3. Retrieve the codebase from github:
 
-        git clone https://github.com/utaustinvilla/robotics.git .
+        git clone https://github.com/utaustinvilla/robotics-2018.git .
 
 4. Run the nao pre-install script:
 

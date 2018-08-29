@@ -1,7 +1,7 @@
 #ifndef __UTNAOTOOL_VISION_WINDOW_H__
 #define __UTNAOTOOL_VISION_WINDOW_H__
 
-#define DEBUG_WINDOW 1
+#define DEBUG_WINDOW 0
 #define MS_BETWEEN_FRAMES 1000
 
 #include <QWidget>
