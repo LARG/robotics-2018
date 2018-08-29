@@ -33,14 +33,14 @@ make
 sudo cp libpng15.so* /usr/lib/x86_64-linux-gnu/
 cd ..
 
-#libs=( alglib yaml-cpp flatbuffers )
-#for lib in "${libs[@]}"
-#do
-#  rm -rf $NAO_HOME/lib/$lib
-#  wget -N $NAO_LIBS/$lib.tar.gz
-#  tar zxvf $lib.tar.gz
-#  mv $lib $NAO_HOME/lib/
-#done
+# libs=( alglib yaml-cpp flatbuffers )
+# for lib in "${libs[@]}"
+# do
+#   rm -rf $NAO_HOME/lib/$lib
+#   wget -N $NAO_LIBS/$lib.tar.gz
+#   tar zxvf $lib.tar.gz
+#   mv $lib $NAO_HOME/lib/
+# done
 
 set +e
 sudo apt-get remove swig* -y # This will fail if we install using the method below
@@ -62,4 +62,4 @@ cmake ..
 make
 sudo make install
 
-#wget $NAO_LIBS/vim.tar.gz
+# wget $NAO_LIBS/vim.tar.gz

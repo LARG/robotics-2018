@@ -7,7 +7,7 @@ export NAO_HOME=~/nao/trunk
 # 1. Check with user that you are about to remove ~/nao. Is this OK?
 echo "About to set-up course codebase. This command will remove your ~/nao directory."
 
-read -p "OK to proceed? " -r
+read -p "OK to proceed [Y/N]? " -r
 
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -31,7 +31,7 @@ cd $NAO_HOME
 
 # 4. Pull in course code
 echo "Cloning course repository."
-git clone https://github.com/LARG/robotics-2015.git .
+git clone https://github.com/LARG/robotics-2018.git .
 
 # 5. Create sym links to TA Naoqi and lib
 echo "Creating sym links to TA's naoqi and lib"
@@ -47,8 +47,11 @@ ln -s "/home/$TA/nao/trunk/bin/qmake-qt4" $NAO_HOME/bin/qmake-qt4
 ln -s "/home/$TA/nao/trunk/bin/moc-qt4" $NAO_HOME/bin/moc-qt4
 ln -s "/home/$TA/nao/trunk/bin/uic-qt4" $NAO_HOME/bin/uic-qt4
 
+# 7. Set-up qitoolchain and qibuild
+qitoolchain create atom $NAO_HOME/naoqi/crosstoolchain/atom/toolchain.xml
+qibuild add-config atom -t atom
 
 echo "export NAO_HOME=~/nao/trunk" >> ~/.bashrc
-echo "source $NAO_HOME/install/bashrc_addenda" >> ~/.bashrc
+echo "source $NAO_HOME/install/bashrc_addendum" >> ~/.bashrc
 
 echo "done"
