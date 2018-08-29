@@ -1,6 +1,6 @@
 ---
 game_state: PLAYING
-blue_goals: 3
+blue_goals: 0
 red_goals: 0
 roles:
   {}
@@ -10,125 +10,115 @@ objects:
   gtconfig:
     placements_:
       0:
-        x: 3594.5
-        y: -1498.29
+        x: 1220.65
+        y: 1131.41
         orientation: 0
         height: 0
       1:
-        x: 2980.31
-        y: -976
-        orientation: 6
+        x: 1595.53
+        y: 942
+        orientation: 0
         height: 0
       2:
-        x: 1795.18
-        y: -833
+        x: 1326.16
+        y: -1128
         orientation: 0
         height: 0
       3:
-        x: 3681.45
-        y: 1423
+        x: 1792.59
+        y: 309
         orientation: 0
         height: 0
       4:
-        x: 675.765
-        y: 663
+        x: 3423.72
+        y: 3
         orientation: 0
         height: 0
       5:
-        x: 219.125
-        y: 511.692
-        orientation: -60
+        x: 1138.51
+        y: 816.949
+        orientation: -69
         height: 0
       6:
-        x: 2238.22
-        y: -1256
+        x: 1599.39
+        y: -392
         orientation: 0
         height: 0
       7:
-        x: 417.696
-        y: 764
+        x: 2152.69
+        y: 537
         orientation: 0
         height: 0
       8:
-        x: 2691.09
-        y: -1414
+        x: 212.462
+        y: 1371
         orientation: 0
         height: 0
       9:
-        x: 3370.58
-        y: -994
+        x: 885.657
+        y: 223
         orientation: 0
         height: 0
       10:
-        x: 2309.62
-        y: 312
+        x: 3064.79
+        y: 850
         orientation: 0
-        height: 0
-      11:
-        x: 50.6961
-        y: 1108.8
-        orientation: 30
         height: 0
   bconfig:
     placements_:
       0:
-        x: 3594.5
-        y: -1498.29
+        x: 1220.65
+        y: 1131.41
         orientation: 0
         height: 0
       1:
-        x: 2980.31
-        y: -976
-        orientation: 6
+        x: 1595.53
+        y: 942
+        orientation: 0
         height: 0
       2:
-        x: 1795.18
-        y: -833
+        x: 1326.16
+        y: -1128
         orientation: 0
         height: 0
       3:
-        x: 3681.45
-        y: 1423
+        x: 1792.59
+        y: 309
         orientation: 0
         height: 0
       4:
-        x: 675.765
-        y: 663
+        x: 3423.72
+        y: 3
         orientation: 0
         height: 0
       5:
-        x: 219.125
-        y: 511.692
-        orientation: -60
+        x: 1138.51
+        y: 816.949
+        orientation: -69
         height: 0
       6:
-        x: 2238.22
-        y: -1256
+        x: 1599.39
+        y: -392
         orientation: 0
         height: 0
       7:
-        x: 417.696
-        y: 764
+        x: 2152.69
+        y: 537
         orientation: 0
         height: 0
       8:
-        x: 2691.09
-        y: -1414
+        x: 212.462
+        y: 1371
         orientation: 0
         height: 0
       9:
-        x: 3370.58
-        y: -994
+        x: 885.657
+        y: 223
         orientation: 0
         height: 0
       10:
-        x: 2309.62
-        y: 312
+        x: 3064.79
+        y: 850
         orientation: 0
-        height: 0
-      11:
-        x: 50.6961
-        y: 1108.8
-        orientation: 30
         height: 0
 ...

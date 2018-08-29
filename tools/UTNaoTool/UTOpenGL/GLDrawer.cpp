@@ -271,14 +271,6 @@ void GLDrawer::drawRobot(){
     localizationGL.drawUncertaintyAngle(self->loc,self->orientation,self->sdOrientation);
   }
 
-  // possibly draw role over robot
-  if (display_[SHOW_ROLES]){
-    QFont serifFont( "Courier", 12);
-    parent_->setFont(serifFont);
-    parent_->renderText(self->loc.x/FACT, self->loc.y/FACT, 400/FACT,
-               QString(roleAbbrevs[gtcache_.robot_state->role_].c_str()));
-  }
-
 }
 
 void GLDrawer::drawOdometry(){
@@ -1012,10 +1004,10 @@ void GLDrawer::overlayBasicInfoText() {
   parent_->renderText(x,y,"Role:");
   glColor3f(1.0,1.0,1.0);
   x+=30;
-  if (gtcache_.robot_state != NULL)
-    parent_->renderText(x,y,roleNames[gtcache_.robot_state->role_].c_str());
-  else
-    parent_->renderText(x,y,"?");
+  // if (gtcache_.robot_state != NULL)
+  //   parent_->renderText(x,y,roleNames[gtcache_.robot_state->role_].c_str());
+  // else
+  //   parent_->renderText(x,y,"?");
 
 }
 
