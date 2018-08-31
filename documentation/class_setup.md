@@ -10,7 +10,7 @@ You should use these steps to obtain, setup, and run code on the lab machines an
 1. Read the [Robot Care](#care) section below.
 2. Copy and run the `lab_setup` script from my home directory to yours with the following command. **This script will delete your ~/nao directory**.
 
-        cp /home/jmenashe/lab_setup ~ && ~/lab_setup
+        cp /home/jphanna/nao/trunk/install/lab_setup ~ && ~/lab_setup
 3. This will add environment variable definitions to your `.bashrc` script. To load them, close the current terminal window and open a new one.
 4. Go to the nao build directory at `~/nao/trunk/build` and compile the core libraries and the tool.
 
