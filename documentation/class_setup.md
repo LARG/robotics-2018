@@ -140,9 +140,14 @@ To install the codebase on your personal machine, you should be running</a> [Ubu
 
         ~/nao/trunk/install/install
 6. This will add environment variable definitions to your `.bashrc` script. To load them, close the current terminal window and open a new one.
-7. Try running the tool to ensure that the build has completed and your libraries are configured: `~/nao/trunk/bin/tool`
-8. Connect to the robolab wireless network using the SSID and password you received.
-9. Follow the instructions for starting up the robot [above](#starting_up).
+7. Compile the code base:
+
+	cd ~/nao/trunk/build
+	./compile all
+
+8. Try running the tool to ensure that the build has completed and your libraries are configured: `~/nao/trunk/bin/tool`
+9. Connect to the robolab wireless network using the SSID and password you received.
+10. Follow the instructions for starting up the robot [above](#starting_up).
 
 ### Using Git
 
