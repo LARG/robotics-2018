@@ -158,7 +158,7 @@ Git is a distributed version control system used for managing code repositories.
 
         cd ~/nao/trunk
         git remote set-url origin git@bitbucket.org:student/roborepo.git
-        git remote set-url class https://github.com/utaustinvilla/robotics.git
+        git remote set-url class https://github.com/utaustinvilla/robotics-2018.git
 3. When you have changes to the codebase that you want to push to the git server, use these commands:
 
         cd ~/nao/trunk
