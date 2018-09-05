@@ -130,7 +130,7 @@ To install the codebase on your personal machine, you should be running</a> [Ubu
         mkdir -p ~/nao/trunk && cd ~/nao/trunk
 3. Retrieve the codebase from github:
 
-        git clone https://github.com/utaustinvilla/robotics-2018.git .
+        git clone https://github.com/LARG/robotics-2018.git .
 
 4. Run the nao pre-install script:
 
