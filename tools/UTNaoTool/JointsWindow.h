@@ -2,7 +2,7 @@
 #define JOINTS_WINDOW_H
 
 #include <QWidget>
-
+#include <QCheckBox>
 #include <memory/MemoryFrame.h>
 #include <memory/JointBlock.h>
 #include <memory/JointCommandBlock.h>
@@ -28,10 +28,16 @@ class JointsWindow : public QWidget {
   QLabel* commandStiffs;
   QLabel* jointTemps;
   QLabel* jointChanges;
-  
+
+  QCheckBox* setStiffs;
+  QCheckBox allStiffs;
+
   QString jointNames[NUM_JOINTS+3];
 
-  
+public slots: 
+  void sendStiffness();
+  void allStiffnessToggle(bool toggle);
+
 };
 
 #endif

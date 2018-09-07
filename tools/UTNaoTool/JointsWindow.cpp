@@ -1,7 +1,7 @@
 #include <QtGui>
 #include "JointsWindow.h"
 #include <iostream>
-
+#include <tool/UTMainWnd.h>
 
 using namespace std;
 
@@ -46,6 +46,10 @@ JointsWindow::JointsWindow() : QWidget() {
   QLabel* jointTempLabel = new QLabel("Temp");
   QLabel* jointChangeLabel = new QLabel("AngleChange");
 
+  QLabel* setStiffnessLabel = new QLabel("SetStiffness");
+
+  QLabel* allStiffnessLabel = new QLabel("All");
+
   jointLabel->setFont( QFont( "Arial", 10, QFont::Bold ) );
   valueLabel->setFont( QFont( "Arial", 10, QFont::Bold ) );
   stiffLabel->setFont( QFont( "Arial", 10, QFont::Bold ) );
@@ -53,6 +57,8 @@ JointsWindow::JointsWindow() : QWidget() {
   commandStiffLabel->setFont( QFont( "Arial", 10, QFont::Bold) );
   jointTempLabel->setFont( QFont( "Arial", 10, QFont::Bold) );
   jointChangeLabel->setFont( QFont( "Arial", 10, QFont::Bold) );
+  setStiffnessLabel->setFont( QFont( "Arial", 10, QFont::Bold) );
+  allStiffnessLabel->setFont( QFont( "Arial", 10, QFont::Bold) );
 
   layout->addWidget(jointLabel,0,0);
   layout->addWidget(valueLabel,0,1);
@@ -61,6 +67,8 @@ JointsWindow::JointsWindow() : QWidget() {
   layout->addWidget(commandStiffLabel,0,4);
   layout->addWidget(jointTempLabel,0,5);
   layout->addWidget(jointChangeLabel,0,6);
+  layout->addWidget(setStiffnessLabel,0,7);
+  layout->addWidget(allStiffnessLabel, NUM_JOINTS+1, 7);
 
   jointLabels = new QLabel[NUM_JOINTS+3];
   jointValues = new QLabel[NUM_JOINTS+3];
@@ -69,6 +77,7 @@ JointsWindow::JointsWindow() : QWidget() {
   commandStiffs = new QLabel[NUM_JOINTS+3];
   jointTemps = new QLabel[NUM_JOINTS+3];
   jointChanges = new QLabel[NUM_JOINTS+3];
+  setStiffs = new QCheckBox[NUM_JOINTS];
 
   // set joints
   for (int i = 0; i < NUM_JOINTS+3; i++) {
@@ -92,11 +101,45 @@ JointsWindow::JointsWindow() : QWidget() {
     layout->addWidget(&jointTemps[i], i+1, 5);
     layout->addWidget(&jointChanges[i], i+1, 6);
   }
+
+  for (int i = 0; i < NUM_JOINTS; i++){
+    layout->addWidget(&setStiffs[i], i+1, 7);
+    connect(&setStiffs[i], SIGNAL(clicked()), this, SLOT(sendStiffness()));
+  }
+  layout->addWidget(&allStiffs, NUM_JOINTS+2, 7);
+  connect(&allStiffs, SIGNAL(toggled(bool)), this, SLOT(allStiffnessToggle(bool)));
   setLayout(layout);
 
   resize(120,200);
 
   setWindowTitle(tr("Joints"));
+}
+
+// Send all the stiffness values
+void JointsWindow::sendStiffness(){
+  
+  QString ip = UTMainWnd::inst()->getCurrentAddress();
+  ToolPacket tp(ToolPacket::SetStiffness);
+
+//  cout << "Going to send some data to " << ip.toStdString() << endl;
+  for (int i = 0; i < NUM_JOINTS; i++){
+    if (setStiffs[i].isChecked())
+      tp.jointStiffness[i] = 1.0;
+    else
+      tp.jointStiffness[i] = 0.0;
+//    cout << tp.jointStiffness[i] << " ";
+  }
+//  cout << endl;
+
+  UTMainWnd::inst()->sendUDPCommand(ip, tp);
+  cout << "Joint stiffness sent" << endl;
+}
+
+void JointsWindow::allStiffnessToggle(bool toggle){
+  for (int i = 0; i < NUM_JOINTS; i++){
+    setStiffs[i].setChecked(toggle);
+  }
+  sendStiffness();
 }
 
 void JointsWindow::update(MemoryFrame* memory) {
