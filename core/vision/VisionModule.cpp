@@ -61,10 +61,11 @@ void VisionModule::processFrame() {
   // reset world objects
   cache_.world_object->reset();
   
+#ifndef TOOL
   if(!areFeetOnGround()) {
     return;
   }
-
+#endif
   tlog(30, "Processing bottom camera");
   bottom_processor_->processFrame();
 
