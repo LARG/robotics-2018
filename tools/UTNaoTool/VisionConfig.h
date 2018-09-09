@@ -8,7 +8,7 @@ class VisionConfig : public YamlConfig {
     int tab;
     bool 
       all, horizon, tooltip, calibration, checkerboard,
-      ball, goal, roi, robot, lines;
+      ball, goal, robot, lines;
     
   private:
     void deserialize(const YAML::Node& node) override;

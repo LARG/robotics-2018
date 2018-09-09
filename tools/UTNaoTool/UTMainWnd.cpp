@@ -386,7 +386,6 @@ void UTMainWnd::runCoreFrame(int i, bool start, bool end) {
     if(config_.coreBehaviors)
       visionCore_->interpreter_->processBehaviorFrame();
   }
-  visionCore_->audio_->processFrame();
 }
 
 void UTMainWnd::runLog() {
