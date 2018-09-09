@@ -5,6 +5,7 @@
 RobotConfig::RobotConfig() {
   self = WO_TEAM_LAST;
   team = 1;
+  role = 5;
   robot_id = 0;
   posX = posY = posZ = orientation = 0;
   team_udp = 10001;

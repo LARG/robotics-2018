@@ -218,7 +218,6 @@ void VisionWindow::handleRunningCore() {
 void VisionWindow::update(MemoryFrame* memory) {
   initialized_ = true;
   last_memory_ = memory;
-  std::cout << "Updated vision window" << std::endl;
   *vision_memory_ = *memory;
   core_->updateMemory(vision_memory_);
 

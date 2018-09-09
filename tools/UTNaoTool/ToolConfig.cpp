@@ -13,7 +13,7 @@ ToolConfig::~ToolConfig() {
 void ToolConfig::deserialize(const YAML::Node& node) {
   YAML_DESERIALIZE(node, filesLocationIndex);
   YAML_DESERIALIZE(node, filesUpdateTimeChecked);
-  YAML_DESERIALIZE(node, streaming);
+  // YAML_DESERIALIZE(node, streaming);
   YAML_DESERIALIZE(node, onDemand);
   YAML_DESERIALIZE(node, bypassVision);
   YAML_DESERIALIZE(node, visionOnly);
@@ -39,7 +39,7 @@ void ToolConfig::deserialize(const YAML::Node& node) {
 void ToolConfig::serialize(YAML::Emitter& emitter) const {
   YAML_SERIALIZE(emitter, filesLocationIndex);
   YAML_SERIALIZE(emitter, filesUpdateTimeChecked);
-  YAML_SERIALIZE(emitter, streaming);
+  // YAML_SERIALIZE(emitter, streaming);
   YAML_SERIALIZE(emitter, onDemand);
   YAML_SERIALIZE(emitter, bypassVision);
   YAML_SERIALIZE(emitter, visionOnly);

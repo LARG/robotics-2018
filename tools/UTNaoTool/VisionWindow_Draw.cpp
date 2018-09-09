@@ -9,7 +9,7 @@
 #define IS_RUNNING_CORE (core_ && core_->vision_ && ((UTMainWnd*)parent_)->runCoreRadio->isChecked())
 
 void VisionWindow::redrawImages() {
-  if(DEBUG_WINDOW) std::cout << "redrawImages\n";
+
   if(!enableDraw_) return;
 
   if (((UTMainWnd*)parent_)->streamRadio->isChecked()) {
