@@ -44,6 +44,7 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
     void loadConfig(const ToolConfig& config);
     void saveConfig(ToolConfig& config);
     void updateAnnotations(AnnotationGroup* annotations);
+    void pause() { play_ = false; updateDisplay(); }
   private slots:
     void fieldClicked(Point2D pos, Qt::MouseButton button);
     void fieldHovered(Point2D pos);
@@ -55,7 +56,6 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
 
     void skip();
     void play() { play_ = true; updateDisplay(); }
-    void pause() { play_ = false; updateDisplay(); }
     void forward();
     void back();
     void restart(LogViewer*) { restart(); }
