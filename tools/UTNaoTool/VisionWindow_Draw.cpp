@@ -227,6 +227,34 @@ void VisionWindow::drawBall(ImageWidget* image) {
   }
 }
 
+void VisionWindow::drawGoal(ImageWidget* image) {
+  if(!config_.all) return;
+  if(world_object_block_ == NULL) return;
+
+  auto processor = getImageProcessor(image);
+  const auto& cmatrix = processor->getCameraMatrix();
+  QPainter painter(image->getImage());
+  painter.setRenderHint(QPainter::Antialiasing);
+
+  auto& goal = world_object_block_->objects_[WO_UNKNOWN_GOAL];
+  if(not goal.seen) return;
+  if(goal.fromTopCamera and _widgetAssignments[image] == Camera::BOTTOM) return;
+  if(not goal.fromTopCamera and _widgetAssignments[image] == Camera::TOP) return;
+  QPen pen(segCol[c_BLUE]);
+
+  int width = cmatrix.getCameraWidthByDistance(goal.visionDistance, 110);
+  int height = cmatrix.getCameraHeightByDistance(goal.visionDistance, 100);
+  int x1 = goal.imageCenterX - width / 2;
+  
+  // Draw top
+  int ty1 = goal.imageCenterY - height;
+  QPainterPath path;
+  path.addRoundedRect(QRect(x1, ty1, width, height), 5, 5);
+  painter.setPen(pen);
+  painter.fillPath(path, QBrush(segCol[c_BLUE]));
+
+}
+
 void VisionWindow::drawBallCands(ImageWidget* image) {
 }
 

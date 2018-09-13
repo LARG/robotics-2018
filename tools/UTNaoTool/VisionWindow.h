@@ -118,6 +118,7 @@ class VisionWindow : public ConfigWindow, public Ui_UTVisionWindow {
     void update(MemoryFrame* memory);
     void drawBallCands(ImageWidget* image);
     void drawBall(ImageWidget* image);
+    void drawGoal(ImageWidget* image);
     void drawTransformedPoints(ImageWidget *image);
     void drawWorldObject(ImageWidget* image, QColor color, int worldObjectID);
     void drawHorizonLine(ImageWidget* image);
