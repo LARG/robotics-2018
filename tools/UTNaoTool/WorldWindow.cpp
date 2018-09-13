@@ -3,7 +3,6 @@
 #include <tool/simulation/BehaviorSimulation.h>
 #include <tool/simulation/LocalizationSimulation.h>
 #include <tool/simulation/IsolatedBehaviorSimulation.h>
-#include <tool/simulation/CoachSimulation.h>
 #include <tool/simulation/GoalieSimulation.h>
 #include <communications/CommunicationModule.cpp>
 #include <common/Util.h>
@@ -174,7 +173,6 @@ void WorldWindow::startSimulation() {
         break;
       case IsolatedBehaviorSim: simulation_ = std::make_unique<IsolatedBehaviorSimulation>(false); break;
       case IsolatedBehaviorSimLoc: simulation_ = std::make_unique<IsolatedBehaviorSimulation>(true); break;
-      case CoachSim: simulation_ = std::make_unique<CoachSimulation>(); break;
       case GoalieSim: simulation_ = std::make_unique<GoalieSimulation>(); break;
     }
     player_ = simulation_->defaultPlayer();
@@ -222,7 +220,6 @@ bool WorldWindow::inSimMode() {
     wconfig_.mode == IsolatedBehaviorSimLoc ||
     wconfig_.mode == BehaviorSimLoc ||
     wconfig_.mode == LocalizationSim ||
-    wconfig_.mode == CoachSim ||
     wconfig_.mode == GoalieSim;
 }
 

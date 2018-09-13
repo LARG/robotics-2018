@@ -6,5 +6,5 @@ options:
   - SHOW_BALL_VEL
   - SHOW_ODOMETRY
   - SHOW_TARGET_POINT
-  - SHOW_GOALS
+  - SHOW_BEACONS
 ...

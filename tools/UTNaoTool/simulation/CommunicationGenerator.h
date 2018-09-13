@@ -13,7 +13,6 @@ class CommunicationGenerator {
     void generateAllCommunications();
   private:
     void generateTeamBallCommunications();
-    void generateCoachBallCommunications();
     void fillCaches();
 
     MemoryCache gtcache_, bcache_;

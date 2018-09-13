@@ -31,15 +31,12 @@ void CommunicationGenerator::setCaches(MemoryCache gtcache, vector<MemoryCache> 
 
 void CommunicationGenerator::generateAllCommunications() {
   generateTeamBallCommunications();
-  generateCoachBallCommunications();
   fillCaches();
 }
 
 void CommunicationGenerator::generateTeamBallCommunications() {
 }
 
-void CommunicationGenerator::generateCoachBallCommunications() {
-}
 
 void CommunicationGenerator::fillCaches() {
   for(auto& cache : bcaches_) {

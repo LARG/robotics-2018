@@ -30,7 +30,6 @@ class WorldWindow : public ConfigWindow, public Ui_WorldWindow {
       IsolatedBehaviorSim,
       IsolatedBehaviorSimLoc,
       LocalizationSim,
-      CoachSim,
       GoalieSim
     );
     Qt::KeyboardModifiers modifiers() { return world->modifiers(); }

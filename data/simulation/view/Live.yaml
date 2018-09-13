@@ -5,5 +5,5 @@ options:
   - SHOW_TEAM_BALL_PACKETS
   - SHOW_ROLES
   - SHOW_NUMBERS
-  - SHOW_GOALS
+  - SHOW_BEACONS
 ...

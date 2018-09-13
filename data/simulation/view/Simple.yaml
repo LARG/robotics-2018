@@ -4,6 +4,4 @@ options:
   - SHOW_ROBOT
   - SHOW_BALL
   - SHOW_LOCATION_TEXT_OVERLAY
-  - SHOW_GOALS
-  - SHOW_LINES
 ...
