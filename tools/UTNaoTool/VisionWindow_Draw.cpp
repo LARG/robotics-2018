@@ -75,6 +75,7 @@ void VisionWindow::updateBigImage() {
   if (currentBigImageType_ == SEG_IMAGE){
     drawSegmentedImage(bigImage);
     if (cbxOverlay->isChecked()) {
+      drawGoal(bigImage);
       drawBall(bigImage);
       drawBallCands(bigImage);
       drawBeacons(bigImage);
@@ -101,10 +102,12 @@ void VisionWindow::redrawImages(ImageWidget* rawImage, ImageWidget* segImage, Im
 
   // if overlay is on, then draw objects on the raw and seg image as well
   if (cbxOverlay->isChecked()) {
+    drawGoal(rawImage);
     drawBall(rawImage);
     drawBallCands(rawImage);
     drawBeacons(rawImage);
 
+    drawGoal(segImage);
     drawBall(segImage);
     drawBallCands(segImage);
     drawBeacons(segImage);
@@ -240,6 +243,7 @@ void VisionWindow::drawGoal(ImageWidget* image) {
   if(not goal.seen) return;
   if(goal.fromTopCamera and _widgetAssignments[image] == Camera::BOTTOM) return;
   if(not goal.fromTopCamera and _widgetAssignments[image] == Camera::TOP) return;
+  std::cout << "Drawing goal" << std::endl;
   QPen pen(segCol[c_BLUE]);
 
   int width = cmatrix.getCameraWidthByDistance(goal.visionDistance, 110);
