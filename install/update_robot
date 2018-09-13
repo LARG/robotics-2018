@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+"""Update date, name, or wireless configs on robot."""
+
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+
+import sys
+import os
+import re
+from common import runRemoteCommand, runLocalCommand, makeTempDir, copyFiles, removeTempDir, runLocalScriptRemotely
+
+NAO_HOME = os.environ["NAO_HOME"]
+USER_HOME = "/home/%s" % os.environ["USER"]
+
+
+def set_date_time(ip):
+    """Set robot local time."""
+    runRemoteCommand(ip,
+                     "ln -sf /usr/share/zoneinfo/US/Central /etc/localtime",
+                     root=True, output=False)
+    date = runLocalCommand("date", output=False)
+    runRemoteCommand(ip, 'date --set="%s"' % date, root=True, output=False)
+
+
+def set_hostname(ip, hostname):
+    """Change robot's name."""
+    runRemoteCommand(ip, 'echo %s > /etc/hostname' % hostname, root=True)
+
+
+def check_passwordless_ssh(ip):
+    """Check that passwordless SSH is set-up."""
+    try:
+        output = runLocalCommand('ssh -t nao@%s "echo test"' % ip,
+                                 output=False)
+        if re.search('WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED', output):
+            return False
+    except Exception:
+        return False
+    return True
+
+
+def setup_passwordless_ssh(ip):
+    """Set-up passwordless SSH."""
+    if check_passwordless_ssh(ip):
+        return
+    print('setting up passwordless ssh')
+    runLocalCommand(
+        'ssh-keygen -f "%s/.ssh/known_hosts" -R %s' % (USER_HOME, ip),
+        output=False)
+    runLocalCommand('ssh-copy-id nao@%s' % ip, password='nao', output=False)
+
+
+def fillout_id(name, robot_id, d):
+    """Place robot ID in networking script."""
+    with open('../data/scripts/%s' % name, 'r') as f:
+        contents = f.read()
+    contents = contents.replace('${ID}', robot_id)
+    with open(os.path.join(d, name + ".tmp"), 'w') as f:
+        f.write(contents)
+
+
+def setup_networking(ip, robot_id, wireless_only):
+    """Copy networking scripts to robot."""
+    tempdir = makeTempDir()
+    try:
+        scriptpath = '%s/install/script_wireless.sh' % NAO_HOME
+        if not wireless_only:
+            fillout_id('utwired', robot_id, tempdir)
+        fillout_id('utwireless', robot_id, tempdir)
+        copyFiles(ip, os.path.join(tempdir, 'utwire*'))
+        copyFiles(ip, '../data/scripts/wpa_supplicant.conf',
+                  '~/wpa_supplicant.conf.tmp')
+        runLocalScriptRemotely(ip, scriptpath, output=True)
+    finally:
+        removeTempDir(tempdir)
+
+
+def main(options):
+    """Run functions based on arguments."""
+    if options.include_ssh:
+        setup_passwordless_ssh(options.ip)
+    if options.hostname:
+        set_hostname(options.ip, options.hostname)
+    if options.wireless_only:
+        print('setting up networking')
+        setup_networking(options.ip, options.id, options.wireless_only)
+    if options.include_date:
+        set_date_time(options.ip)
+    print('complete')
+
+
+def parse_args(args):
+    """Parse command line arguments."""
+    from optparse import OptionParser
+    parser = OptionParser('''setup_robot [options]
+    Examples:
+
+    Initial setup for robot 51 on default wired ip:
+
+        ./setup_robot --ip 169.254.12.15 --id 51
+
+    Update wireless configuration without altering wired:
+
+        ./setup_robot --ip 11.0.1.45 --id 45 --wireless-only
+
+    Update the robot's name:
+
+        ./setup_robot --ip 11.0.1.52 --id 52 -n "Samuel Swiss"
+    ''')
+    parser.add_option('--ip', dest='ip', action='store', default=None,
+                      help='The IP address you will use to access the robot during setup.')
+    parser.add_option('--id', dest='id', action='store', default=None,
+                      help="The robot's 2-digit id used for configuration and as the last octet of wired and wireless ip addresses. When running with --wireless-only, this id is used *only* for the last octet of the wireless ip address.")
+    parser.add_option('--hostname', '-n', dest='hostname', action='store',
+                      default=None,
+                      help="The robot's hostname that will appear on the command line when connecting over ssh.")
+    parser.add_option('--wireless-only', '-w', dest='wireless_only',
+                      action='store_true', default=False,
+                      help='Deploy only wireless settings - do not deploy code or other configurations.')
+    parser.add_option('--date', '-d', dest='include_date', action='store_true',
+                      default=False,
+                      help="Update the robot's current date/time.")
+    parser.add_option('--nossh', dest='include_ssh', action='store_false',
+                      default=True,
+                      help='Disable automatic passwordless ssh setup.')
+
+    options, args = parser.parse_args(args)
+    return options, args
+
+
+if __name__ == '__main__':
+    options, _ = parse_args(sys.argv[1:])
+    if not options.ip:
+        if 'CURRENT_ROBOT' in os.environ:
+            options.ip = os.environ['CURRENT_ROBOT']
+            if options.ip:
+                print('Using current robot ip: %s' % options.ip)
+        if not options.ip:
+            print("You must specify the robot IP")
+            sys.exit(2)
+    if not options.id:
+        try:
+            options.id = str(int(options.ip.split('.')[3]))
+            print("Extracted id from ip address: %s" % options.id)
+        except:
+            print("ID was not supplied and could not be inferred from the robot's IP address")
+            print("IP: %s" % options.ip)
+            sys.exit(2)
+    if not options.id and options.wireless_only:
+        print("You must specify the robot ID")
+        sys.exit(2)
+    main(options)
