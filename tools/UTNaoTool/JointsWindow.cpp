@@ -127,7 +127,7 @@ void JointsWindow::sendStiffness(){
       tp.jointStiffness[i] = 1.0;
     else
       tp.jointStiffness[i] = 0.0;
-//    cout << tp.jointStiffness[i] << " ";
+    cout << tp.jointStiffness[i] << " ";
   }
 //  cout << endl;
 

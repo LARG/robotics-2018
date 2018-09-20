@@ -599,7 +599,7 @@ void VisionCore::receiveData() {
   vision_joint_commands_->send_body_angles_ = false;
   vision_joint_commands_->send_head_pitch_angle_ = false;
   vision_joint_commands_->send_head_yaw_angle_ = false;
-  vision_joint_commands_->send_stiffness_ = false;
+  // vision_joint_commands_->send_stiffness_ = false;
   vision_joint_commands_->send_sonar_command_ = false;
   vision_joint_commands_->send_arm_angles_  = false;
 
