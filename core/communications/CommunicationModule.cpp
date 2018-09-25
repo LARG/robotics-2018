@@ -254,8 +254,10 @@ void CommunicationModule::listenToolUDP() {
       break;
     case ToolPacket::SetStiffness: 
       for (int i = 0; i < NUM_JOINTS; i++){
-        this->joint_commands_->setJointStiffness(i, tp.jointStiffness[i]);
-        std::cout << tp.jointStiffness[i] << " ";
+        if (joint_commands_->stiffness_[i] > 0.9) {
+          this->joint_commands_->setJointStiffness(i, tp.jointStiffness[i]);
+          std::cout << tp.jointStiffness[i] << " ";
+        }
       }
       std::cout << "Stiffness set" << std::endl;
       this->joint_commands_->send_stiffness_=true;
