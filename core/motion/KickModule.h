@@ -26,6 +26,7 @@ class KickModule : public Module {
     void finish();
     bool finished();
     void moveBetweenKeyframes(const Keyframe& start, const Keyframe& finish, int cframe);
+    void initStiffness();
     void performKick();
     void moveToInitial(const Keyframe& keyframe, int cframe);
     bool reachedKeyframe(const Keyframe& keyframe);

@@ -30,6 +30,7 @@ void KickModule::initSpecificModule() {
 
 void KickModule::start() {
   printf("Starting kick sequence\n");
+  initStiffness();
   state_ = Initial;
   cache_.kick_request->kick_running_ = true;
   keyframe_ = 0;
@@ -81,6 +82,14 @@ void KickModule::processFrame() {
     cache_.kick_request->kick_running_ = true;
     performKick();
   }
+}
+
+
+void KickModule::initStiffness() {
+  for (int i=0; i < NUM_JOINTS; i++)
+    cache_.joint_command->stiffness_[i] = 1.0;
+  cache_.joint_command->send_stiffness_ = true;
+  cache_.joint_command->stiffness_time_ = 10;
 }
 
 void KickModule::performKick() {
