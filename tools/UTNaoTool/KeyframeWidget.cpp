@@ -141,6 +141,8 @@ void KeyframeWidget::save() {
     ks.keyframes.push_back(kitem->keyframe());
   }
   ks.save(kfconfig_.sequence_file);
+  std::cout << "Kick saved to " << kfconfig_.sequence_file << std::endl;
+
 }
 
 void KeyframeWidget::reload() {
@@ -156,12 +158,35 @@ void KeyframeWidget::reload() {
   }
   if(!loading_)
     ConfigWidget::saveConfig();
+  std::cout << "Kick loaded from " << kfconfig_.sequence_file << std::endl;
 }
 
 void KeyframeWidget::saveAs() {
+  QString file = QFileDialog::getOpenFileName(this, 
+    tr("Open Kick File"),
+    QString(getenv("NAO_HOME")) + "/data/kicks",
+    tr("Kick files (*.yaml)"),
+    0, QFileDialog::DontUseNativeDialog
+  );
+  if (file.isEmpty())
+    return;
+  kfconfig_.sequence_file = file.toStdString();
+  save();
 }
 
 void KeyframeWidget::load() {
+
+  QString file = QFileDialog::getOpenFileName(this, 
+    tr("Open Kick File"),
+    QString(getenv("NAO_HOME")) + "/data/kicks",
+    tr("Kick files (*.yaml)"),
+    0, QFileDialog::DontUseNativeDialog
+  );
+  if (file.isEmpty())
+    return;
+  kfconfig_.sequence_file = file.toStdString();
+  reload();
+
 }
 
 void KeyframeWidget::addKeyframe() {
