@@ -10,12 +10,12 @@
 #include <memory/KickRequestBlock.h>
 
 #define JOINT_EPSILON (3.f * DEG_T_RAD)
-#define DEBUG false
+#define DEBUG false 
 
 KickModule::KickModule() : state_(Finished), sequence_(NULL) { }
 
 void KickModule::initSpecificModule() {
-  auto file = cache_.memory->data_path_ + "/kicks/default.yaml";
+  auto file = cache_.memory->data_path_ + "/kicks/kick2.yaml";
   sequence_ = new KeyframeSequence();
   printf("Loading kick sequence from '%s'...", file.c_str());
   fflush(stdout);
@@ -93,6 +93,7 @@ void KickModule::initStiffness() {
 }
 
 void KickModule::performKick() {
+  initStiffness();
   if(DEBUG) printf("performKick, state: %s, keyframe: %i, frames: %i\n", getName(state_), keyframe_, frames_);
   if(state_ == Finished) return;
   if(sequence_ == NULL) return;
@@ -124,6 +125,7 @@ void KickModule::performKick() {
     moveBetweenKeyframes(keyframe, next, frames_);
   }
   frames_++;
+  std::cout << frames_ << std::endl;
 }
 
 bool KickModule::reachedKeyframe(const Keyframe& keyframe) {
