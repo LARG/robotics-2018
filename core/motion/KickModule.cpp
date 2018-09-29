@@ -125,7 +125,7 @@ void KickModule::performKick() {
     moveBetweenKeyframes(keyframe, next, frames_);
   }
   frames_++;
-  std::cout << frames_ << std::endl;
+  // std::cout << frames_ << std::endl;
 }
 
 bool KickModule::reachedKeyframe(const Keyframe& keyframe) {
