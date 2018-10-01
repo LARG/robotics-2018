@@ -10,22 +10,24 @@
 #include <memory/KickRequestBlock.h>
 
 #define JOINT_EPSILON (3.f * DEG_T_RAD)
-#define DEBUG false 
+#define DEBUG false
+#define HACK
 
 KickModule::KickModule() : state_(Finished), sequence_(NULL) { }
 
 void KickModule::initSpecificModule() {
-
-  auto file = cache_.memory->data_path_ + "/kicks/good_kick.yaml";
+  #ifndef HACK
+  auto file = cache_.memory->data_path_ + "/kicks/default.yaml";
   sequence_ = new KeyframeSequence();
   printf("Loading kick sequence from '%s'...", file.c_str());
   fflush(stdout);
-  if(sequence_->load(file))
+  if(sequence_->load(file)) {
     printf("success!\n");
-  else {
+  } else {
     printf("failed!\n");
     sequence_ = NULL;
   }
+  #endif
   initial_ = NULL;
 }
 
@@ -36,7 +38,19 @@ void KickModule::start() {
   cache_.kick_request->kick_running_ = true;
   keyframe_ = 0;
   frames_ = 0;
-  initial_ = new Keyframe(cache_.joint->values_, 0);
+  auto file = cache_.memory->data_path_ + "/kicks/default.yaml";
+  #ifdef HACK
+  sequence_ = new KeyframeSequence();
+  printf("Loading kick sequence from '%s'...", file.c_str());
+  fflush(stdout);
+  if(sequence_->load(file)) {
+    printf("success!\n");
+  } else {
+    printf("failed!\n");
+    sequence_ = NULL;
+  }
+  #endif
+  initial_ = new Keyframe(cache_.joint->values_.data(), 0);
 }
 
 void KickModule::finish() {
@@ -46,6 +60,10 @@ void KickModule::finish() {
   cache_.kick_request->kick_type_ == Kick::NO_KICK;
   if(initial_) delete initial_;
   initial_ = NULL;
+  #ifdef HACK
+  if(sequence_) delete sequence_;
+  sequence_ = NULL;
+  #endif
 }
 
 bool KickModule::finished() {
@@ -87,6 +105,7 @@ void KickModule::processFrame() {
 
 
 void KickModule::initStiffness() {
+  std::cout << "init stiffness!" << std::endl;
   for (int i=0; i < NUM_JOINTS; i++)
     cache_.joint_command->stiffness_[i] = 1.0;
   cache_.joint_command->send_stiffness_ = true;
@@ -126,7 +145,6 @@ void KickModule::performKick() {
     moveBetweenKeyframes(keyframe, next, frames_);
   }
   frames_++;
-  // std::cout << frames_ << std::endl;
 }
 
 bool KickModule::reachedKeyframe(const Keyframe& keyframe) {
