@@ -17,6 +17,11 @@ KickModule::KickModule() : state_(Finished), sequence_(NULL) { }
 
 void KickModule::initSpecificModule() {
   #ifndef HACK
+  // For some reason, small changes to the default file are causing the walk
+  // to behave weird. Unclear what the root issue is but the fix right now is
+  // to load the kick on demand. Since kicks load quickly and happen
+  // relatively infrequently this should not add too much overhead to the kick
+  // behavior.
   auto file = cache_.memory->data_path_ + "/kicks/default.yaml";
   sequence_ = new KeyframeSequence();
   printf("Loading kick sequence from '%s'...", file.c_str());
