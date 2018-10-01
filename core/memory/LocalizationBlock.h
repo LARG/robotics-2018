@@ -17,6 +17,7 @@ DECLARE_INTERNAL_SCHEMA(struct LocalizationBlock : public MemoryBlock {
   public:
     SCHEMA_METHODS(LocalizationBlock);
     LocalizationBlock();
+    SCHEMA_FIELD(Point2D player_);
     //SCHEMA_FIELD(Eigen::Matrix<float, STATE_SIZE, 1, Eigen::DontAlign> state);
     //SCHEMA_FIELD(Eigen::Matrix<float, STATE_SIZE, STATE_SIZE, Eigen::DontAlign> covariance);
     mutable SCHEMA_FIELD(std::array<float, STATE_SIZE> state_data);

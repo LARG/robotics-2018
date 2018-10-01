@@ -421,20 +421,6 @@ void ObservationGenerator::generateGroundTruthObservations(){
     // decide if seen depending on pan
     if (fabs(joint_->values_[HeadPan] - bearing) < FOVx/2.0 && distance < 5'000){
       if(wo->isUnknown()) continue;
-      if(i == WO_BALL) {
-        wo->relVel = gtball.absVel;
-        wo->relVel.rotate(-gtrobot.orientation);
-
-        wo->relPos = gtball.loc;
-        wo->relPos = wo->relPos.globalToRelative(gtrobot.loc, gtrobot.orientation);
-
-        wo->relOrientation = gtrobot.loc.getBearingTo(gtball.loc, gtrobot.orientation);
-        wo->sd.x = wo->sd.y = 0;
-      }
-      wo->loc.x = gto->loc.x;
-      wo->loc.y = gto->loc.y;
-      wo->distance = distance;
-      wo->bearing = bearing;
       gto->seen = wo->seen = true;
       gto->frameLastSeen = wo->frameLastSeen = frame_info_->frame_id;
       float diff = joint_->values_[HeadPan] - wo->bearing;
