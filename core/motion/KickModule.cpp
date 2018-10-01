@@ -50,7 +50,7 @@ void KickModule::start() {
     sequence_ = NULL;
   }
   #endif
-  initial_ = new Keyframe(cache_.joint->values_.data(), 0);
+  initial_ = new Keyframe(cache_.joint->values_, 0);
 }
 
 void KickModule::finish() {
