@@ -12,7 +12,7 @@ SET(RSWALK_SRCS
    perception/kinematics/Kinematics.cpp
    perception/kinematics/Pose.cpp
    perception/kinematics/Parameters.cpp
-   perception/kinematics/CKF.cpp
+   # perception/kinematics/CKF.cpp
 
    # Types
    types/XYZ_Coord.hpp
