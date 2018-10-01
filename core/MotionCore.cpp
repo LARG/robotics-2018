@@ -32,7 +32,6 @@
 #include <math/Pose2D.h>
 
 #include <common/Calibration.h>
-#include <common/PIDController.h>
 #include <common/RobotCalibration.h>
 #include <common/Kicks.h>
 
@@ -406,7 +405,6 @@ void MotionCore::postProcess() {
   // try to make the head hit its destination
   static float prevHeadTiltCommand = 0;
   static float prevHeadTilt = 0;
-  static PIDController headTiltPID(1.0,0.1,0.0,DEG_T_RAD * 0.2);
   bool headTiltCommandChanged = (fabs(processed_joint_commands_->angles_[HeadTilt] - prevHeadTiltCommand) > 0.01);
   bool headTiltChanged = (fabs(processed_joint_angles_->values_[HeadTilt] - prevHeadTilt) > DEG_T_RAD * 0.5);
   prevHeadTiltCommand = processed_joint_commands_->angles_[HeadTilt];

@@ -20,7 +20,6 @@ lights/LEDModule.h
 opponents/OppModule.h
 vision/VisionModule.h
 behavior/BehaviorModule.h
-math/UnscentedKalmanFilterParams.h
 localization/LocalizationModule.h
 localization/LocalizationParams.h
 
