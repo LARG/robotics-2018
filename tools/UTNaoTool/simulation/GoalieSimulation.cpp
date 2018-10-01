@@ -14,7 +14,7 @@ typedef ObjectConfiguration OP;
 
 GoalieSimulation::GoalieSimulation() : IBSim(true, KEEPER) {
   auto& config = config_.objects.gtconfig;
-  if(!loadGame("goalie_sim")) {
+  if(not loadGame("goalie_sim")) {
     config = {
       {player_, OP(_X, _Y, _ORIENT)},
       {WO_BALL, OP(BALL_X, _Y)}

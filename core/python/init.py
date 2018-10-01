@@ -82,7 +82,7 @@ def processBehaviorFrame():
     """Run loaded behavior processFrame."""
     global behaviorLoaded
     if not behaviorLoaded:
-        runBehavior("walk_kick")
+        runBehavior("keeper")
         behaviorLoaded = True
     try:
         if memory.robot_state.WO_SELF != core.WO_TEAM_COACH:

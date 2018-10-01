@@ -61,6 +61,7 @@ void LocalizationModule::initFromWorld() {
 // Reinitialize from scratch
 void LocalizationModule::reInit() {
   pfilter_->init(Point2D(-750,0), 0.0f);
+  cache_.localization_mem->player_ = Point2D(-750,0);
   cache_.localization_mem->state = decltype(cache_.localization_mem->state)::Zero();
   cache_.localization_mem->covariance = decltype(cache_.localization_mem->covariance)::Identity();
 }
@@ -79,12 +80,10 @@ void LocalizationModule::processFrame() {
   auto& ball = cache_.world_object->objects_[WO_BALL];
   auto& self = cache_.world_object->objects_[cache_.robot_state->WO_SELF];
 
-  // Process the current frame and retrieve our location/orientation estimate
-  // from the particle filter
-  pfilter_->processFrame();
-  self.loc = pfilter_->pose().translation;
-  self.orientation = pfilter_->pose().rotation;
-  log(40, "Localization Update: x=%2.f, y=%2.f, theta=%2.2f", self.loc.x, self.loc.y, self.orientation * RAD_T_DEG);
+  // Retrieve the robot's current location from localization memory
+  // and store it back into world objects
+  auto sloc = cache_.localization_mem->player_;
+  self.loc = sloc;
     
   //TODO: modify this block to use your Kalman filter implementation
   if(ball.seen) {
