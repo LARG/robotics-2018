@@ -14,12 +14,13 @@ typedef ObjectConfiguration OP;
 
 GoalieSimulation::GoalieSimulation() : IBSim(true, KEEPER) {
   auto& config = config_.objects.gtconfig;
-  if(not loadGame("goalie_sim")) {
+//  if(not loadGame("goalie_sim")) {
+    std::cout << "Default object placement" << std::endl;
     config = {
       {player_, OP(_X, _Y, _ORIENT)},
       {WO_BALL, OP(BALL_X, _Y)}
     };
-  }
+//  }
   saveGame("goalie_sim");
   bcache_.robot_state->role_ = KEEPER;
   gtcache_.game_state->setState(config_.game_state);

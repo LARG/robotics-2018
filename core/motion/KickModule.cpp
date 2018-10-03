@@ -110,7 +110,7 @@ void KickModule::processFrame() {
 
 
 void KickModule::initStiffness() {
-  std::cout << "init stiffness!" << std::endl;
+
   for (int i=0; i < NUM_JOINTS; i++)
     cache_.joint_command->stiffness_[i] = 1.0;
   cache_.joint_command->send_stiffness_ = true;
