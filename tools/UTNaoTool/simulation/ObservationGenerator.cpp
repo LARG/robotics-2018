@@ -105,120 +105,11 @@ void ObservationGenerator::generateBallObservations() {
   }
 }
 
-void ObservationGenerator::generateLineObservations() {
-  getSelf(gtSelf,obsSelf,player_);
-  int seenLines = 0;
+void ObservationGenerator::generateLineObservations() {}
 
-  for (int i = LINE_OFFSET; i < LINE_OFFSET + NUM_LINES; i++) {
-    if (seenLines >= 4) break;
-    if(!lconfig_.use_field_edges && WorldObject::isEdgeObject(i)) continue;
-    WorldObject& truthWO = gt_object_->objects_[i];
-   
-    Line2D visionLine(gtSelf.loc, gtSelf.orientation);
-    Point2D point = truthWO.lineLoc.getSegmentIntersection(visionLine);
-    int idx = WO_UNKNOWN_FIELD_LINE_1+seenLines;
-    if(i == WO_CENTER_LINE) idx = WO_CENTER_LINE;
-    auto& obsWO = obs_object_->objects_[idx];
-    float bearing = gtSelf.loc.getBearingTo(point, gtSelf.orientation);
-    float distance = gtSelf.loc.getDistanceTo(point);
-    float pan = joint_->values_[HeadPan];
-    if (fabs(pan - bearing) > FOVx/2.0)
-      continue;
+void ObservationGenerator::generateOpponentObservations() {}
 
-    float missedObsRate = 1.0/3.0;
-    float randPct = Random::inst().sampleU();
-    // see lines up to 2.5 m
-    if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 2500){
-      // seen
-      seenLines++;
-
-      float maxleft = gtSelf.orientation + pan + FOVx/2;
-      float maxright = gtSelf.orientation + pan - FOVx/2;
-      LineSegment vline = truthWO.lineLoc.getVisiblePortion(gtSelf.loc, gtSelf.orientation + pan, FOVx);
-      vline = vline.globalToRelative(gtSelf.loc, gtSelf.orientation);
-
-      float xnoise = Random::inst().sampleU(.95,1.05);
-      float ynoise = Random::inst().sampleU(.95,1.05);
-      float tnoise = Random::inst().sampleU(-10 * DEG_T_RAD, 10 * DEG_T_RAD);
-      vline.start.x *= xnoise; vline.end.x *= xnoise;
-      vline.start.y *= ynoise; vline.end.y *= ynoise;
-      vline.computeCenter();
-      obsWO.visionPt1 = vline.start;
-      obsWO.visionPt2 = vline.end;
-      obsWO.visionLine = vline;
-      Point2D robot(0,0);
-      Point2D closest = vline.getPointOnSegmentClosestTo(robot);
-      obsWO.visionDistance = closest.getMagnitude();
-      obsWO.visionBearing = closest.getDirection();
-      obsWO.visionConfidence = 1.0;
-      float diff = joint_->values_[HeadPan] - bearing;
-      obsWO.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
-      obsWO.imageCenterY = iparams_.height/2.0;
-      obsWO.seen = true;
-      
-      
-      point = point.globalToRelative(gtSelf.loc, gtSelf.orientation);
-    } // line was seen with random prob
-  } // line loop
-}
-
-void ObservationGenerator::generateOpponentObservations() {
-  getSelf(gtSelf,obsSelf,player_);
-  int firstOpp = 1;
-  if (team_ == TEAM_BLUE) firstOpp += WO_TEAM_LAST;
-  int oppSeen = 0;
-  for (int i = 0; i < 4; i++){
-    WorldObject& truthWO = gt_object_->objects_[i+firstOpp];
-    float bearing = gtSelf.loc.getBearingTo(truthWO.loc,gtSelf.orientation);
-    float distance = gtSelf.loc.getDistanceTo(truthWO.loc);
-
-    auto& obsWO = obs_object_->objects_[5+oppSeen];
-    // in FOV
-    if (fabs(joint_->values_[HeadPan] - bearing) < FOVx/2.0){
-      float missedObsRate = 1.0/5.0;
-      float randPct = Random::inst().sampleU();
-      // only see opponents between 0.5 and 2.5 meters
-      if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance > 500 && distance < 2500){
-        // seen
-        obsWO.seen = true;
-        obsWO.visionConfidence = 1.0;
-        oppSeen++;
-        float diff = joint_->values_[HeadPan] - bearing;
-        obsWO.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
-        obsWO.imageCenterY = iparams_.height/2.0;
-        // add distance and bearing noise
-        float randNoise = Random::inst().sampleU()-0.5;
-        obsWO.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.25*distance;// up to 25% distance error
-        obsWO.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 7.0*DEG_T_RAD;// up to 7 deg bearing error
-
-      }
-    }
-  } // opp loop
-}
-
-void ObservationGenerator::generateCenterCircleObservations() {
-  getSelf(gtSelf,obsSelf,player_);
-  getObject(gtCircle, obsCircle, WO_CENTER_CIRCLE);
-  float bearing = gtSelf.loc.getBearingTo(gtCircle.loc,gtSelf.orientation);
-  float distance = gtSelf.loc.getDistanceTo(gtCircle.loc);
-  if (isVisible(WO_CENTER_CIRCLE)) {
-    float missedObsRate = 1.0/5.0;
-    float randPct = Random::inst().sampleU();
-    // see circle up to 3 m
-    if (randPct > (missedObsRate * MISSED_OBS_FACTOR) && distance < 3000){
-      // seen
-      obsCircle.seen = true;
-      float diff = joint_->values_[HeadPan] - bearing;
-      obsCircle.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
-      obsCircle.imageCenterY = iparams_.height/2.0;
-      // add distance and bearing noise
-      float randNoise = Random::inst().sampleU()-0.5;
-      obsCircle.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.15*distance;// up to 15% distance error
-      obsCircle.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;// up to 5 deg bearing error
-      obsCircle.visionConfidence = 1.0;
-    }
-  }
-}
+void ObservationGenerator::generateCenterCircleObservations() {}
 
 void ObservationGenerator::generateBeaconObservations() {
   getSelf(gtSelf,obsSelf,player_);
@@ -341,12 +232,12 @@ void ObservationGenerator::generateAllObservations() {
   obs_object_->reset();
   initializeBelief();
   generateBallObservations();
-  generateLineObservations();
-  generateOpponentObservations();
-  generateCenterCircleObservations();
+  // generateLineObservations();
+  // generateOpponentObservations();
+  // generateCenterCircleObservations();
   generateBeaconObservations();
   generateGoalObservations();
-  generatePenaltyCrossObservations();
+  // generatePenaltyCrossObservations();
   fillObservationObjects();
 }
 
@@ -433,29 +324,7 @@ void ObservationGenerator::generateGroundTruthObservations(){
   fillObservationObjects();
 }
 
-void ObservationGenerator::generatePenaltyCrossObservations() {
-  getSelf(gtSelf,obsSelf,player_);
-  std::vector<WorldObjectType> crosses = { WO_OWN_PENALTY_CROSS, WO_OPP_PENALTY_CROSS };
-  for(auto cross : crosses) {
-    getObject(gtCross, obsCross, cross);
-    float bearing = gtSelf.loc.getBearingTo(gtCross.loc,gtSelf.orientation);
-    float distance = gtSelf.loc.getDistanceTo(gtCross.loc);
-    if (isVisible(cross)) {
-      float missedObsRate = 4.0/5.0;
-      float randPct = Random::inst().sampleU();
-      if (randPct > missedObsRate && distance < 2000){
-        obsCross.seen = true;
-        float diff = joint_->values_[HeadPan] - bearing;
-        obsCross.imageCenterX = iparams_.width/2.0 + (diff / (FOVx/2.0) * iparams_.width/2.0);
-        obsCross.imageCenterY = iparams_.height/2.0;
-        float randNoise = Random::inst().sampleU()-0.5;
-        obsCross.visionDistance = distance + randNoise * VISION_ERROR_FACTOR * 0.15*distance;// up to 15% distance error
-        obsCross.visionBearing = bearing + randNoise * VISION_ERROR_FACTOR * 5.0*DEG_T_RAD;// up to 5 deg bearing error
-        obsCross.visionConfidence = 1.0;
-      }
-    }
-  }
-}
+void ObservationGenerator::generatePenaltyCrossObservations() {}
 
 void ObservationGenerator::initializeBelief() {
   if(initialized_) return;

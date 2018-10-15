@@ -917,7 +917,10 @@ void GLDrawer::overlayObservationText() {
   y+=10;
   glColor3f(1.0,1.0,1.0);
   for (int i = 0; i < NUM_WORLD_OBJS; i++){
-    wo = &(gtcache_.world_object->objects_[i]);
+    if(not display_[SHOW_GOALS] and i >= WO_OWN_GOAL and i <= WO_UNKNOWN_GOALPOST) {
+      continue;
+    }
+    wo = &(bcache_.world_object->objects_[i]);
     // if seen, get distance and angle
     if (wo->seen){
       text = QString("(") + ::getName((WorldObjectType)i) +
