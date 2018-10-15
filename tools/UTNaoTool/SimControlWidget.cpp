@@ -56,8 +56,8 @@ void SimControlWidget::fieldClicked(Point2D pos, Qt::MouseButton button) {
     printf("move ball to %2.f,%2.f\n", pos.x, pos.y);
     simulation_->moveBall(pos);
   } else if (button == Qt::RightButton && (modifiers() == Qt::ControlModifier)) {
-    printf("teleport ball to %2.f,%2.f\n", pos.x, pos.y);
-    simulation_->teleportBall(pos);
+    printf("teleport robot to %2.f,%2.f\n", pos.x, pos.y);
+    simulation_->teleportPlayer(pos, 0., 0);
   }
 }
 
