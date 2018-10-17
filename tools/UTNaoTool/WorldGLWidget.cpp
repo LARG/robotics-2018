@@ -254,12 +254,12 @@ void WorldGLWidget::draw(Simulation* simulation) {
     auto bcaches = simulation->getPlayerBeliefMemoryCaches();
     if (display_[GLDrawer::SHOW_VISION_RANGE]) drawer_.drawVisionRanges(bcaches);
 
-    if (display_[GLDrawer::SHOW_ALTERNATE_ROBOTS]) drawer_.drawAlternateRobots(bcaches);
+    if (display_[GLDrawer::SHOW_LOCALIZATION_INFO]) drawer_.drawAlternateRobots(bcaches);
   } else if (cache_.memory) {
     drawer_.setGtCache(cache_);
     drawer_.setBeliefCache(cache_);
     drawer_.draw(display_);
-    if (display_[GLDrawer::SHOW_ALTERNATE_ROBOTS]) drawer_.drawAlternateRobots(cache_);
+    if (display_[GLDrawer::SHOW_LOCALIZATION_INFO]) drawer_.drawAlternateRobots(cache_);
     if (display_[GLDrawer::SHOW_VISION_RANGE]) drawer_.drawVisionRanges(cache_);
   }
   if(dragInfo_.dragging)
