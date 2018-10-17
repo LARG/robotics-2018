@@ -53,8 +53,6 @@ public:
   void disableLogging();
   void disableTextLogging();
   
-  void updateOdometry();
-
   MemoryFrame memory_;
   CoreType type_;
   unsigned int last_frame_processed_;

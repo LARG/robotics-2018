@@ -185,7 +185,6 @@ void MotionCore::processMotionFrame() {
     walk_->processFrame();
   }
 
-  updateOdometry();
 
 
   // override commands with getup if necessary
@@ -515,58 +514,3 @@ void MotionCore::receiveData() {
 }
 
 
-void MotionCore::updateOdometry(){
-  // TODO RE-ENABLE ODOMETRY
-/*
-  // set if standing or walking
-  odometry_->standing = !walk_info_->walk_is_active_;
-  if (odometry_->standing) {
-    last_stand_frame_ = frame_info_->frame_id;
-  }
-  if (walk_request_->motion_ == WalkRequestBlock::STAND) {
-    if (next_stand_frame_ == 0)
-      next_stand_frame_ = frame_info_->frame_id + 4 * al_walk_param_->walk_step_min_period_;
-  } else
-    next_stand_frame_ = 0;
-
-  // save where robot was last time vision updated odom
-  if (odometry_->displacement.translation.x == 0 && odometry_->displacement.translation.y == 0 && odometry_->displacement.rotation == 0){
-    walk_info_->robot_odometry_frame_ = walk_info_->robot_last_position_;
-    last_odometry_update_ = frame_info_->frame_id;
-  }
-
-  // save last position
-  walk_info_->robot_last_position_ = walk_info_->robot_position_;
-
-  // odometry is how much torso has moved last time vision used it
-  odometry_->displacement = walk_info_->robot_position_.globalToRelative(walk_info_->robot_odometry_frame_);
-
-  // correct for the robot walk offsets
-  bool do_odometry_correction = ((!odometry_->standing) && (frame_info_->frame_id - last_stand_frame_ > al_walk_param_->walk_step_min_period_ * 4)); // is not standing, and not just coming out of a stand
-  do_odometry_correction = do_odometry_correction && ((frame_info_->frame_id < next_stand_frame_) || (next_stand_frame_ == 0)); // don't correct if we're in the last step before standing
-
-  //std::cout << next_stand_frame_ << " " << frame_info_->frame_id << std::endl;
-  if (do_odometry_correction) {
-    // TODO: currently ignoring other offsets
-    float steps_per_second = 50.0 / al_walk_param_->walk_step_min_period_;
-    float max_turn_speed = DEG_T_RAD * al_walk_param_->walk_max_step_theta_ * steps_per_second;
-    float turn_offset_vel = walk_request_->odometry_turn_offset_ * max_turn_speed;
-    unsigned int num_frames_passed = frame_info_->frame_id - last_odometry_update_ + 1; // +1 for the current frame
-    double time = 0.01 * num_frames_passed;
-    float da = -1 * turn_offset_vel * time;
-
-    //float da = -1 * walk_request_->odometry_turn_offset_ * DEG_T_RAD * al_walk_param_->walk_max_step_theta_ / (2.0 * al_walk_param_->walk_step_min_period_);
-    //da *= 4;
-    //std::cout << odometry_->displacement.rotation << " " << da << std::endl;
-    odometry_->displacement.rotation += da;
-  }
-
-  // multiply by factor
-  odometry_->displacement.translation.x *= al_walk_param_->fwd_odometry_factor_;
-  odometry_->displacement.translation.y *= al_walk_param_->side_odometry_factor_;
-  if (odometry_->displacement.rotation > 0)
-    odometry_->displacement.rotation *= al_walk_param_->turn_ccw_odometry_factor_;
-  else
-    odometry_->displacement.rotation *= al_walk_param_->turn_cw_odometry_factor_;
-*/
-}
