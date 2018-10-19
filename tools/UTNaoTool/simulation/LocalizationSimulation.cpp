@@ -307,8 +307,8 @@ int LocalizationSimulation::defaultPlayer() {
 }
 
 vector<string> LocalizationSimulation::getTextDebug(int player) {
-  if(agents_.find((LocSimAgent::Type)player) == agents_.end()) return vector<string>();
-  auto agent = agents_[(LocSimAgent::Type)player];
+  if(agents_.find(LocSimAgent::Type::Default) == agents_.end()) return vector<string>();
+  auto agent = agents_[LocSimAgent::Type::Default];
   if(!agent.core) return vector<string>();
   return agent.core->textlog_->textEntries();
 }
